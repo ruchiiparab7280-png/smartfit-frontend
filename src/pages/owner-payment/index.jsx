@@ -1,56 +1,60 @@
-import React from "react";
-import { useNavigate } from "react-router-dom";
-import Button from "../../components/ui/Button";
-import Icon from "../../components/AppIcon";
+const handlePayment = async () => {
 
-const OwnerPayment = () => {
+  try {
 
-  const navigate = useNavigate();
+    // 1️⃣ Create Order from backend
+    const res = await fetch("https://smartfit-backend-q4l6.onrender.com/payment/create-order", {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json"
+      }
+    });
 
-  const handlePayment = () => {
+    const order = await res.json();
 
-    // For now demo payment success
-    localStorage.setItem("paymentStatus","paid");
+    // 2️⃣ Razorpay options
+    const options = {
+      key: "rzp_live_SLbPVWPsf30b5O",
+      amount: order.amount,
+      currency: order.currency,
+      name: "SmartFit",
+      description: "Gym Partnership",
+      order_id: order.id,
 
-    navigate("/owner-dashboard");
-  };
+      handler: async function (response) {
 
- 
+        // 3️⃣ Verify Payment
+        const verifyRes = await fetch("https://smartfit-backend-q4l6.onrender.com/payment/verify", {
+          method: "POST",
+          headers: {
+            "Content-Type": "application/json"
+          },
+          body: JSON.stringify(response)
+        });
 
+        const verifyData = await verifyRes.json();
 
-  return (
-    <div className="min-h-screen flex items-center justify-center bg-background">
+        if (verifyData.status === "success") {
 
-      <div className="bg-card p-10 rounded-lg shadow-md text-center max-w-md">
+          localStorage.setItem("paymentStatus", "paid");
+          navigate("/owner-dashboard");
 
-        <Icon name="CreditCard" size={60} className="mx-auto text-primary mb-6" />
+        } else {
+          alert("Payment verification failed");
+        }
+      },
 
-        <h2 className="text-2xl font-bold mb-4">
-          Complete Your Partnership Payment
-        </h2>
+      theme: {
+        color: "#ff7a00"
+      }
+    };
 
-        <p className="text-muted-foreground mb-6">
-          To activate your gym listing and access the Owner Dashboard,
-          please complete the one-time partnership payment.
-        </p>
+    // 4️⃣ Open Razorpay popup
+    const rzp = new window.Razorpay(options);
+    rzp.open();
 
-        <div className="mb-6">
-          <p className="text-lg font-semibold">
-            SmartFit Partnership Fee
-          </p>
-          <p className="text-4xl font-bold text-primary">
-            ₹4,999
-          </p>
-          <p className="text-sm text-muted-foreground">
-            One-time activation
-          </p>
-        </div>
-
-       <Button onClick={handlePayment}>Pay Now</Button>
-
-      </div>
-    </div>
-  );
+  } catch (err) {
+    console.error(err);
+    alert("Payment failed to start");
+  }
 };
-
-export default OwnerPayment;

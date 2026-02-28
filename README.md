@@ -107,5 +107,6 @@ Designed for modern responsive web applications
 
 
 
-http://localhost:4028/admin-approval
-
+https://smartfit-frontend-taupe.vercel.app/admin-approval
+https://smartfit-backend-q4l6.onrender.com
+https://smartfit-frontend-taupe.vercel.app/
