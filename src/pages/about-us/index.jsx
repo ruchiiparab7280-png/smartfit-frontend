@@ -2,7 +2,7 @@ import React, { useEffect } from 'react';
 import MainNavigation from '../../components/MainNavigation';
 import HeroSection from './components/HeroSection';
 import WhoWeAreSection from './components/WhoWeAreSection';
-import MissionVisionSection from './components/MissionVisionSection';
+import MissionVisionSection from './components/MissionVisionSection.jsx';
 import WhyChooseUsSection from './components/WhyChooseUsSection';
 import ServiceSection from './components/ServiceSection';
 
