@@ -44,16 +44,17 @@ const OwnerPayment = () => {
 
      const result = await orderRes.json();
 
-if (!result.success) {
+const data = await orderRes.json();
+
+if (!data.id) {
   alert("Order creation failed");
   return;
 }
 
-const data = result.order;
 
       // Step 3: Razorpay popup options
       const options = {
-        key: "rzp_test_SLuWOZ9GWH4GTe",
+        key: data.key,
         amount: data.amount,
         currency: data.currency,
         name: "SmartFit",
