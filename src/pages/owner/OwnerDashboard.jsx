@@ -1,6 +1,7 @@
 import React, { useEffect, useState } from "react";
 import MainNavigation from "../../components/MainNavigation";
 import { useNavigate } from "react-router-dom";
+import { Users, Package, ClipboardList, CalendarCheck } from "lucide-react";
 
 const OwnerDashboard = () => {
 
@@ -11,11 +12,11 @@ const OwnerDashboard = () => {
   const [trials, setTrials] = useState([]);
   const [trainerBookings, setTrainerBookings] = useState([]);
 
-  // 🔐 PAYMENT GUARD
+  // 🔐 PAYMENT PROTECTION
   useEffect(() => {
-    const status = localStorage.getItem("paymentStatus");
+    const paymentStatus = localStorage.getItem("paymentStatus");
 
-    if (!status || status !== "paid") {
+    if (paymentStatus !== "paid") {
       navigate("/owner-payment");
     }
   }, []);
@@ -29,53 +30,57 @@ const OwnerDashboard = () => {
   }, []);
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-black via-gray-900 to-black text-white">
+    <div className="min-h-screen bg-background">
       <MainNavigation />
 
       <div className="flex pt-20">
 
         {/* SIDEBAR */}
-        <div className="w-72 min-h-screen bg-black/70 border-r border-orange-500/20 p-6 backdrop-blur-xl shadow-lg">
+        <div className="w-72 min-h-screen bg-gradient-to-b from-black to-gray-900 p-6 border-r border-white/10">
 
-          <h2 className="text-3xl font-bold mb-8 text-orange-400">
+          <h2 className="text-3xl font-bold text-orange-400 mb-8">
             Owner Panel
           </h2>
 
-          <div className="space-y-3">
+          <div className="space-y-4">
 
             <button
               onClick={() => navigate("/trainers")}
-              className="w-full text-left p-3 rounded-lg bg-white/5 hover:bg-orange-500 hover:text-white transition"
+              className="w-full flex items-center gap-3 p-3 rounded-lg bg-white/5 hover:bg-orange-500 transition"
             >
-              🧑‍🏫 Manage Trainers
+              <Users size={20} />
+              Manage Trainers
             </button>
 
             <button
               onClick={() => navigate("/supplements")}
-              className="w-full text-left p-3 rounded-lg bg-white/5 hover:bg-orange-500 hover:text-white transition"
+              className="w-full flex items-center gap-3 p-3 rounded-lg bg-white/5 hover:bg-orange-500 transition"
             >
-              🥤 Manage Supplements
+              <Package size={20} />
+              Manage Supplements
             </button>
 
             <button
               onClick={() => navigate("/trials")}
-              className="w-full text-left p-3 rounded-lg bg-white/5 hover:bg-orange-500 hover:text-white transition"
+              className="w-full flex items-center gap-3 p-3 rounded-lg bg-white/5 hover:bg-orange-500 transition"
             >
-              🎟 Trial Requests
+              <ClipboardList size={20} />
+              Trial Requests
             </button>
 
             <button
               onClick={() => navigate("/trainer-requests")}
-              className="w-full text-left p-3 rounded-lg bg-white/5 hover:bg-orange-500 hover:text-white transition"
+              className="w-full flex items-center gap-3 p-3 rounded-lg bg-white/5 hover:bg-orange-500 transition"
             >
-              📅 Trainer Bookings
+              <CalendarCheck size={20} />
+              Trainer Bookings
             </button>
 
           </div>
 
           <button
             onClick={() => navigate("/")}
-            className="mt-10 w-full bg-orange-500/20 p-2 rounded hover:bg-orange-500 transition"
+            className="mt-10 w-full bg-orange-500 p-3 rounded-lg hover:opacity-80"
           >
             ← Back to Home
           </button>
@@ -85,39 +90,42 @@ const OwnerDashboard = () => {
         {/* CONTENT */}
         <div className="flex-1 p-10">
 
-          <h1 className="text-4xl font-bold mb-10 text-orange-400">
-            Gym Overview
-          </h1>
+          {/* HEADER */}
+          <div className="mb-10">
+            <h1 className="text-5xl font-bold text-orange-400 mb-2">
+              Gym Overview
+            </h1>
+            <p className="text-gray-400">
+              Monitor your gym activity in real-time
+            </p>
+          </div>
 
+          {/* CARDS */}
           <div className="grid md:grid-cols-2 lg:grid-cols-4 gap-8">
 
-            <div className="bg-white/5 p-6 rounded-xl border border-orange-500/20 shadow-lg hover:scale-105 transition">
-              <p className="text-gray-400">Total Trainers</p>
-              <h2 className="text-4xl font-bold text-orange-400">
-                {trainers.length}
-              </h2>
-            </div>
+            <DashboardCard
+              title="Total Trainers"
+              value={trainers.length}
+              icon={<Users />}
+            />
 
-            <div className="bg-white/5 p-6 rounded-xl border border-orange-500/20 shadow-lg hover:scale-105 transition">
-              <p className="text-gray-400">Total Supplements</p>
-              <h2 className="text-4xl font-bold text-orange-400">
-                {proteins.length}
-              </h2>
-            </div>
+            <DashboardCard
+              title="Total Supplements"
+              value={proteins.length}
+              icon={<Package />}
+            />
 
-            <div className="bg-white/5 p-6 rounded-xl border border-orange-500/20 shadow-lg hover:scale-105 transition">
-              <p className="text-gray-400">Trial Requests</p>
-              <h2 className="text-4xl font-bold text-orange-400">
-                {trials.length}
-              </h2>
-            </div>
+            <DashboardCard
+              title="Trial Requests"
+              value={trials.length}
+              icon={<ClipboardList />}
+            />
 
-            <div className="bg-white/5 p-6 rounded-xl border border-orange-500/20 shadow-lg hover:scale-105 transition">
-              <p className="text-gray-400">Trainer Bookings</p>
-              <h2 className="text-4xl font-bold text-orange-400">
-                {trainerBookings.length}
-              </h2>
-            </div>
+            <DashboardCard
+              title="Trainer Bookings"
+              value={trainerBookings.length}
+              icon={<CalendarCheck />}
+            />
 
           </div>
 
