@@ -54,7 +54,7 @@ if (!data.id) {
 
       // Step 3: Razorpay popup options
       const options = {
-        key: data.key,
+       key: result.key,
         amount: data.amount,
         currency: data.currency,
         name: "SmartFit",
