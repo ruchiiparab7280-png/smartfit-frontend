@@ -11,13 +11,13 @@ const OwnerDashboard = () => {
   const [trainerRequests, setTrainerRequests] = useState([]);
 
   // 🔐 Payment Guard
-  useEffect(() => {
-    const payment = localStorage.getItem("paymentStatus");
+useEffect(() => {
+  const status = localStorage.getItem("paymentStatus");
 
-    if (payment !== "paid") {
-      navigate("/owner-plan");
-    }
-  }, [navigate]);
+  if (status !== "paid") {
+    navigate("/owner-plan");
+  }
+}, []);
 
   // 📦 Load stored requests safely
   useEffect(() => {

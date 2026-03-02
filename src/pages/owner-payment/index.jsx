@@ -7,7 +7,6 @@ const OwnerPayment = () => {
 
   const navigate = useNavigate();
 
-  // Razorpay Script Loader
   const loadScript = (src) => {
     return new Promise((resolve) => {
       const script = document.createElement("script");
@@ -20,54 +19,58 @@ const OwnerPayment = () => {
 
   const handlePayment = async () => {
 
-    // Step 1: Load Razorpay SDK
-    const res = await loadScript("https://checkout.razorpay.com/v1/checkout.js");
+    const loaded = await loadScript("https://checkout.razorpay.com/v1/checkout.js");
 
-    if (!res) {
+    if (!loaded) {
       alert("Razorpay SDK failed to load");
       return;
     }
 
     try {
 
-      // Step 2: Create order from backend
       const orderRes = await fetch(
         "https://smartfit-backend-q4l6.onrender.com/payment/create-order",
         {
           method: "POST",
-          headers: {
-            "Content-Type": "application/json",
-          },
+          headers: { "Content-Type": "application/json" },
           body: JSON.stringify({ amount: 4999 }),
         }
       );
 
-     const result = await orderRes.json();
+      const orderData = await orderRes.json();
 
-const data = await orderRes.json();
+      if (!orderData.id) {
+        alert("Order failed");
+        return;
+      }
 
-if (!data.id) {
-  alert("Order creation failed");
-  return;
-}
-
-
-      // Step 3: Razorpay popup options
       const options = {
-       key: result.key,
-        amount: data.amount,
-        currency: data.currency,
+        key: orderData.key,
+        amount: orderData.amount,
+        currency: orderData.currency,
         name: "SmartFit",
         description: "Gym Partnership Fee",
-        order_id: data.id,
+        order_id: orderData.id,
 
-        handler: function (response) {
+        handler: async function (response) {
 
-          console.log("Payment Success:", response);
+          const verifyRes = await fetch(
+            "https://smartfit-backend-q4l6.onrender.com/payment/verify",
+            {
+              method: "POST",
+              headers: { "Content-Type": "application/json" },
+              body: JSON.stringify(response),
+            }
+          );
 
-          localStorage.setItem("paymentStatus", "paid");
+          const verifyData = await verifyRes.json();
 
-          navigate("/owner-dashboard");
+          if (verifyData.success) {
+            localStorage.setItem("paymentStatus", "paid");
+            navigate("/owner-dashboard");
+          } else {
+            alert("Payment verification failed");
+          }
         },
 
         prefill: {
@@ -76,26 +79,21 @@ if (!data.id) {
           contact: "9999999999",
         },
 
-        theme: {
-          color: "#6366f1",
-        },
+        theme: { color: "#6366f1" },
       };
 
-      // Step 4: Open Razorpay Popup
       const paymentObject = new window.Razorpay(options);
       paymentObject.open();
 
     } catch (error) {
       console.error("Payment Error:", error);
-      alert("Something went wrong!");
+      alert("Payment failed");
     }
   };
 
   return (
     <div className="min-h-screen flex items-center justify-center bg-background">
-
       <div className="bg-card p-10 rounded-lg shadow-md text-center max-w-md">
-
         <Icon name="CreditCard" size={60} className="mx-auto text-primary mb-6" />
 
         <h2 className="text-2xl font-bold mb-4">
@@ -103,26 +101,17 @@ if (!data.id) {
         </h2>
 
         <p className="text-muted-foreground mb-6">
-          To activate your gym listing and access the Owner Dashboard,
-          please complete the one-time partnership payment.
+          Activate your gym listing with one-time payment.
         </p>
 
         <div className="mb-6">
-          <p className="text-lg font-semibold">
-            SmartFit Partnership Fee
-          </p>
-          <p className="text-4xl font-bold text-primary">
-            ₹4,999
-          </p>
-          <p className="text-sm text-muted-foreground">
-            One-time activation
-          </p>
+          <p className="text-lg font-semibold">SmartFit Partnership Fee</p>
+          <p className="text-4xl font-bold text-primary">₹4,999</p>
         </div>
 
         <Button onClick={handlePayment}>
           Pay Now
         </Button>
-
       </div>
     </div>
   );
