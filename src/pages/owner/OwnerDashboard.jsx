@@ -1,41 +1,47 @@
-import React, { useEffect} from "react";
+import React, { useEffect, useState } from "react";
 import MainNavigation from "../../components/MainNavigation";
 import Icon from "../../components/AppIcon";
 import { useNavigate } from "react-router-dom";
 
-
-
 const OwnerDashboard = () => {
 
-  const paymentStatus = localStorage.getItem("paymentStatus");
+  const navigate = useNavigate();
 
-useEffect(() => {
-  const paymentStatus = localStorage.getItem("paymentStatus");
+  const [trialRequests, setTrialRequests] = useState([]);
+  const [trainerRequests, setTrainerRequests] = useState([]);
 
-  if (paymentStatus !== "paid") {
-    navigate("/payment-page");
-  }
-}, []);
+  // 🔐 Payment Guard
+  useEffect(() => {
+    const payment = localStorage.getItem("paymentStatus");
 
-const navigate = useNavigate();
+    if (payment !== "paid") {
+      navigate("/owner-plan");
+    }
+  }, [navigate]);
 
-useEffect(() => {
-  const payment = localStorage.getItem("paymentStatus");
+  // 📦 Load stored requests safely
+  useEffect(() => {
+    const trials = JSON.parse(localStorage.getItem("trialRequests")) || [];
+    const trainers = JSON.parse(localStorage.getItem("trainerRequests")) || [];
 
-  if (payment !== "paid") {
-    navigate("/owner-plan");
-  }
-}, []);
+    setTrialRequests(trials);
+    setTrainerRequests(trainers);
+  }, []);
+
   const approveTrial = (req) => {
-    const updated = { ...req, status: "approved" };
-    localStorage.setItem("trialRequest", JSON.stringify(updated));
-    window.location.reload();
+    const updated = trialRequests.map((t) =>
+      t.user === req.user ? { ...t, status: "approved" } : t
+    );
+    setTrialRequests(updated);
+    localStorage.setItem("trialRequests", JSON.stringify(updated));
   };
 
   const approveTrainer = (req) => {
-    const updated = { ...req, status: "approved" };
-    localStorage.setItem("trainerRequest", JSON.stringify(updated));
-    window.location.reload();
+    const updated = trainerRequests.map((t) =>
+      t.user === req.user ? { ...t, status: "approved" } : t
+    );
+    setTrainerRequests(updated);
+    localStorage.setItem("trainerRequests", JSON.stringify(updated));
   };
 
   return (
@@ -44,6 +50,7 @@ useEffect(() => {
 
       <div className="container-custom py-8">
 
+        {/* HEADER */}
         <div className="mb-8">
           <div className="flex items-center gap-3">
             <Icon name="ShieldCheck" size={32} color="var(--color-primary)" />
@@ -79,14 +86,18 @@ useEffect(() => {
         {/* CONTROL PANEL */}
         <div className="grid grid-cols-1 md:grid-cols-2 gap-6 mb-8">
 
-          <div className="bg-card p-6 rounded-lg cursor-pointer"
-            onClick={() => navigate("/supplements")}>
+          <div
+            className="bg-card p-6 rounded-lg cursor-pointer"
+            onClick={() => navigate("/supplements")}
+          >
             <h3 className="text-xl font-bold mb-2">Manage Supplements</h3>
             <p>Add protein, change price, upload photo</p>
           </div>
 
-          <div className="bg-card p-6 rounded-lg cursor-pointer"
-            onClick={() => navigate("/trainers")}>
+          <div
+            className="bg-card p-6 rounded-lg cursor-pointer"
+            onClick={() => navigate("/trainers")}
+          >
             <h3 className="text-xl font-bold mb-2">Manage Trainers</h3>
             <p>Add trainer, price & photo</p>
           </div>
@@ -97,38 +108,46 @@ useEffect(() => {
         <div className="bg-card p-6 rounded-lg mb-6">
           <h2 className="text-2xl font-bold mb-4">Free Trial Requests</h2>
 
-          {trialRequests.map((req, i) => (
-            <div key={i} className="border p-4 mb-3 rounded">
-              <p>User: {req.user}</p>
-              <p>Status: {req.status}</p>
+          {trialRequests.length === 0 ? (
+            <p>No requests yet</p>
+          ) : (
+            trialRequests.map((req, i) => (
+              <div key={i} className="border p-4 mb-3 rounded">
+                <p>User: {req.user}</p>
+                <p>Status: {req.status}</p>
 
-              <button
-                onClick={() => approveTrial(req)}
-                className="bg-green-500 px-4 py-2 rounded text-white mt-2"
-              >
-                Approve
-              </button>
-            </div>
-          ))}
+                <button
+                  onClick={() => approveTrial(req)}
+                  className="bg-green-500 px-4 py-2 rounded text-white mt-2"
+                >
+                  Approve
+                </button>
+              </div>
+            ))
+          )}
         </div>
 
         {/* TRAINER REQUESTS */}
         <div className="bg-card p-6 rounded-lg">
           <h2 className="text-2xl font-bold mb-4">Trainer Booking Requests</h2>
 
-          {trainerRequests.map((req, i) => (
-            <div key={i} className="border p-4 mb-3 rounded">
-              <p>User: {req.user}</p>
-              <p>Status: {req.status}</p>
+          {trainerRequests.length === 0 ? (
+            <p>No requests yet</p>
+          ) : (
+            trainerRequests.map((req, i) => (
+              <div key={i} className="border p-4 mb-3 rounded">
+                <p>User: {req.user}</p>
+                <p>Status: {req.status}</p>
 
-              <button
-                onClick={() => approveTrainer(req)}
-                className="bg-green-500 px-4 py-2 rounded text-white mt-2"
-              >
-                Approve
-              </button>
-            </div>
-          ))}
+                <button
+                  onClick={() => approveTrainer(req)}
+                  className="bg-green-500 px-4 py-2 rounded text-white mt-2"
+                >
+                  Approve
+                </button>
+              </div>
+            ))
+          )}
         </div>
 
       </div>
