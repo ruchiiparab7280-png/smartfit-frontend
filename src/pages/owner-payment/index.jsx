@@ -28,6 +28,7 @@ const OwnerPayment = () => {
 
     try {
 
+      // 🔹 Step 1: Create order
       const orderRes = await fetch(
         "https://smartfit-backend-q4l6.onrender.com/payment/create-order",
         {
@@ -44,8 +45,9 @@ const OwnerPayment = () => {
         return;
       }
 
+      // 🔹 Step 2: Razorpay Options
       const options = {
-        key: orderData.key,
+        key: orderData.key,      // ✅ FIXED
         amount: orderData.amount,
         currency: orderData.currency,
         name: "SmartFit",
@@ -54,6 +56,7 @@ const OwnerPayment = () => {
 
         handler: async function (response) {
 
+          // 🔹 Step 3: Verify payment
           const verifyRes = await fetch(
             "https://smartfit-backend-q4l6.onrender.com/payment/verify",
             {
@@ -69,7 +72,7 @@ const OwnerPayment = () => {
             localStorage.setItem("paymentStatus", "paid");
             navigate("/owner-dashboard");
           } else {
-            alert("Payment verification failed");
+            alert("Payment verification failed ❌");
           }
         },
 
@@ -79,9 +82,12 @@ const OwnerPayment = () => {
           contact: "9999999999",
         },
 
-        theme: { color: "#6366f1" },
+        theme: {
+          color: "#6366f1",
+        },
       };
 
+      // 🔹 Step 4: Open popup
       const paymentObject = new window.Razorpay(options);
       paymentObject.open();
 
@@ -94,6 +100,7 @@ const OwnerPayment = () => {
   return (
     <div className="min-h-screen flex items-center justify-center bg-background">
       <div className="bg-card p-10 rounded-lg shadow-md text-center max-w-md">
+
         <Icon name="CreditCard" size={60} className="mx-auto text-primary mb-6" />
 
         <h2 className="text-2xl font-bold mb-4">
@@ -112,6 +119,7 @@ const OwnerPayment = () => {
         <Button onClick={handlePayment}>
           Pay Now
         </Button>
+
       </div>
     </div>
   );
