@@ -18,7 +18,9 @@ const OwnerPayment = () => {
   };
 
   const handlePayment = async () => {
-
+      // 🔥 Wake backend first
+       await fetch("https://smartfit-backend-q4l6.onrender.com/");
+        await new Promise(res => setTimeout(res, 4000));
     const loaded = await loadScript("https://checkout.razorpay.com/v1/checkout.js");
 
     if (!loaded) {
