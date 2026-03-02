@@ -46,46 +46,45 @@ const OwnerPayment = () => {
       }
 
       // 🔹 Step 2: Razorpay Options
-      const options = {
-        key: orderData.key,      // ✅ FIXED
-        amount: orderData.amount,
-        currency: orderData.currency,
-        name: "SmartFit",
-        description: "Gym Partnership Fee",
-        order_id: orderData.id,
+     const options = {
+  key: orderData.key,
+  amount: orderData.amount,
+  currency: orderData.currency,
+  name: "SmartFit",
+  description: "Gym Partnership Fee",
+  order_id: orderData.id,
 
-        handler: async function (response) {
+  handler: async function (response) {
 
-          // 🔹 Step 3: Verify payment
-          const verifyRes = await fetch(
-            "https://smartfit-backend-q4l6.onrender.com/payment/verify",
-            {
-              method: "POST",
-              headers: { "Content-Type": "application/json" },
-              body: JSON.stringify(response),
-            }
-          );
+    const verifyRes = await fetch(
+      "https://smartfit-backend-q4l6.onrender.com/payment/verify",
+      {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify(response),
+      }
+    );
 
-          const verifyData = await verifyRes.json();
+    const verifyData = await verifyRes.json();
 
-          if (verifyData.success) {
-            localStorage.setItem("paymentStatus", "paid");
-            navigate("/owner-dashboard");
-          } else {
-            alert("Payment verification failed ❌");
-          }
-        },
+    if (verifyData.success) {
+      localStorage.setItem("paymentStatus", "paid");
+      navigate("/owner-dashboard");
+    } else {
+      alert("Payment verification failed ❌");
+    }
+  },
 
-        prefill: {
-          name: "Gym Owner",
-          email: "owner@test.com",
-          contact: "9999999999",
-        },
+  prefill: {
+    name: "Gym Owner",
+    email: "owner@test.com",
+    contact: "9999999999",
+  },
 
-        theme: {
-          color: "#6366f1",
-        },
-      };
+  theme: {
+    color: "#6366f1",
+  },
+};
 
       // 🔹 Step 4: Open popup
       const paymentObject = new window.Razorpay(options);
