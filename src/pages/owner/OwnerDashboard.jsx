@@ -1,153 +1,126 @@
 import React, { useEffect, useState } from "react";
 import MainNavigation from "../../components/MainNavigation";
-import Icon from "../../components/AppIcon";
 import { useNavigate } from "react-router-dom";
 
 const OwnerDashboard = () => {
 
   const navigate = useNavigate();
 
-  const [trialRequests, setTrialRequests] = useState([]);
-  const [trainerRequests, setTrainerRequests] = useState([]);
+  const [trainers, setTrainers] = useState([]);
+  const [proteins, setProteins] = useState([]);
+  const [trials, setTrials] = useState([]);
+  const [trainerBookings, setTrainerBookings] = useState([]);
 
-  // 🔐 Payment Guard
-useEffect(() => {
-  const status = localStorage.getItem("paymentStatus");
-
-  if (status !== "paid") {
-    navigate("/owner-plan");
-  }
-}, []);
-
-  // 📦 Load stored requests safely
+  // 🔐 PAYMENT GUARD
   useEffect(() => {
-    const trials = JSON.parse(localStorage.getItem("trialRequests")) || [];
-    const trainers = JSON.parse(localStorage.getItem("trainerRequests")) || [];
+    const status = localStorage.getItem("paymentStatus");
 
-    setTrialRequests(trials);
-    setTrainerRequests(trainers);
+    if (!status || status !== "paid") {
+      navigate("/owner-payment");
+    }
   }, []);
 
-  const approveTrial = (req) => {
-    const updated = trialRequests.map((t) =>
-      t.user === req.user ? { ...t, status: "approved" } : t
-    );
-    setTrialRequests(updated);
-    localStorage.setItem("trialRequests", JSON.stringify(updated));
-  };
-
-  const approveTrainer = (req) => {
-    const updated = trainerRequests.map((t) =>
-      t.user === req.user ? { ...t, status: "approved" } : t
-    );
-    setTrainerRequests(updated);
-    localStorage.setItem("trainerRequests", JSON.stringify(updated));
-  };
+  // 📊 LOAD DATA
+  useEffect(() => {
+    setTrainers(JSON.parse(localStorage.getItem("gymTrainers")) || []);
+    setProteins(JSON.parse(localStorage.getItem("gymProteins")) || []);
+    setTrials(JSON.parse(localStorage.getItem("trialRequests")) || []);
+    setTrainerBookings(JSON.parse(localStorage.getItem("trainerRequests")) || []);
+  }, []);
 
   return (
-    <div className="min-h-screen bg-background">
+    <div className="min-h-screen bg-gradient-to-br from-black via-gray-900 to-black text-white">
       <MainNavigation />
 
-      <div className="container-custom py-8">
+      <div className="flex pt-20">
 
-        {/* HEADER */}
-        <div className="mb-8">
-          <div className="flex items-center gap-3">
-            <Icon name="ShieldCheck" size={32} color="var(--color-primary)" />
-            <h1 className="text-4xl font-bold text-foreground">
-              Owner Dashboard
-            </h1>
+        {/* SIDEBAR */}
+        <div className="w-72 min-h-screen bg-black/70 border-r border-orange-500/20 p-6 backdrop-blur-xl shadow-lg">
+
+          <h2 className="text-3xl font-bold mb-8 text-orange-400">
+            Owner Panel
+          </h2>
+
+          <div className="space-y-3">
+
+            <button
+              onClick={() => navigate("/trainers")}
+              className="w-full text-left p-3 rounded-lg bg-white/5 hover:bg-orange-500 hover:text-white transition"
+            >
+              🧑‍🏫 Manage Trainers
+            </button>
+
+            <button
+              onClick={() => navigate("/supplements")}
+              className="w-full text-left p-3 rounded-lg bg-white/5 hover:bg-orange-500 hover:text-white transition"
+            >
+              🥤 Manage Supplements
+            </button>
+
+            <button
+              onClick={() => navigate("/trials")}
+              className="w-full text-left p-3 rounded-lg bg-white/5 hover:bg-orange-500 hover:text-white transition"
+            >
+              🎟 Trial Requests
+            </button>
+
+            <button
+              onClick={() => navigate("/trainer-requests")}
+              className="w-full text-left p-3 rounded-lg bg-white/5 hover:bg-orange-500 hover:text-white transition"
+            >
+              📅 Trainer Bookings
+            </button>
+
           </div>
-          <p className="text-muted-foreground">
-            Manage your gym, trainers and requests
-          </p>
-        </div>
 
-        {/* STATS */}
-        <div className="grid grid-cols-1 md:grid-cols-3 gap-6 mb-6">
-
-          <div className="bg-card p-6 rounded-lg">
-            <h3 className="text-lg font-bold">Trial Requests</h3>
-            <p className="text-3xl">{trialRequests.length}</p>
-          </div>
-
-          <div className="bg-card p-6 rounded-lg">
-            <h3 className="text-lg font-bold">Trainer Requests</h3>
-            <p className="text-3xl">{trainerRequests.length}</p>
-          </div>
-
-          <div className="bg-card p-6 rounded-lg">
-            <h3 className="text-lg font-bold">Gym Controls</h3>
-            <p className="text-sm">Manage Trainers & Supplements</p>
-          </div>
-
-        </div>
-
-        {/* CONTROL PANEL */}
-        <div className="grid grid-cols-1 md:grid-cols-2 gap-6 mb-8">
-
-          <div
-            className="bg-card p-6 rounded-lg cursor-pointer"
-            onClick={() => navigate("/supplements")}
+          <button
+            onClick={() => navigate("/")}
+            className="mt-10 w-full bg-orange-500/20 p-2 rounded hover:bg-orange-500 transition"
           >
-            <h3 className="text-xl font-bold mb-2">Manage Supplements</h3>
-            <p>Add protein, change price, upload photo</p>
-          </div>
-
-          <div
-            className="bg-card p-6 rounded-lg cursor-pointer"
-            onClick={() => navigate("/trainers")}
-          >
-            <h3 className="text-xl font-bold mb-2">Manage Trainers</h3>
-            <p>Add trainer, price & photo</p>
-          </div>
+            ← Back to Home
+          </button>
 
         </div>
 
-        {/* FREE TRIAL REQUESTS */}
-        <div className="bg-card p-6 rounded-lg mb-6">
-          <h2 className="text-2xl font-bold mb-4">Free Trial Requests</h2>
+        {/* CONTENT */}
+        <div className="flex-1 p-10">
 
-          {trialRequests.length === 0 ? (
-            <p>No requests yet</p>
-          ) : (
-            trialRequests.map((req, i) => (
-              <div key={i} className="border p-4 mb-3 rounded">
-                <p>User: {req.user}</p>
-                <p>Status: {req.status}</p>
+          <h1 className="text-4xl font-bold mb-10 text-orange-400">
+            Gym Overview
+          </h1>
 
-                <button
-                  onClick={() => approveTrial(req)}
-                  className="bg-green-500 px-4 py-2 rounded text-white mt-2"
-                >
-                  Approve
-                </button>
-              </div>
-            ))
-          )}
-        </div>
+          <div className="grid md:grid-cols-2 lg:grid-cols-4 gap-8">
 
-        {/* TRAINER REQUESTS */}
-        <div className="bg-card p-6 rounded-lg">
-          <h2 className="text-2xl font-bold mb-4">Trainer Booking Requests</h2>
+            <div className="bg-white/5 p-6 rounded-xl border border-orange-500/20 shadow-lg hover:scale-105 transition">
+              <p className="text-gray-400">Total Trainers</p>
+              <h2 className="text-4xl font-bold text-orange-400">
+                {trainers.length}
+              </h2>
+            </div>
 
-          {trainerRequests.length === 0 ? (
-            <p>No requests yet</p>
-          ) : (
-            trainerRequests.map((req, i) => (
-              <div key={i} className="border p-4 mb-3 rounded">
-                <p>User: {req.user}</p>
-                <p>Status: {req.status}</p>
+            <div className="bg-white/5 p-6 rounded-xl border border-orange-500/20 shadow-lg hover:scale-105 transition">
+              <p className="text-gray-400">Total Supplements</p>
+              <h2 className="text-4xl font-bold text-orange-400">
+                {proteins.length}
+              </h2>
+            </div>
 
-                <button
-                  onClick={() => approveTrainer(req)}
-                  className="bg-green-500 px-4 py-2 rounded text-white mt-2"
-                >
-                  Approve
-                </button>
-              </div>
-            ))
-          )}
+            <div className="bg-white/5 p-6 rounded-xl border border-orange-500/20 shadow-lg hover:scale-105 transition">
+              <p className="text-gray-400">Trial Requests</p>
+              <h2 className="text-4xl font-bold text-orange-400">
+                {trials.length}
+              </h2>
+            </div>
+
+            <div className="bg-white/5 p-6 rounded-xl border border-orange-500/20 shadow-lg hover:scale-105 transition">
+              <p className="text-gray-400">Trainer Bookings</p>
+              <h2 className="text-4xl font-bold text-orange-400">
+                {trainerBookings.length}
+              </h2>
+            </div>
+
+          </div>
+
         </div>
 
       </div>
