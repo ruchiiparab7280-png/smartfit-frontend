@@ -1,119 +1,160 @@
-import React,{useState,useEffect} from "react";
+import React, { useState, useEffect } from "react";
 import MainNavigation from "../../components/MainNavigation";
 
 const SupplementControl = () => {
 
-const [protein,setProtein] = useState({
-name:"",
-price:"",
-image:""
-});
+  const [protein, setProtein] = useState({
+    name: "",
+    price: "",
+    imagePreview: ""
+  });
 
-const [proteins,setProteins] = useState([]);
+  const [proteins, setProteins] = useState([]);
 
-useEffect(()=>{
-const saved = JSON.parse(localStorage.getItem("gymProteins")) || [];
-setProteins(saved);
-},[]);
+  useEffect(() => {
+    const saved = JSON.parse(localStorage.getItem("gymProteins")) || [];
+    setProteins(saved);
+  }, []);
 
-const handleSave = () => {
+  const handleSave = () => {
 
-const newProtein = {
-id:Date.now(),
-...protein
-};
+    if (!protein.name || !protein.price) {
+      alert("Enter all details");
+      return;
+    }
 
-const updated = [...proteins,newProtein];
+    const newProtein = {
+      id: Date.now(),
+      name: protein.name,
+      price: protein.price
+      // ❌ image save nahi kar rahe
+    };
 
-localStorage.setItem("gymProteins",JSON.stringify(updated));
+    const updated = [...proteins, newProtein];
 
-setProteins(updated);
+    localStorage.setItem("gymProteins", JSON.stringify(updated));
+    setProteins(updated);
 
-setProtein({
-name:"",
-price:"",
-image:""
-});
+    setProtein({
+      name: "",
+      price: "",
+      imagePreview: ""
+    });
 
-};
+  };
 
-const removeProtein = (id) => {
+  const removeProtein = (id) => {
 
-const updated = proteins.filter(p=>p.id !== id);
+    const updated = proteins.filter(p => p.id !== id);
+    localStorage.setItem("gymProteins", JSON.stringify(updated));
+    setProteins(updated);
 
-localStorage.setItem("gymProteins",JSON.stringify(updated));
+  };
 
-setProteins(updated);
+  return (
+    <div className="min-h-screen bg-background">
+      <MainNavigation />
 
-};
+      <div className="container-custom pt-24 pb-8">
 
-return(
+        <div className="mb-10 bg-gradient-to-r from-orange-500 to-red-500 p-8 rounded-xl text-white shadow-lg">
+          <h1 className="text-4xl font-bold mb-2">
+            Supplement Management
+          </h1>
+        </div>
 
-<div className="min-h-screen bg-background">
+        <div className="grid md:grid-cols-2 gap-8">
 
-<MainNavigation/>
+          <div className="bg-white/10 p-8 rounded-xl">
 
-<div className="container-custom pt-24 pb-8">
+            <h2 className="text-2xl font-bold mb-6">
+              Add Supplement
+            </h2>
 
-<h1 className="text-4xl font-bold mb-8 text-orange-400">
-Supplement Management
-</h1>
+            <input
+              type="text"
+              value={protein.name}
+              placeholder="Protein Name"
+              onChange={(e) => setProtein({ ...protein, name: e.target.value })}
+              className="w-full p-3 mb-3 rounded"
+            />
 
-<input
-placeholder="Supplement Name"
-className="p-3 mr-3 rounded bg-black/20"
-onChange={(e)=>setProtein({...protein,name:e.target.value})}
-/>
+            <input
+              type="number"
+              value={protein.price}
+              placeholder="Price"
+              onChange={(e) => setProtein({ ...protein, price: e.target.value })}
+              className="w-full p-3 mb-3 rounded"
+            />
 
-<input
-placeholder="Price"
-className="p-3 mr-3 rounded bg-black/20"
-onChange={(e)=>setProtein({...protein,price:e.target.value})}
-/>
+            <input
+              type="file"
+              onChange={(e) => {
+                const file = e.target.files[0];
+                if (!file) return;
 
-<button
-onClick={handleSave}
-className="bg-orange-500 px-6 py-2 rounded"
->
-Add Supplement
-</button>
+                const reader = new FileReader();
+                reader.onloadend = () => {
+                  setProtein({
+                    ...protein,
+                    imagePreview: reader.result
+                  });
+                };
+                reader.readAsDataURL(file);
+              }}
+              className="w-full mb-4"
+            />
 
-<div className="mt-10">
+            {protein.imagePreview && (
+              <img
+                src={protein.imagePreview}
+                alt="preview"
+                className="w-20 h-20 mb-3 rounded object-cover"
+              />
+            )}
 
-{proteins.map(p=>(
-<div key={p.id} className="bg-white/10 p-4 mb-4 rounded flex justify-between items-center">
+            <button
+              onClick={handleSave}
+              className="bg-orange-500 px-6 py-3 rounded text-white w-full"
+            >
+              Add Supplement
+            </button>
 
-<div className="flex items-center gap-4">
+          </div>
 
-{p.image && (
-<img src={p.image} className="w-16 h-16 rounded-full object-cover"/>
-)}
+          <div className="bg-white/10 p-8 rounded-xl">
 
-<div>
-<p className="font-bold">{p.name}</p>
-<p>₹ {p.price}</p>
-</div>
+            <h2 className="text-2xl font-bold mb-6">
+              Your Supplements
+            </h2>
 
-</div>
+            {proteins.map(p => (
+              <div
+                key={p.id}
+                className="mb-4 p-4 border rounded flex justify-between"
+              >
+                <div>
+                  <p className="font-bold">{p.name}</p>
+                  <p>₹ {p.price}</p>
+                </div>
 
-<button
-onClick={()=>removeProtein(p.id)}
-className="bg-red-500 px-3 py-1 rounded text-white"
->
-Remove
-</button>
+                <button
+                  onClick={() => removeProtein(p.id)}
+                  className="bg-red-500 px-3 py-1 rounded text-white"
+                >
+                  Remove
+                </button>
 
-</div>
-))}
+              </div>
+            ))}
 
-</div>
+          </div>
 
-</div>
+        </div>
 
-</div>
-
-);
-
+      </div>
+    </div>
+  );
 };
 
 export default SupplementControl;

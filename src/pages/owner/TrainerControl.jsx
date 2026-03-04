@@ -1,119 +1,142 @@
-import React,{useState,useEffect} from "react";
+import React, { useState, useEffect } from "react";
 import MainNavigation from "../../components/MainNavigation";
 
 const TrainerControl = () => {
 
-const [trainer,setTrainer] = useState({
-name:"",
-price:"",
-image:""
-});
+  const [trainer, setTrainer] = useState({
+    name: "",
+    price: "",
+    image: ""
+  });
 
-const [trainers,setTrainers] = useState([]);
+  const [trainers, setTrainers] = useState([]);
 
-useEffect(()=>{
-const saved = JSON.parse(localStorage.getItem("gymTrainers")) || [];
-setTrainers(saved);
-},[]);
+  useEffect(() => {
+    const saved = JSON.parse(localStorage.getItem("gymTrainers")) || [];
+    setTrainers(saved);
+  }, []);
 
-const handleSave = () => {
+  const handleSave = () => {
 
-const newTrainer = {
-id:Date.now(),
-...trainer
-};
+    const newTrainer = {
+      id: Date.now(),
+      ...trainer
+    };
 
-const updated = [...trainers,newTrainer];
+    const updated = [...trainers, newTrainer];
 
-localStorage.setItem("gymTrainers",JSON.stringify(updated));
+    localStorage.setItem("gymTrainers", JSON.stringify(updated));
+    window.location.reload();
+  };
 
-setTrainers(updated);
+  const removeTrainer = (id) => {
 
-setTrainer({
-name:"",
-price:"",
-image:""
-});
+    const updated = trainers.filter(t => t.id !== id);
+    localStorage.setItem("gymTrainers", JSON.stringify(updated));
+    window.location.reload();
+  };
 
-};
+  return (
+    <div className="min-h-screen bg-background">
+      <MainNavigation />
 
-const removeTrainer = (id) => {
+      <div className="container-custom pt-24 pb-8">
 
-const updated = trainers.filter(t=>t.id !== id);
+        {/* HERO */}
+        <div className="mb-10 bg-gradient-to-r from-orange-500 to-red-500 p-8 rounded-xl text-white shadow-lg">
+          <h1 className="text-4xl font-bold mb-2">
+            Trainer Management
+          </h1>
+          <p className="text-lg opacity-90">
+            Add, update and manage your gym trainers
+          </p>
+        </div>
 
-localStorage.setItem("gymTrainers",JSON.stringify(updated));
+        <div className="grid md:grid-cols-2 gap-8">
 
-setTrainers(updated);
+          {/* ADD FORM */}
+          <div className="bg-white/10 backdrop-blur-lg p-8 rounded-xl border border-white/20">
 
-};
+            <h2 className="text-2xl font-bold mb-6">
+              Add Trainer
+            </h2>
 
-return(
+            <input
+              type="text"
+              placeholder="Trainer Name"
+              onChange={(e) => setTrainer({ ...trainer, name: e.target.value })}
+              className="w-full p-3 mb-3 rounded bg-white/10 border border-white/20"
+            />
 
-<div className="min-h-screen bg-background">
+            <input
+              type="number"
+              placeholder="Session Price"
+              onChange={(e) => setTrainer({ ...trainer, price: e.target.value })}
+              className="w-full p-3 mb-3 rounded bg-white/10 border border-white/20"
+            />
 
-<MainNavigation/>
+            <input
+              type="file"
+              onChange={(e) => {
+                const reader = new FileReader();
+                reader.onloadend = () => {
+                  setTrainer({ ...trainer, image: reader.result });
+                };
+                reader.readAsDataURL(e.target.files[0]);
+              }}
+              className="w-full mb-4"
+            />
 
-<div className="container-custom pt-24 pb-8">
+            <button
+              onClick={handleSave}
+              className="bg-gradient-to-r from-orange-500 to-red-500 px-6 py-3 rounded text-white w-full"
+            >
+              Add Trainer
+            </button>
 
-<h1 className="text-4xl font-bold mb-8 text-orange-400">
-Trainer Management
-</h1>
+          </div>
 
-<input
-placeholder="Trainer Name"
-className="p-3 mr-3 rounded bg-black/20"
-onChange={(e)=>setTrainer({...trainer,name:e.target.value})}
-/>
+          {/* TRAINER LIST */}
+          <div className="bg-white/10 backdrop-blur-lg p-8 rounded-xl border border-white/20">
 
-<input
-placeholder="Session Price"
-className="p-3 mr-3 rounded bg-black/20"
-onChange={(e)=>setTrainer({...trainer,price:e.target.value})}
-/>
+            <h2 className="text-2xl font-bold mb-6">
+              Your Trainers
+            </h2>
 
-<button
-onClick={handleSave}
-className="bg-orange-500 px-6 py-2 rounded"
->
-Add Trainer
-</button>
+            {trainers.length === 0 && (
+              <p>No Trainers Added</p>
+            )}
 
-<div className="mt-10">
+            {trainers.map(t => (
+              <div key={t.id} className="mb-6 p-4 border border-white/20 rounded">
 
-{trainers.map(t=>(
-<div key={t.id} className="bg-white/10 p-4 mb-4 rounded flex justify-between items-center">
+                {t.image && (
+                  <img
+                    src={t.image}
+                    className="w-24 h-24 rounded-full mb-2 object-cover"
+                  />
+                )}
 
-<div className="flex items-center gap-4">
+                <p className="font-bold">{t.name}</p>
+                <p>₹ {t.price} / session</p>
 
-{t.image && (
-<img src={t.image} className="w-16 h-16 rounded-full object-cover"/>
-)}
+                <button
+                  onClick={() => removeTrainer(t.id)}
+                  className="bg-red-500 px-3 py-1 mt-2 rounded text-white"
+                >
+                  Remove
+                </button>
 
-<div>
-<p className="font-bold">{t.name}</p>
-<p>₹ {t.price} / session</p>
-</div>
+              </div>
+            ))}
 
-</div>
+          </div>
 
-<button
-onClick={()=>removeTrainer(t.id)}
-className="bg-red-500 px-3 py-1 rounded text-white"
->
-Remove
-</button>
+        </div>
 
-</div>
-))}
-
-</div>
-
-</div>
-
-</div>
-
-);
-
+      </div>
+    </div>
+  );
 };
 
 export default TrainerControl;
