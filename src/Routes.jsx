@@ -18,7 +18,8 @@ import SupplementControl from "./pages/owner/SupplementControl";
 import TrainerControl from "./pages/owner/TrainerControl";
 import Contact from "./pages/contact";
 import OwnerPayment from "./pages/owner-payment";
-
+import MembershipManagement from "./pages/owner/MembershipManagement";
+import Earnings from "./pages/owner/Earnings";
 
 
 
@@ -46,6 +47,9 @@ const Routes = () => {
         <Route path="/trainers" element={<TrainerControl />} />
         <Route path="/contact" element={<Contact />} />
         <Route path="/owner-payment" element={<OwnerPayment />} />
+        <Route path="/membership" element={<MembershipManagement />} />
+        <Route path="/earnings" element={<Earnings />} />
+
         <Route path="/about-us" element={<AboutUs />} />
         <Route path="*" element={<NotFound />} />
       </RouterRoutes>
