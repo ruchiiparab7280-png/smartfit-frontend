@@ -10,7 +10,7 @@ import SignUpForm from './components/SignUpForm';
 
 const SignInSignUp = () => {
   const navigate = useNavigate();
-  const [activeTab, setActiveTab] = useState('login');
+  const [activeTab, setActiveTab] = useState('signup');
   const [userType, setUserType] = useState('user');
 
   useEffect(() => {
