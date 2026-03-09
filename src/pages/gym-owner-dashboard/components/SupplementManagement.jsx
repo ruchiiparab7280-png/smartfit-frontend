@@ -1,5 +1,6 @@
 import React, { useState } from 'react';
 
+
 const initialSupplements = [
 { id: 1, name: 'Whey Protein Gold', price: 59.99, image: "https://img.rocket.new/generatedImages/rocket_gen_img_1aacf124c-1773068342201.png", description: 'Premium whey protein isolate with 25g protein per serving. Chocolate and vanilla flavors available.' },
 { id: 2, name: 'Creatine Monohydrate', price: 29.99, image: "https://img.rocket.new/generatedImages/rocket_gen_img_1bcabe25d-1773068341904.png", description: 'Pure micronized creatine for strength and power gains. Unflavored, mixes easily.' },
@@ -9,8 +10,42 @@ const initialSupplements = [
 
 const emptyForm = { name: '', price: '', description: '', image: '' };
 
+const supplementOrders = [
+{
+id: 101,
+customer: "Rahul Sharma",
+supplement: "Whey Protein Gold",
+quantity: 1,
+total: 59.99,
+paymentMethod: "Online",
+paymentStatus: "Paid",
+date: "12 Mar 2026"
+},
+{
+id: 102,
+customer: "Aman Verma",
+supplement: "Creatine Monohydrate",
+quantity: 2,
+total: 59.98,
+paymentMethod: "Cash on Purchase",
+paymentStatus: "Pending",
+date: "13 Mar 2026"
+},
+{
+id: 103,
+customer: "Priya Patel",
+supplement: "BCAA Recovery",
+quantity: 1,
+total: 34.99,
+paymentMethod: "Online",
+paymentStatus: "Paid",
+date: "14 Mar 2026"
+}
+];
+
 const SupplementManagement = () => {
   const [supplements, setSupplements] = useState(initialSupplements);
+  const [orders] = useState(supplementOrders);
   const [showModal, setShowModal] = useState(false);
   const [editId, setEditId] = useState(null);
   const [form, setForm] = useState(emptyForm);
@@ -125,10 +160,82 @@ const SupplementManagement = () => {
                 <button type="button" onClick={() => setShowModal(false)} className="flex-1 py-2.5 border border-slate-200 text-slate-600 font-semibold rounded-lg hover:bg-slate-50 transition-colors">Cancel</button>
                 <button type="submit" className="flex-1 py-2.5 bg-blue-600 text-white font-semibold rounded-lg hover:bg-blue-700 transition-colors">{editId ? 'Save Changes' : 'Add Supplement'}</button>
               </div>
+              
             </form>
           </div>
+          
         </div>
-      }
+}
+
+{/* Supplement Orders */}
+
+<div className="mt-10">
+<h3 className="text-xl font-bold text-slate-800 mb-4">
+Supplement Orders
+</h3>
+
+<div className="bg-white rounded-xl border border-slate-200 overflow-hidden">
+<table className="w-full text-sm">
+
+<thead className="bg-slate-100 text-slate-600">
+<tr>
+<th className="px-4 py-3 text-left">Customer</th>
+<th className="px-4 py-3 text-left">Supplement</th>
+<th className="px-4 py-3 text-left">Qty</th>
+<th className="px-4 py-3 text-left">Total</th>
+<th className="px-4 py-3 text-left">Payment Method</th>
+<th className="px-4 py-3 text-left">Status</th>
+<th className="px-4 py-3 text-left">Date</th>
+</tr>
+</thead>
+
+<tbody>
+{orders?.map(order => (
+<tr key={order?.id} className="border-t border-slate-100">
+
+<td className="px-4 py-3 font-medium text-slate-700">
+{order?.customer}
+</td>
+
+<td className="px-4 py-3 text-slate-600">
+{order?.supplement}
+</td>
+
+<td className="px-4 py-3">
+{order?.quantity}
+</td>
+
+<td className="px-4 py-3 font-semibold text-blue-600">
+${order?.total}
+</td>
+
+<td className="px-4 py-3">
+{order?.paymentMethod}
+</td>
+
+<td className="px-4 py-3">
+<span className={`px-2 py-1 text-xs rounded-full font-medium ${
+order?.paymentStatus === "Paid"
+? "bg-green-100 text-green-700"
+: "bg-yellow-100 text-yellow-700"
+}`}>
+{order?.paymentStatus}
+</span>
+</td>
+
+<td className="px-4 py-3 text-slate-500">
+{order?.date}
+</td>
+
+</tr>
+))}
+</tbody>
+
+</table>
+</div>
+</div>
+        
+      
     </div>);
 
 };
