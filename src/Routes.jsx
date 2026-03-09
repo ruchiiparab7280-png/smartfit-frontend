@@ -13,13 +13,9 @@ import ApprovalPending from "./pages/ApprovalPending";
 import AdminApproval from "./pages/admin-approval";
 import OwnerApproved from "./pages/owner-approved";
 import OwnerRejected from "./pages/owner-rejected";
-import OwnerDashboard from "./pages/owner/OwnerDashboard";
-import SupplementControl from "./pages/owner/SupplementControl";
-import TrainerControl from "./pages/owner/TrainerControl";
+import GymOwnerDashboard from './pages/gym-owner-dashboard';
 import Contact from "./pages/contact";
-import OwnerPayment from "./pages/owner-payment";
-import MembershipManagement from "./pages/owner/MembershipManagement";
-import Earnings from "./pages/owner/Earnings";
+
 
 
 
@@ -42,14 +38,9 @@ const Routes = () => {
         <Route path="/admin-approval" element={<AdminApproval />} />
         <Route path="/owner-approved" element={<OwnerApproved />} />
         <Route path="/owner-rejected" element={<OwnerRejected />} />
-        <Route path="/owner-dashboard" element={<OwnerDashboard />} />
-        <Route path="/supplements" element={<SupplementControl/>} />
-        <Route path="/trainers" element={<TrainerControl />} />
+        <Route path="/gym-owner-dashboard" element={<GymOwnerDashboard />} />
         <Route path="/contact" element={<Contact />} />
-        <Route path="/owner-payment" element={<OwnerPayment />} />
-        <Route path="/membership" element={<MembershipManagement />} />
-        <Route path="/earnings" element={<Earnings />} />
-
+        
         <Route path="/about-us" element={<AboutUs />} />
         <Route path="*" element={<NotFound />} />
       </RouterRoutes>
