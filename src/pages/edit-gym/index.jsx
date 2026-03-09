@@ -46,7 +46,7 @@ const EditGym = () => {
 
       if(response.ok){
         alert("Gym Updated ✅");
-        navigate("/owner-dashboard");
+        navigate("/gym-owner-dashboard");
       }
       else{
         alert(data.message);

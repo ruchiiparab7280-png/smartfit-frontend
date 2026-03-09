@@ -41,7 +41,7 @@ const MainNavigation = () => {
 
 const dashboardPath =
   role === "owner"
-    ? "/owner-dashboard"
+    ? "/gym-owner-dashboard"
     : "/user-dashboard";
 
 const showDashboard =

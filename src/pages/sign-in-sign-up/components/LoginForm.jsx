@@ -96,7 +96,7 @@ if (data.user.role === "owner") {
     const payment = localStorage.getItem("paymentStatus");
 
     if(payment === "paid"){
-      navigate("/owner-dashboard");
+      navigate("/gym-owner-dashboard");
     } else {
       navigate("/owner-approved");
     }

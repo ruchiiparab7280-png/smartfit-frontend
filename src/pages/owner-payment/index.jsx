@@ -71,7 +71,7 @@ const OwnerPayment = () => {
 
     if (verifyData.success) {
       localStorage.setItem("paymentStatus", "paid");
-      navigate("/owner-dashboard");
+      navigate("/gym-owner-dashboard");
     } else {
       alert("Payment verification failed ❌");
     }
