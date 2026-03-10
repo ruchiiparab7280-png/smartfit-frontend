@@ -1,4 +1,22 @@
 import React, { useState, useEffect } from 'react';
+
+const amenitiesList = [
+"Cardio Equipment",
+"Weight Machines",
+"Personal Training",
+"Swimming Pool",
+"Juice Bar",
+"Free Weights",
+"Group Classes",
+"Sauna/Steam Room",
+"Basketball Court",
+"Childcare Services",
+"Parking Available",
+"Locker Rooms",
+"Shower Facilities",
+"WiFi Available"
+];
+
 const GymDetails = () => {
  const [formData, setFormData] = useState({
   gymName: "",
@@ -7,7 +25,8 @@ const GymDetails = () => {
   email: "",
   openingTime: "",
   closingTime: "",
-  description: ""
+  description: "",
+  amenities: []
 });
 useEffect(() => {
 
@@ -30,7 +49,8 @@ useEffect(() => {
         email: data.email || "",
         openingTime: data.opening_time || "",
         closingTime: data.closing_time || "",
-        description: data.description || ""
+        description: data.description || "",
+        amenities: data.amenities ? data.amenities.split(",") : []
       });
 
     } catch (error) {
@@ -48,7 +68,23 @@ useEffect(() => {
   const handleChange = (e) => {
     setFormData({ ...formData, [e?.target?.name]: e?.target?.value });
   };
+const handleAmenityChange = (amenity) => {
 
+  setFormData(prev => {
+
+    let updated = [...prev.amenities];
+
+    if (updated.includes(amenity)) {
+      updated = updated.filter(a => a !== amenity);
+    } else {
+      updated.push(amenity);
+    }
+
+    return { ...prev, amenities: updated };
+
+  });
+
+};
  const handleImageUpload = (e) => {
 
   const files = Array.from(e.target.files);
@@ -154,6 +190,34 @@ useEffect(() => {
               className="w-full px-4 py-2.5 rounded-lg border border-slate-200 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent text-slate-800 resize-none"
             />
           </div>
+
+          <div className="md:col-span-2">
+
+<label className="block text-sm font-semibold text-slate-700 mb-3">
+Amenities & Features
+</label>
+
+<div className="grid grid-cols-2 md:grid-cols-3 gap-3">
+
+{amenitiesList.map((item) => (
+
+<label key={item} className="flex items-center gap-2 text-sm">
+
+<input
+type="checkbox"
+checked={formData.amenities.includes(item)}
+onChange={() => handleAmenityChange(item)}
+/>
+
+{item}
+
+</label>
+
+))}
+
+</div>
+
+</div>
           <div className="md:col-span-2">
             <p className="text-xs text-red-500 mt-2">
 Minimum 6 gym images required
