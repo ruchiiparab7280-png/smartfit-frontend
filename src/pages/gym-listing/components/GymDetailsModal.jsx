@@ -1,10 +1,26 @@
-import React from 'react';
+import React, { useRef } from 'react';
 import Image from '../../../components/AppImage';
 import Icon from '../../../components/AppIcon';
 import Button from '../../../components/ui/Button';
 
 const GymDetailsModal = ({ gym, isOpen, onClose }) => {
   if (!isOpen || !gym) return null;
+
+  const scrollRef = useRef(null);
+
+const scrollLeft = () => {
+  scrollRef.current.scrollBy({
+    left: -400,
+    behavior: "smooth"
+  });
+};
+
+const scrollRight = () => {
+  scrollRef.current.scrollBy({
+    left: 400,
+    behavior: "smooth"
+  });
+};
 
   const renderStars = (rating) => {
     return Array.from({ length: 5 }, (_, index) => (
@@ -34,17 +50,46 @@ const GymDetailsModal = ({ gym, isOpen, onClose }) => {
         </button>
 
         <div className="relative h-64 sm:h-80 overflow-hidden rounded-t-lg">
-          <Image
-            src={gym?.image}
-            alt={gym?.imageAlt}
-            className="w-full h-full object-cover"
-          />
-          {gym?.featured && (
-            <div className="absolute top-4 left-4 bg-accent text-accent-foreground px-4 py-2 rounded-md font-medium">
-              Featured Gym
-            </div>
-          )}
-        </div>
+
+  {/* LEFT BUTTON */}
+  <button
+    onClick={scrollLeft}
+    className="absolute left-3 top-1/2 -translate-y-1/2 bg-black/60 text-white p-2 rounded-full z-10"
+  >
+    <Icon name="ChevronLeft" size={20} />
+  </button>
+
+  {/* IMAGE SLIDER */}
+  <div
+    ref={scrollRef}
+    className="flex overflow-x-auto h-full scroll-smooth no-scrollbar"
+  >
+    {gym?.images?.map((img, index) => (
+      <Image
+        key={index}
+        src={img}
+        alt="gym"
+        className="min-w-full h-full object-cover"
+      />
+    ))}
+  </div>
+
+  {/* RIGHT BUTTON */}
+  <button
+    onClick={scrollRight}
+    className="absolute right-3 top-1/2 -translate-y-1/2 bg-black/60 text-white p-2 rounded-full z-10"
+  >
+    <Icon name="ChevronRight" size={20} />
+  </button>
+
+  {/* FEATURED TAG */}
+  {gym?.featured && (
+    <div className="absolute top-4 left-4 bg-accent text-accent-foreground px-4 py-2 rounded-md font-medium">
+      Featured Gym
+    </div>
+  )}
+
+</div>
 
         <div className="p-6 sm:p-8">
           <div className="flex flex-col sm:flex-row sm:items-start sm:justify-between mb-6">

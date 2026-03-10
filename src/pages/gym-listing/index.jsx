@@ -1,4 +1,5 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect,  } from 'react';
+
 import MainNavigation from '../../components/MainNavigation';
 import Icon from '../../components/AppIcon';
 import Button from '../../components/ui/Button';
@@ -28,7 +29,13 @@ const GymListing = () => {
   {
     id: 1,
     name: "PowerFit Elite Gym",
-    image: "https://images.unsplash.com/photo-1729156638396-47c6a6cffe16",
+    images: [
+    "https://images.unsplash.com/photo-1729156638396-47c6a6cffe16",
+    "https://images.unsplash.com/photo-1581009146145-b5ef050c2e1e",
+    "https://images.unsplash.com/photo-1599058917212-d750089bc07e",
+     "https://images.unsplash.com/photo-1571019614242-c5c5dee9f50b"
+  ],
+
     imageAlt: "Modern gym interior",
     address: "Andheri East, Mumbai",
     distance: 1.2,
