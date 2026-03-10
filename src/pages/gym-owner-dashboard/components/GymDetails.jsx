@@ -49,18 +49,31 @@ useEffect(() => {
     setFormData({ ...formData, [e?.target?.name]: e?.target?.value });
   };
 
-  const handleImageUpload = (e) => {
-    const files = Array.from(e?.target?.files);
-    const previews = files?.map(f => URL.createObjectURL(f));
-    setImages(prev => [...prev, ...previews]);
-  };
+ const handleImageUpload = (e) => {
+
+  const files = Array.from(e.target.files);
+
+  if (images.length + files.length > 6) {
+    alert("Maximum 6 images allowed");
+    return;
+  }
+
+  const previews = files.map(file => URL.createObjectURL(file));
+
+  setImages(prev => [...prev, ...previews]);
+
+};
 
   const handleSave = (e) => {
-    e?.preventDefault();
-    setSaved(true);
-    setTimeout(() => setSaved(false), 3000);
-  };
+  e.preventDefault();
 
+  if (images.length < 6) {
+    alert("Please upload at least 6 gym images");
+    return;
+  }
+
+  setSaved(true);
+};
   return (
     <div>
       <div className="mb-6">
@@ -142,6 +155,9 @@ useEffect(() => {
             />
           </div>
           <div className="md:col-span-2">
+            <p className="text-xs text-red-500 mt-2">
+Minimum 6 gym images required
+</p>
             <label className="block text-sm font-semibold text-slate-700 mb-2">Gym Images</label>
             <div className="border-2 border-dashed border-slate-200 rounded-xl p-6 text-center hover:border-blue-400 transition-colors">
               <input
