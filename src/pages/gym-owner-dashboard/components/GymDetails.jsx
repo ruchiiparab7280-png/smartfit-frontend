@@ -179,7 +179,7 @@ useEffect(() => {
 
           <div className="md:col-span-2">
 
-<label className="block text-sm font-semibold text-slate-800 mb-3">
+<label key={item} className="flex items-center gap-2 text-sm text-slate-800 font-medium">
 Amenities & Features
 </label>
 
@@ -188,7 +188,7 @@ Amenities & Features
 {amenitiesList.map((item) => (
 
 <label key={item} className="flex items-center gap-2 text-sm">
-
+<label key={item} className="flex items-center gap-2 text-sm text-slate-900 font-medium"></label>
 <input
 type="checkbox"
 checked={formData.amenities.includes(item)}
