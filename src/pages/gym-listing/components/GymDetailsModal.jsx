@@ -6,18 +6,18 @@ import Button from '../../../components/ui/Button';
 const GymDetailsModal = ({ gym, isOpen, onClose }) => {
   if (!isOpen || !gym) return null;
 
-  const scrollRef = useRef(null);
+ const scrollRef = useRef(null);
 
 const scrollLeft = () => {
   scrollRef.current.scrollBy({
-    left: -400,
+    left: -600,
     behavior: "smooth"
   });
 };
 
 const scrollRight = () => {
   scrollRef.current.scrollBy({
-    left: 400,
+    left: 600,
     behavior: "smooth"
   });
 };
@@ -51,36 +51,39 @@ const scrollRight = () => {
 
         <div className="relative h-64 sm:h-80 overflow-hidden rounded-t-lg">
 
-  {/* LEFT BUTTON */}
-  <button
-    onClick={scrollLeft}
-    className="absolute left-3 top-1/2 -translate-y-1/2 bg-black/60 text-white p-2 rounded-full z-10"
-  >
-    <Icon name="ChevronLeft" size={20} />
-  </button>
+ {/* LEFT BUTTON */}
 
-  {/* IMAGE SLIDER */}
-  <div
-    ref={scrollRef}
-    className="flex overflow-x-auto h-full scroll-smooth no-scrollbar"
-  >
-    {gym?.images?.map((img, index) => (
-      <Image
-        key={index}
-        src={img}
-        alt="gym"
-        className="min-w-full h-full object-cover"
-      />
-    ))}
-  </div>
+<button
+  onClick={scrollLeft}
+  className="absolute left-3 top-1/2 -translate-y-1/2 bg-black/60 text-white p-2 rounded-full z-10"
+>
+  <Icon name="ChevronLeft" size={20} />
+</button>
 
-  {/* RIGHT BUTTON */}
-  <button
-    onClick={scrollRight}
-    className="absolute right-3 top-1/2 -translate-y-1/2 bg-black/60 text-white p-2 rounded-full z-10"
-  >
-    <Icon name="ChevronRight" size={20} />
-  </button>
+{/* IMAGE SLIDER */}
+
+<div
+  ref={scrollRef}
+  className="flex overflow-x-auto h-full scroll-smooth no-scrollbar"
+>
+  {gym?.images?.map((img, index) => (
+    <Image
+      key={index}
+      src={img}
+      alt="gym"
+      className="min-w-full h-full object-cover flex-shrink-0"
+    />
+  ))}
+</div>
+
+{/* RIGHT BUTTON */}
+
+<button
+  onClick={scrollRight}
+  className="absolute right-3 top-1/2 -translate-y-1/2 bg-black/60 text-white p-2 rounded-full z-10"
+>
+  <Icon name="ChevronRight" size={20} />
+</button>
 
   {/* FEATURED TAG */}
   {gym?.featured && (
