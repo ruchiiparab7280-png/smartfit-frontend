@@ -1,15 +1,47 @@
-import React, { useState } from 'react';
-
+import React, { useState, useEffect } from 'react';
 const GymDetails = () => {
-  const [formData, setFormData] = useState({
-    gymName: 'SmartFit Multi Gym',
-    address: '123 Fitness Avenue, Downtown, NY 10001',
-    contactNumber: '+1 (555) 234-5678',
-    email: 'owner@multigym.com',
-    openingTime: '06:00',
-    closingTime: '22:00',
-    description: 'A premium fitness facility offering state-of-the-art equipment, expert trainers, and a motivating environment for all fitness levels.',
-  });
+ const [formData, setFormData] = useState({
+  gymName: "",
+  address: "",
+  contactNumber: "",
+  email: "",
+  openingTime: "",
+  closingTime: "",
+  description: ""
+});
+useEffect(() => {
+
+  const fetchGymDetails = async () => {
+
+    try {
+
+      const email = localStorage.getItem("userEmail");
+
+      const res = await fetch(
+        `${import.meta.env.VITE_API_URL}/owner-gym/${email}`
+      );
+
+      const data = await res.json();
+
+      setFormData({
+        gymName: data.gym_name || "",
+        address: data.address || "",
+        contactNumber: data.phone || "",
+        email: data.email || "",
+        openingTime: data.opening_time || "",
+        closingTime: data.closing_time || "",
+        description: data.description || ""
+      });
+
+    } catch (error) {
+      console.log("Fetch error:", error);
+    }
+
+  };
+
+  fetchGymDetails();
+
+}, []);
   const [images, setImages] = useState([]);
   const [saved, setSaved] = useState(false);
 
