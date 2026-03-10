@@ -1,23 +1,10 @@
-import React, { useState } from 'react';
+import React from 'react';
 import Image from '../../../components/AppImage';
 import Icon from '../../../components/AppIcon';
 import Button from '../../../components/ui/Button';
-import { useNavigate } from "react-router-dom";
 
-  const GymDetailsModal = ({ gym, isOpen, onClose }) => {
-  const navigate = useNavigate();
-  const [showPlanSelect, setShowPlanSelect] = useState(false);
-  const [selectedPlan, setSelectedPlan] = useState(null);
-  const savedProtein = JSON.parse(localStorage.getItem("gymProtein"));
-  const savedTrainer = JSON.parse(localStorage.getItem("gymTrainer"));
-
+const GymDetailsModal = ({ gym, isOpen, onClose }) => {
   if (!isOpen || !gym) return null;
-
-  const plans = [
-  { name: "Basic", price: 999, duration: "1 Month" },
-  { name: "Standard", price: 2499, duration: "3 Months" },
-  { name: "Premium", price: 4499, duration: "6 Months" }
-];
 
   const renderStars = (rating) => {
     return Array.from({ length: 5 }, (_, index) => (
@@ -26,220 +13,306 @@ import { useNavigate } from "react-router-dom";
         name={index < Math.floor(rating) ? 'Star' : 'StarOff'}
         size={18}
         color={index < Math.floor(rating) ? '#F59E0B' : '#D1D5DB'}
+        className="fill-current"
       />
     ));
   };
 
   return (
-    <>
-      <div className="fixed inset-0 z-50 flex items-center justify-center p-4">
-        <div className="absolute inset-0 bg-black/60" onClick={onClose} />
+    <div className="fixed inset-0 z-300 flex items-center justify-center p-4">
+      <div
+        className="absolute inset-0 bg-background/80 backdrop-blur-sm"
+        onClick={onClose}
+      />
+      <div className="relative bg-card rounded-lg card-elevation-lg max-w-4xl w-full max-h-[90vh] overflow-y-auto">
+        <button
+          onClick={onClose}
+          className="absolute top-4 right-4 z-10 bg-background/90 backdrop-blur-sm p-2 rounded-full hover:bg-background transition-base focus-ring"
+          aria-label="Close modal"
+        >
+          <Icon name="X" size={24} />
+        </button>
 
-        <div className="relative bg-card rounded-lg max-w-4xl w-full max-h-[90vh] overflow-y-auto">
+        <div className="relative h-64 sm:h-80 overflow-hidden rounded-t-lg">
+          <Image
+            src={gym?.image}
+            alt={gym?.imageAlt}
+            className="w-full h-full object-cover"
+          />
+          {gym?.featured && (
+            <div className="absolute top-4 left-4 bg-accent text-accent-foreground px-4 py-2 rounded-md font-medium">
+              Featured Gym
+            </div>
+          )}
+        </div>
 
-          <button
-            onClick={onClose}
-            className="absolute top-4 right-4 bg-background p-2 rounded-full"
-          >
-            <Icon name="X" size={20} />
-          </button>
-
-          {/* IMAGE */}
-          <div className="h-64 overflow-hidden">
-            <Image
-              src={gym?.image}
-              alt={gym?.name}
-              className="w-full h-full object-cover"
-            />
+        <div className="p-6 sm:p-8">
+          <div className="flex flex-col sm:flex-row sm:items-start sm:justify-between mb-6">
+            <div className="mb-4 sm:mb-0">
+              <h2 className="text-2xl sm:text-3xl font-bold text-foreground mb-2">
+                {gym?.name}
+              </h2>
+              <div className="flex items-center space-x-2 mb-2">
+                {renderStars(gym?.rating)}
+                <span className="text-sm text-muted-foreground">
+                  {gym?.rating} ({gym?.reviews} reviews)
+                </span>
+              </div>
+              <div className="flex items-center text-muted-foreground">
+                <Icon name="MapPin" size={18} className="mr-2" />
+                <span>{gym?.address}</span>
+              </div>
+            </div>
+            <div className="text-left sm:text-right">
+              <p className="text-sm text-muted-foreground mb-1">Starting from</p>
+              <p className="text-3xl font-bold text-primary">${gym?.price}/month</p>
+            </div>
           </div>
 
-          <div className="p-6">
-
-            <h2 className="text-2xl font-bold mb-2">{gym?.name}</h2>
-
-            <div className="flex items-center mb-2">
-              {renderStars(gym?.rating)}
-              <span className="ml-2 text-sm">{gym?.rating}</span>
+          <div className="grid grid-cols-2 sm:grid-cols-4 gap-4 mb-6 p-4 bg-muted rounded-lg">
+            <div className="text-center">
+              <Icon name="Users" size={24} className="mx-auto mb-2 text-primary" />
+              <p className="text-sm text-muted-foreground">Members</p>
+              <p className="font-semibold text-foreground">{gym?.members}+</p>
             </div>
+            <div className="text-center">
+              <Icon name="Clock" size={24} className="mx-auto mb-2 text-primary" />
+              <p className="text-sm text-muted-foreground">Open Hours</p>
+              <p className="font-semibold text-foreground">{gym?.openTime}</p>
+            </div>
+            <div className="text-center">
+              <Icon name="MapPin" size={24} className="mx-auto mb-2 text-primary" />
+              <p className="text-sm text-muted-foreground">Distance</p>
+              <p className="font-semibold text-foreground">{gym?.distance} km</p>
+            </div>
+            <div className="text-center">
+              <Icon name="Star" size={24} className="mx-auto mb-2 text-primary" />
+              <p className="text-sm text-muted-foreground">Rating</p>
+              <p className="font-semibold text-foreground">{gym?.rating}/5</p>
+            </div>
+          </div>
 
-            <p className="text-muted-foreground mb-4">{gym?.description}</p>
+          <div className="mb-6">
+            <h3 className="text-lg font-semibold text-foreground mb-3 flex items-center">
+              <Icon name="Info" size={20} className="mr-2" />
+              About This Gym
+            </h3>
+            <p className="text-muted-foreground leading-relaxed">
+              {gym?.description}
+            </p>
+          </div>
 
-            {/* MEMBERSHIP */}
-            <div className="mb-6">
-              <h3 className="text-lg font-semibold mb-3">Membership Plans</h3>
-              {plans.map((plan, index) => (
+          <div className="mb-6">
+            <h3 className="text-lg font-semibold text-foreground mb-3 flex items-center">
+              <Icon name="Sparkles" size={20} className="mr-2" />
+              Amenities & Features
+            </h3>
+            <div className="grid grid-cols-2 sm:grid-cols-3 gap-3">
+              {gym?.amenities?.map((amenity, index) => (
                 <div
-  key={index}
-  className="p-3 mb-2 rounded bg-orange-500 text-white font-semibold"
->
-                 <p className="font-bold text-white">
-                    ₹{plan?.price}/{plan?.duration}
-                  </p>
-                  <p>{plan?.name}</p>
+                  key={index}
+                  className="flex items-center space-x-2 p-3 bg-muted rounded-lg"
+                >
+                  <Icon name={amenity?.icon} size={18} color="var(--color-primary)" />
+                  <span className="text-sm text-foreground">{amenity?.name}</span>
                 </div>
               ))}
             </div>
+          </div>
 
-            {/* FREE TRIAL */}
-            <div className="mb-6 bg-gray-800 p-4 rounded-xl">
-              <h3 className="text-lg font-semibold text-white mb-2">
-                Free Trial
-              </h3>
-              <p className="text-green-400 mb-2">
-                1 Day Free Trial Available
-              </p>
-              <button
-                onClick={() => {
-  const trialRequest = {
-    user: localStorage.getItem("userName"),
-    gym: gym.name,
-    status: "pending"
-  };
-
-  localStorage.setItem("trialRequest", JSON.stringify(trialRequest));
-  alert("Trial Request Sent!");
-}}
-
-                className="bg-orange-500 px-4 py-2 rounded"
-              >
-                Book Free Trial
-              </button>
+          <div className="mb-6">
+            <h3 className="text-lg font-semibold text-foreground mb-3 flex items-center">
+              <Icon name="CreditCard" size={20} className="mr-2" />
+              Membership Plans
+            </h3>
+            <div className="grid sm:grid-cols-3 gap-4">
+              {gym?.plans?.map((plan, index) => (
+                <div
+                  key={index}
+                  className="p-4 border border-border rounded-lg hover:border-primary transition-base"
+                >
+                  <h4 className="font-semibold text-foreground mb-2">{plan?.name}</h4>
+                  <p className="text-2xl font-bold text-primary mb-2">
+                    ${plan?.price}
+                    <span className="text-sm text-muted-foreground font-normal">/{plan?.duration}</span>
+                  </p>
+                  <ul className="space-y-1">
+                    {plan?.features?.map((feature, idx) => (
+                      <li key={idx} className="text-sm text-muted-foreground flex items-start">
+                        <Icon name="Check" size={16} className="mr-1 mt-0.5 text-success flex-shrink-0" />
+                        <span>{feature}</span>
+                      </li>
+                    ))}
+                  </ul>
+                </div>
+              ))}
             </div>
+          </div>
 
-            {/* TRAINERS */}
-           <div className="mb-6 bg-gray-800 p-4 rounded-xl">
-  <h3 className="text-lg font-semibold text-white mb-3">
+          {/* FREE TRIAL */}
+
+<div className="mb-6 bg-muted p-4 rounded-lg">
+
+  <h3 className="text-lg font-semibold text-foreground mb-2 flex items-center">
+    <Icon name="Gift" size={20} className="mr-2" />
+    One Day Free Trial
+  </h3>
+
+  <p className="text-muted-foreground mb-3">
+    Try this gym for free for one day before purchasing a membership.
+  </p>
+
+  <button
+    onClick={() => alert("Free Trial Request Sent!")}
+    className="bg-orange-500 hover:bg-orange-600 text-white px-4 py-2 rounded-md"
+  >
+    Book Free Trial
+  </button>
+
+</div>
+
+
+          {/* TRAINERS */}
+
+<div className="mb-6">
+  <h3 className="text-lg font-semibold text-foreground mb-3 flex items-center">
+    <Icon name="UserCheck" size={20} className="mr-2" />
     Available Trainers
   </h3>
 
-  {savedTrainer ? (
-    <div>
-      <p className="text-white font-semibold">{savedTrainer.name}</p>
-      <p className="text-orange-400">₹{savedTrainer.price} / session</p>
+  <div className="grid grid-cols-2 sm:grid-cols-3 gap-4">
 
-      {savedTrainer.image && (
-        <img src={savedTrainer.image} alt="trainer" className="w-32 mt-2 rounded" />
-      )}
+    {gym?.trainers?.map((trainer, index) => (
 
-      <button
-        onClick={() => {
-  const trainerRequest = {
-    user: localStorage.getItem("userName"),
-    trainer: savedTrainer.name,
-    status: "pending"
-  };
-
-  localStorage.setItem("trainerRequest", JSON.stringify(trainerRequest));
-  alert("Trainer Booking Sent!");
-}}
-
-        className="bg-orange-500 px-3 py-1 rounded mt-2"
+      <div
+        key={index}
+        className="p-4 bg-muted rounded-lg text-center"
       >
-        Book Trainer
-      </button>
-    </div>
-  ) : (
-    <p className="text-gray-400">No Trainer Added Yet</p>
-  )}
+
+        <img
+          src={trainer.image}
+          alt="trainer"
+          className="w-20 h-20 mx-auto rounded-full object-cover mb-2"
+        />
+
+        <p className="font-semibold text-foreground">
+          {trainer.name}
+        </p>
+
+        <p className="text-sm text-muted-foreground">
+          ₹{trainer.price}/session
+        </p>
+
+        <button
+          onClick={() => alert("Trainer Booking Sent")}
+          className="mt-2 bg-orange-500 text-white px-3 py-1 rounded"
+        >
+          Book Trainer
+        </button>
+
+      </div>
+
+    ))}
+
+  </div>
 </div>
 
-            {/* SUPPLEMENTS */}
-            <div className="mb-6 bg-gray-800 p-4 rounded-xl">
-  <h3 className="text-lg font-semibold text-white mb-3">
+{/* SUPPLEMENTS */}
+
+<div className="mb-6">
+  <h3 className="text-lg font-semibold text-foreground mb-3 flex items-center">
+    <Icon name="ShoppingCart" size={20} className="mr-2" />
     Supplements Available
   </h3>
 
-  {savedProtein ? (
-    <div>
-      <p className="text-white font-semibold">{savedProtein.name}</p>
-      <p className="text-orange-400">₹{savedProtein.price}</p>
+  <div className="grid grid-cols-2 sm:grid-cols-3 gap-4">
 
-      {savedProtein.image && (
-        <img src={savedProtein.image} alt="protein" className="w-32 mt-2 rounded" />
-      )}
+    {gym?.supplements?.map((item, index) => (
 
-      <button
-  onClick={() =>
-    navigate("/checkout", {
-      state: {
-        gym: gym,
-        plan: {
-          name: savedProtein.name,
-          price: savedProtein.price,
-          duration: "Supplement Purchase"
-        }
-      }
-    })
-  }
-  className="bg-orange-500 px-3 py-1 rounded mt-2"
->
-  Buy Now
-</button>
-    </div>
-  ) : (
-    <p className="text-gray-400">No Supplements Added Yet</p>
-  )}
+      <div
+        key={index}
+        className="p-4 bg-muted rounded-lg text-center"
+      >
+
+        <img
+          src={item.image}
+          alt="supplement"
+          className="w-20 h-20 mx-auto rounded object-cover mb-2"
+        />
+
+        <p className="font-semibold text-foreground">
+          {item.name}
+        </p>
+
+        <p className="text-sm text-muted-foreground">
+          ₹{item.price}
+        </p>
+
+        <button
+          className="mt-2 bg-orange-500 text-white px-3 py-1 rounded"
+        >
+          Buy Now
+        </button>
+
+      </div>
+
+    ))}
+
+  </div>
 </div>
-            {/* CONTACT */}
-            <div className="flex gap-3">
-              <Button
-                fullWidth
-                onClick={() => setShowPlanSelect(true)}
-              >
-                Book Now
-              </Button>
 
-              <Button variant="outline" fullWidth>
-                Call Now
-              </Button>
+          <div className="mb-6">
+            <h3 className="text-lg font-semibold text-foreground mb-3 flex items-center">
+              <Icon name="Phone" size={20} className="mr-2" />
+              Contact Information
+            </h3>
+            <div className="grid sm:grid-cols-2 gap-4">
+              <div className="flex items-center space-x-3 p-3 bg-muted rounded-lg">
+                <Icon name="Phone" size={20} color="var(--color-primary)" />
+                <div>
+                  <p className="text-xs text-muted-foreground">Phone</p>
+                  <p className="text-sm font-medium text-foreground">{gym?.phone}</p>
+                </div>
+              </div>
+              <div className="flex items-center space-x-3 p-3 bg-muted rounded-lg">
+                <Icon name="Mail" size={20} color="var(--color-primary)" />
+                <div>
+                  <p className="text-xs text-muted-foreground">Email</p>
+                  <p className="text-sm font-medium text-foreground">{gym?.email}</p>
+                </div>
+              </div>
             </div>
+          </div>
 
+          <div className="flex flex-col sm:flex-row space-y-2 sm:space-y-0 sm:space-x-3">
+            <Button
+              variant="default"
+              fullWidth
+              iconName="Calendar"
+              iconPosition="left"
+            >
+              Book a Visit
+            </Button>
+            <Button
+              variant="outline"
+              fullWidth
+              iconName="Phone"
+              iconPosition="left"
+            >
+              Call Now
+            </Button>
+            <Button
+              variant="outline"
+              fullWidth
+              iconName="Mail"
+              iconPosition="left"
+            >
+              Send Message
+            </Button>
           </div>
         </div>
       </div>
-
-      {/* PLAN SELECT POPUP */}
-      {showPlanSelect && (
-  <div className="fixed inset-0 flex items-center justify-center z-50">
-
-    {/* Background Blur */}
-    <div className="absolute inset-0 bg-black/70 backdrop-blur-sm"></div>
-          <div className="relative bg-white/10 backdrop-blur-lg p-6 rounded-xl text-center w-80 border border-white/20 shadow-xl">
-
-            <h3 className="text-xl font-bold mb-4 text-white">
-  Choose Membership Plan
-</h3>
-
-            {plans.map((plan, index) => (
-              <button
-                key={index}
-                onClick={() => {
-  setShowPlanSelect(false);
-
-  navigate("/checkout", {
-    state: {
-      gym: gym,
-      plan: plan
-    }
-  });
-}}
-                className="block w-full p-3 mb-3 rounded-lg bg-orange-500 text-white font-semibold hover:bg-orange-600 transition shadow-md hover:scale-105"
-              >
-                ₹{plan?.price} / {plan?.duration}
-              </button>
-            ))}
-
-            <button
-              onClick={() => setShowPlanSelect(false)}
-              className="border border-white px-4 py-2 rounded-lg text-white hover:bg-white/10 transition"
-            >
-              Cancel
-            </button>
-
-          </div>
-        </div>
-      )}
-    </>
+    </div>
   );
 };
 

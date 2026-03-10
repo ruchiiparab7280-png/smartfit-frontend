@@ -41,6 +41,7 @@ const GymListing = () => {
     phone: "+91 98765 43210",
     email: "powerfit@gmail.com",
     description: "Premium gym with modern machines and certified trainers.",
+
     amenities: [
       { name: "Parking", icon: "Car" },
       { name: "Locker Room", icon: "Lock" },
@@ -48,9 +49,36 @@ const GymListing = () => {
       { name: "AC", icon: "Wind" },
       { name: "Personal Trainer", icon: "UserCheck" }
     ],
+
     plans: [
       { name: "Basic", price: 1499, duration: "month", features: ["Gym access"] },
       { name: "Premium", price: 2499, duration: "month", features: ["Classes", "Trainer"] }
+    ],
+
+    trainers: [
+      {
+        name: "Rahul Sharma",
+        price: 500,
+        image: "https://randomuser.me/api/portraits/men/32.jpg"
+      },
+      {
+        name: "Aman Verma",
+        price: 600,
+        image: "https://randomuser.me/api/portraits/men/45.jpg"
+      }
+    ],
+
+    supplements: [
+      {
+        name: "Whey Protein",
+        price: 2499,
+        image: "https://images.unsplash.com/photo-1594737625785-c3fcd5f5a7a7"
+      },
+      {
+        name: "Creatine",
+        price: 1499,
+        image: "https://images.unsplash.com/photo-1605296867304-46d5465a13f1"
+      }
     ]
   },
 
@@ -70,13 +98,31 @@ const GymListing = () => {
     phone: "+91 98989 12121",
     email: "ironparadise@gmail.com",
     description: "Hardcore strength and bodybuilding gym.",
+
     amenities: [
       { name: "Parking", icon: "Car" },
       { name: "Locker Room", icon: "Lock" },
       { name: "Personal Trainer", icon: "UserCheck" }
     ],
+
     plans: [
       { name: "Standard", price: 1999, duration: "month", features: ["24/7 Access"] }
+    ],
+
+    trainers: [
+      {
+        name: "Vikram Singh",
+        price: 700,
+        image: "https://randomuser.me/api/portraits/men/52.jpg"
+      }
+    ],
+
+    supplements: [
+      {
+        name: "Mass Gainer",
+        price: 2999,
+        image: "https://images.unsplash.com/photo-1605296867304-46d5465a13f1"
+      }
     ]
   },
 
@@ -96,88 +142,31 @@ const GymListing = () => {
     phone: "+91 98111 22334",
     email: "zenyoga@gmail.com",
     description: "Peaceful yoga and meditation center.",
+
     amenities: [
       { name: "Meditation Room", icon: "Heart" },
       { name: "AC", icon: "Wind" },
       { name: "Locker Room", icon: "Lock" }
     ],
+
     plans: [
       { name: "Beginner", price: 1799, duration: "month", features: ["Yoga Classes"] }
-    ]
-  },
-
-  {
-    id: 4,
-    name: "CrossFit Revolution",
-    image: "https://images.unsplash.com/photo-1591641079732-e34ae7aed2ed",
-    imageAlt: "CrossFit gym",
-    address: "Whitefield, Powai",
-    distance: 5.1,
-    rating: 4.7,
-    reviews: 298,
-    price: 2999,
-    members: 450,
-    openTime: "5 AM - 10 PM",
-    featured: false,
-    phone: "+91 99000 44556",
-    email: "crossfit@gmail.com",
-    description: "High intensity CrossFit workouts.",
-    amenities: [
-      { name: "Group Classes", icon: "Users" },
-      { name: "Trainer", icon: "UserCheck" }
     ],
-    plans: [
-      { name: "Starter", price: 2999, duration: "month", features: ["Unlimited Classes"] }
-    ]
-  },
 
-  {
-    id: 5,
-    name: "Aqua Fitness Club",
-    image: "https://images.unsplash.com/photo-1574349508438-3b402594a11a",
-    imageAlt: "Swimming pool gym",
-    address: " Near PVR Kandivali, Mumbai",
-    distance: 6.3,
-    rating: 4.5,
-    reviews: 189,
-    price: 2299,
-    members: 820,
-    openTime: "6 AM - 10 PM",
-    featured: false,
-    phone: "+91 98300 77889",
-    email: "aquafitness@gmail.com",
-    description: "Swimming and aqua workout focused gym.",
-    amenities: [
-      { name: "Swimming Pool", icon: "Waves" },
-      { name: "Shower", icon: "Droplet" }
+    trainers: [
+      {
+        name: "Neha Kapoor",
+        price: 400,
+        image: "https://randomuser.me/api/portraits/women/65.jpg"
+      }
     ],
-    plans: [
-      { name: "Swimmer", price: 2299, duration: "month", features: ["Pool Access"] }
-    ]
-  },
 
-  {
-    id: 6,
-    name: "Cardio Kings Fitness",
-    image: "https://images.unsplash.com/photo-1697490583984-9d945f9dbcd9",
-    imageAlt: "Cardio gym",
-    address: "Dahisar Mumbai",
-    distance: 1.8,
-    rating: 4.4,
-    reviews: 256,
-    price: 1299,
-    members: 1500,
-    openTime: "5 AM - 11 PM",
-    featured: false,
-    phone: "+91 99999 11122",
-    email: "cardiokings@gmail.com",
-    description: "Best gym for weight loss and cardio.",
-    amenities: [
-      { name: "Treadmills", icon: "Activity" },
-      { name: "AC", icon: "Wind" }
-    ],
-    plans: [
-      { name: "Basic", price: 1299, duration: "month", features: ["Cardio Access"] }
+    supplements: [
+      {
+        name: "Vegan Protein",
+        price: 2199,
+        image: "https://images.unsplash.com/photo-1594737625785-c3fcd5f5a7a7"
+      }
     ]
   }
 ];
