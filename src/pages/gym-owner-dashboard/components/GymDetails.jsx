@@ -50,7 +50,9 @@ useEffect(() => {
         openingTime: data.opening_time || "",
         closingTime: data.closing_time || "",
         description: data.description || "",
-        amenities: data.amenities ? data.amenities.split(",") : []
+        amenities: data.amenities 
+    ? data.amenities.split(",").map(a => a.trim()) 
+    : []
       });
 
     } catch (error) {
@@ -68,23 +70,7 @@ useEffect(() => {
   const handleChange = (e) => {
     setFormData({ ...formData, [e?.target?.name]: e?.target?.value });
   };
-const handleAmenityChange = (amenity) => {
 
-  setFormData(prev => {
-
-    let updated = [...prev.amenities];
-
-    if (updated.includes(amenity)) {
-      updated = updated.filter(a => a !== amenity);
-    } else {
-      updated.push(amenity);
-    }
-
-    return { ...prev, amenities: updated };
-
-  });
-
-};
  const handleImageUpload = (e) => {
 
   const files = Array.from(e.target.files);
@@ -193,7 +179,7 @@ const handleAmenityChange = (amenity) => {
 
           <div className="md:col-span-2">
 
-<label className="block text-sm font-semibold text-slate-700 mb-3">
+<label className="block text-sm font-semibold text-slate-800 mb-3">
 Amenities & Features
 </label>
 
@@ -207,6 +193,7 @@ Amenities & Features
 type="checkbox"
 checked={formData.amenities.includes(item)}
 onChange={() => handleAmenityChange(item)}
+className="accent-blue-600"
 />
 
 {item}
