@@ -39,24 +39,24 @@ const GymDetails = () => {
       try {
         const email = localStorage.getItem("userEmail");
 
-        const res = await fetch(
-          `${import.meta.env.VITE_API_URL}/owner-gym/${email}`
-        );
-
-        const data = await res.json();
-
-        setFormData({
-          gymName: data.gym_name || "",
-          address: data.address || "",
-          contactNumber: data.phone || "",
-          email: data.email || "",
-          openingTime: data.opening_time || "",
-          closingTime: data.closing_time || "",
-          description: data.gym_description || "",
-          amenities: data.amenities
-            ? data.amenities.split(",").map((a) => a.trim())
-            : [],
-        });
+      const res = await fetch(
+  `${import.meta.env.VITE_API_URL}/update-gym/${email}`,
+  {
+    method: "PUT",
+    headers: {
+      "Content-Type": "application/json"
+    },
+    body: JSON.stringify({
+      gym_name: formData.gymName,
+      address: formData.address,
+      phone: formData.contactNumber,
+      gym_description: formData.description,
+      amenities: formData.amenities.join(", "),
+      opening_time: formData.openingTime,
+      closing_time: formData.closingTime
+    })
+  }
+);
       } catch (error) {
         console.log("Fetch error:", error);
       }
