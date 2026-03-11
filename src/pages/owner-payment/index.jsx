@@ -73,7 +73,9 @@ const OwnerPayment = () => {
     const verifyData = await verifyRes.json();
 
     if (verifyData.success) {
-  navigate("/gym-owner-dashboard");
+         alert("Payment Successful ✅");
+   // redirect after success
+        window.location.href = "/gym-owner-dashboard";
 } else {
   alert("Payment verification failed ❌");
 }
