@@ -24,164 +24,77 @@ const GymListing = () => {
   const [searchQuery, setSearchQuery] = useState('');
   const [selectedGym, setSelectedGym] = useState(null);
   const [showDetailsModal, setShowDetailsModal] = useState(false);
+  const [gyms, setGyms] = useState([]);
+useEffect(() => {
 
- const mockGyms = [
-  {
-    id: 1,
-    name: "PowerFit Elite Gym",
-    image: "https://images.unsplash.com/photo-1729156638396-47c6a6cffe16",
+  const fetchGyms = async () => {
 
-  images: [
-    "https://images.unsplash.com/photo-1729156638396-47c6a6cffe16",
+    try {
+
+      const res = await fetch(
+        `${import.meta.env.VITE_API_URL}/api/gyms`
+      );
+      if (!res.ok) {
+  console.log("Gym API error");
+  return;
+}
+      const data = await res.json();
+
+     const formattedGyms = data.map((gym, index) => ({
+  id: index + 1,
+
+  name: gym.gym_name || "Gym name not mentioned",
+  address: gym.address || "Address not mentioned",
+  phone: gym.phone || "Not mentioned",
+  email: gym.email || "Not mentioned",
+
+  distance: 2,
+  rating: 4.5,
+  reviews: 10,
+
+  price: gym.monthly_fee || "Not mentioned yet",
+  members: gym.capacity || "Not mentioned yet",
+
+  openTime:
+    gym.opening_time && gym.closing_time
+      ? `${gym.opening_time} - ${gym.closing_time}`
+      : "Not mentioned yet",
+
+  image:
+    gym.image ||
     "https://images.unsplash.com/photo-1583454110551-21f2fa2afe61",
-    "https://images.unsplash.com/photo-1599058917212-d750089bc07e"
-  ],
 
-    imageAlt: "Modern gym interior",
-    address: "Andheri East, Mumbai",
-    distance: 1.2,
-    rating: 4.6,
-    reviews: 342,
-    price: 1499,
-    members: 1200,
-    openTime: "5 AM - 11 PM",
-    featured: true,
-    phone: "+91 98765 43210",
-    email: "powerfit@gmail.com",
-    description: "Premium gym with modern machines and certified trainers.",
+  description: gym.gym_description || "No description provided",
 
-    amenities: [
-      { name: "Parking", icon: "Car" },
-      { name: "Locker Room", icon: "Lock" },
-      { name: "Shower", icon: "Droplet" },
-      { name: "AC", icon: "Wind" },
-      { name: "Personal Trainer", icon: "UserCheck" }
-    ],
+  amenities: gym.amenities
+    ? gym.amenities.split(",").map((a) => ({
+        name: a.trim(),
+        icon: "Check",
+      }))
+    : [],
 
-    plans: [
-      { name: "Basic", price: 1499, duration: "month", features: ["Gym access"] },
-      { name: "Premium", price: 2499, duration: "month", features: ["Classes", "Trainer"] }
-    ],
+  trainers: [],
+  supplements: [],
+}));
 
-    trainers: [
-      {
-        name: "Rahul Sharma",
-        price: 500,
-        image: "https://randomuser.me/api/portraits/men/32.jpg"
-      },
-      {
-        name: "Aman Verma",
-        price: 600,
-        image: "https://randomuser.me/api/portraits/men/45.jpg"
-      }
-    ],
+      setGyms(formattedGyms);
 
-    supplements: [
-      {
-        name: "Whey Protein",
-        price: 2499,
-        image: "https://images.unsplash.com/photo-1594737625785-c3fcd5f5a7a7"
-      },
-      {
-        name: "Creatine",
-        price: 1499,
-        image: "https://images.unsplash.com/photo-1605296867304-46d5465a13f1"
-      }
-    ]
-  },
+    } catch (error) {
 
-  {
-    id: 2,
-    name: "Iron Paradise Fitness",
-    image: "https://images.unsplash.com/photo-1697490580141-a76008636dd7",
-    imageAlt: "Strength gym",
-    address: "Bandra West, Mumbai",
-    distance: 3.5,
-    rating: 4.6,
-    reviews: 287,
-    price: 1999,
-    members: 950,
-    openTime: "24/7",
-    featured: false,
-    phone: "+91 98989 12121",
-    email: "ironparadise@gmail.com",
-    description: "Hardcore strength and bodybuilding gym.",
+      console.log("Gym fetch error:", error);
 
-    amenities: [
-      { name: "Parking", icon: "Car" },
-      { name: "Locker Room", icon: "Lock" },
-      { name: "Personal Trainer", icon: "UserCheck" }
-    ],
+    }
 
-    plans: [
-      { name: "Standard", price: 1999, duration: "month", features: ["24/7 Access"] }
-    ],
+  };
 
-    trainers: [
-      {
-        name: "Vikram Singh",
-        price: 700,
-        image: "https://randomuser.me/api/portraits/men/52.jpg"
-      }
-    ],
+  fetchGyms();
 
-    supplements: [
-      {
-        name: "Mass Gainer",
-        price: 2999,
-        image: "https://images.unsplash.com/photo-1605296867304-46d5465a13f1"
-      }
-    ]
-  },
+}, []);
 
-  {
-    id: 3,
-    name: "Zen Yoga & Wellness Center",
-    image: "https://images.unsplash.com/photo-1671726203463-f262325f1b02",
-    imageAlt: "Yoga studio",
-    address: "Indiranagar, Nallasopara",
-    distance: 4.2,
-    rating: 4.9,
-    reviews: 421,
-    price: 1799,
-    members: 680,
-    openTime: "6 AM - 9 PM",
-    featured: true,
-    phone: "+91 98111 22334",
-    email: "zenyoga@gmail.com",
-    description: "Peaceful yoga and meditation center.",
-
-    amenities: [
-      { name: "Meditation Room", icon: "Heart" },
-      { name: "AC", icon: "Wind" },
-      { name: "Locker Room", icon: "Lock" }
-    ],
-
-    plans: [
-      { name: "Beginner", price: 1799, duration: "month", features: ["Yoga Classes"] }
-    ],
-
-    trainers: [
-      {
-        name: "Neha Kapoor",
-        price: 400,
-        image: "https://randomuser.me/api/portraits/women/65.jpg"
-      }
-    ],
-
-    supplements: [
-      {
-        name: "Vegan Protein",
-        price: 2199,
-        image: "https://images.unsplash.com/photo-1594737625785-c3fcd5f5a7a7"
-      }
-    ]
-  }
-];
-  const [filteredGyms, setFilteredGyms] = useState(mockGyms);
-
+ 
+  const [filteredGyms, setFilteredGyms] = useState([]);
   useEffect(() => {
-    let result = [...mockGyms];
+    let result = [...gyms];
 
     if (searchQuery) {
       result = result.filter(gym =>
@@ -229,7 +142,7 @@ const GymListing = () => {
     }
 
     setFilteredGyms(result);
-  }, [filters, sortBy, searchQuery]);
+  }, [filters, sortBy, searchQuery,gyms]);
 
   const handleResetFilters = () => {
     setFilters({
