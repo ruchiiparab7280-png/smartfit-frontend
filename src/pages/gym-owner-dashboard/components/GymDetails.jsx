@@ -103,17 +103,45 @@ const GymDetails = () => {
 
   /* ================= SAVE ================= */
 
-  const handleSave = (e) => {
-    e.preventDefault();
+  const handleSave = async (e) => {
 
-    if (images.length < 6) {
-      alert("Please upload at least 6 gym images");
-      return;
+  e.preventDefault();
+
+  if (images.length < 6) {
+    alert("Please upload at least 6 gym images");
+    return;
+  }
+
+  try {
+
+    const email = localStorage.getItem("userEmail");
+
+    const res = await fetch(
+      `${import.meta.env.VITE_API_URL}/update-gym/${email}`,
+      {
+        method: "PUT",
+        headers: {
+          "Content-Type": "application/json"
+        },
+        body: JSON.stringify(formData)
+      }
+    );
+
+    const data = await res.json();
+
+    if (res.ok) {
+      alert("Gym details updated");
+      setSaved(true);
     }
 
-    setSaved(true);
-  };
+  } catch (error) {
 
+    console.log(error);
+    alert("Update failed");
+
+  }
+
+};
   return (
     <div>
       <div className="mb-6">
