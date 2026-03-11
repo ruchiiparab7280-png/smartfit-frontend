@@ -37,26 +37,28 @@ const GymDetails = () => {
   useEffect(() => {
     const fetchGymDetails = async () => {
       try {
+
         const email = localStorage.getItem("userEmail");
 
-      const res = await fetch(
-  `${import.meta.env.VITE_API_URL}/update-gym/${email}`,
-  {
-    method: "PUT",
-    headers: {
-      "Content-Type": "application/json"
-    },
-    body: JSON.stringify({
-      gym_name: formData.gymName,
-      address: formData.address,
-      phone: formData.contactNumber,
-      gym_description: formData.description,
-      amenities: formData.amenities.join(", "),
-      opening_time: formData.openingTime,
-      closing_time: formData.closingTime
-    })
-  }
-);
+        const res = await fetch(
+          `${import.meta.env.VITE_API_URL}/owner-gym/${email}`
+        );
+
+        const data = await res.json();
+
+        setFormData({
+          gymName: data.gym_name || "",
+          address: data.address || "",
+          contactNumber: data.phone || "",
+          email: data.email || "",
+          openingTime: data.opening_time ? data.opening_time.slice(0,5) : "",
+          closingTime: data.closing_time ? data.closing_time.slice(0,5) : "",
+          description: data.gym_description || "",
+          amenities: data.amenities
+            ? data.amenities.split(",").map((a) => a.trim())
+            : [],
+        });
+
       } catch (error) {
         console.log("Fetch error:", error);
       }
@@ -105,45 +107,53 @@ const GymDetails = () => {
 
   const handleSave = async (e) => {
 
-  e.preventDefault();
+    e.preventDefault();
 
-  if (images.length < 6) {
-    alert("Please upload at least 6 gym images");
-    return;
-  }
-
-  try {
-
-    const email = localStorage.getItem("userEmail");
-
-    const res = await fetch(
-      `${import.meta.env.VITE_API_URL}/update-gym/${email}`,
-      {
-        method: "PUT",
-        headers: {
-          "Content-Type": "application/json"
-        },
-        body: JSON.stringify(formData)
-      }
-    );
-
-    const data = await res.json();
-
-    if (res.ok) {
-      alert("Gym details updated");
-      setSaved(true);
+    if (images.length < 6) {
+      alert("Please upload at least 6 gym images");
+      return;
     }
 
-  } catch (error) {
+    try {
 
-    console.log(error);
-    alert("Update failed");
+      const email = localStorage.getItem("userEmail");
 
-  }
+      const res = await fetch(
+        `${import.meta.env.VITE_API_URL}/update-gym/${email}`,
+        {
+          method: "PUT",
+          headers: {
+            "Content-Type": "application/json"
+          },
+          body: JSON.stringify({
+            gym_name: formData.gymName,
+            address: formData.address,
+            phone: formData.contactNumber,
+            gym_description: formData.description,
+            amenities: formData.amenities.join(", "),
+            opening_time: formData.openingTime,
+            closing_time: formData.closingTime
+          })
+        }
+      );
 
-};
+      const data = await res.json();
+
+      if (res.ok) {
+        setSaved(true);
+        alert("Gym details updated successfully");
+      }
+
+    } catch (error) {
+      console.log(error);
+      alert("Update failed");
+    }
+
+  };
+
   return (
     <div>
+
       <div className="mb-6">
         <h2 className="text-2xl font-bold text-slate-800">Edit Gym Details</h2>
         <p className="text-slate-500 mt-1">
@@ -155,6 +165,7 @@ const GymDetails = () => {
         onSubmit={handleSave}
         className="bg-white rounded-xl shadow-sm border border-slate-200 p-6"
       >
+
         <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
 
           {/* Gym Name */}
@@ -215,6 +226,7 @@ const GymDetails = () => {
 
           {/* Time */}
           <div className="grid grid-cols-2 gap-4">
+
             <div>
               <label className="block text-sm font-semibold text-slate-700 mb-2">
                 Opening Time
@@ -240,6 +252,7 @@ const GymDetails = () => {
                 className="w-full px-4 py-2.5 rounded-lg border border-slate-200 text-slate-800"
               />
             </div>
+
           </div>
 
           {/* Description */}
@@ -258,6 +271,7 @@ const GymDetails = () => {
 
           {/* Amenities */}
           <div className="md:col-span-2">
+
             <label className="block text-sm font-semibold text-slate-700 mb-3">
               Amenities & Features
             </label>
@@ -265,25 +279,32 @@ const GymDetails = () => {
             <div className="grid grid-cols-2 md:grid-cols-3 gap-3">
 
               {amenitiesList.map((item) => (
+
                 <label
                   key={item}
                   className="flex items-center gap-2 text-sm text-slate-900 font-medium"
                 >
+
                   <input
                     type="checkbox"
                     className="accent-blue-600"
                     checked={formData.amenities.includes(item)}
                     onChange={() => handleAmenityChange(item)}
                   />
+
                   {item}
+
                 </label>
+
               ))}
 
             </div>
+
           </div>
 
           {/* Images */}
           <div className="md:col-span-2">
+
             <p className="text-xs text-red-500 mb-2">
               Minimum 6 gym images required
             </p>
@@ -297,6 +318,7 @@ const GymDetails = () => {
 
             {images.length > 0 && (
               <div className="flex gap-3 mt-4">
+
                 {images.map((img, i) => (
                   <img
                     key={i}
@@ -304,9 +326,12 @@ const GymDetails = () => {
                     className="w-20 h-20 object-cover rounded"
                   />
                 ))}
+
               </div>
             )}
+
           </div>
+
         </div>
 
         <button
@@ -321,7 +346,9 @@ const GymDetails = () => {
             Changes saved successfully!
           </p>
         )}
+
       </form>
+
     </div>
   );
 };
