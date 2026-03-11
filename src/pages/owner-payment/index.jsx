@@ -59,13 +59,16 @@ const OwnerPayment = () => {
   handler: async function (response) {
 
     const verifyRes = await fetch(
-      "https://smartfit-backend-q4l6.onrender.com/payment/verify",
-      {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify(response),
-      }
-    );
+  "https://smartfit-backend-q4l6.onrender.com/payment/verify",
+  {
+    method: "POST",
+    headers: { "Content-Type": "application/json" },
+    body: JSON.stringify({
+      ...response,
+      email: localStorage.getItem("userEmail")
+    }),
+  }
+);
 
     const verifyData = await verifyRes.json();
 
