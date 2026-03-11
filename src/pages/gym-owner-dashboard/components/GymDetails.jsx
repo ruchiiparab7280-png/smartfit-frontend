@@ -108,10 +108,10 @@ setFormData({
 
     e.preventDefault();
 
-    if (images.length < 6) {
-      alert("Please upload at least 6 gym images");
-      return;
-    }
+   // if (images.length < 6) {
+      //alert("Please upload at least 6 gym images");
+      //return;
+    //}
 
     try {
 
