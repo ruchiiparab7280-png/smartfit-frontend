@@ -13,6 +13,7 @@ import ApprovalPending from "./pages/ApprovalPending";
 import AdminApproval from "./pages/admin-approval";
 import OwnerApproved from "./pages/owner-approved";
 import OwnerRejected from "./pages/owner-rejected";
+import OwnerPayment from "./pages/owner-payment";
 import GymOwnerDashboard from './pages/gym-owner-dashboard';
 import Contact from "./pages/contact";
 
@@ -38,6 +39,7 @@ const Routes = () => {
         <Route path="/admin-approval" element={<AdminApproval />} />
         <Route path="/owner-approved" element={<OwnerApproved />} />
         <Route path="/owner-rejected" element={<OwnerRejected />} />
+        <Route path="/owner-payment" element={<OwnerPayment />} />
         <Route path="/gym-owner-dashboard" element={<GymOwnerDashboard />} />
         <Route path="/contact" element={<Contact />} />
         
