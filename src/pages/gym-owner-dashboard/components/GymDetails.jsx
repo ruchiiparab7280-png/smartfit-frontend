@@ -334,11 +334,12 @@ setFormData({
         </div>
 
         <button
-          type="submit"
-          className="mt-6 px-6 py-2 bg-blue-600 text-white rounded-lg"
-        >
-          Save Changes
-        </button>
+  type="button"
+  onClick={handleSave}
+  className="mt-6 px-6 py-2 bg-blue-600 text-white rounded-lg cursor-pointer"
+>
+  Save Changes
+</button>
 
         {saved && (
           <p className="text-green-600 mt-2">
