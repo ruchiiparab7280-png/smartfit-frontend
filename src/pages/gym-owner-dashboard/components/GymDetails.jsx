@@ -40,25 +40,24 @@ const GymDetails = () => {
 
         const email = localStorage.getItem("userEmail");
 
-        const res = await fetch(
-          `${import.meta.env.VITE_API_URL}/owner-gym/${email}`
-        );
+       const res = await fetch(
+  `${import.meta.env.VITE_API_URL}/owner-gym/${email}`
+);
 
-        const data = await res.json();
+const data = await res.json();
 
-        setFormData({
-          gymName: data.gym_name || "",
-          address: data.address || "",
-          contactNumber: data.phone || "",
-          email: data.email || "",
-          openingTime: data.opening_time ? data.opening_time.slice(0,5) : "",
-          closingTime: data.closing_time ? data.closing_time.slice(0,5) : "",
-          description: data.gym_description || "",
-          amenities: data.amenities
-            ? data.amenities.split(",").map((a) => a.trim())
-            : [],
-        });
-
+setFormData({
+  gymName: data.gym_name || "",
+  address: data.address || "",
+  contactNumber: data.phone || "",
+  email: data.email || "",
+  openingTime: data.opening_time ? data.opening_time.slice(0,5) : "",
+  closingTime: data.closing_time ? data.closing_time.slice(0,5) : "",
+  description: data.gym_description || "",
+  amenities: data.amenities
+    ? data.amenities.split(",").map((a) => a.trim())
+    : [],
+});
       } catch (error) {
         console.log("Fetch error:", error);
       }
