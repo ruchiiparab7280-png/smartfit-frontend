@@ -349,7 +349,7 @@ className="w-full px-4 py-2.5 rounded-lg border border-slate-200"
 <button
 type="button"
 onClick={()=>setShowModal(false)}
-className="flex-1 py-2.5 border border-slate-200 text-slate-600 font-semibold rounded-lg hover:bg-slate-50"
+className="flex-1 py-2.5 border border-slate-200 text-slate-900 font-semibold rounded-lg hover:bg-slate-50"
 >
 Cancel
 </button>
