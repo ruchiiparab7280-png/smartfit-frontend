@@ -105,6 +105,8 @@ setShowModal(true);
 
 const handleDelete = async (id) => {
 
+console.log("Deleting supplement id:", id);
+
 try{
 
 await fetch(
@@ -114,7 +116,6 @@ method:"DELETE"
 }
 );
 
-// refresh list
 fetchSupplements();
 
 }catch(err){
@@ -124,7 +125,6 @@ console.log(err);
 }
 
 };
-
 
 // image preview
 const handleImageChange = (e) => {
