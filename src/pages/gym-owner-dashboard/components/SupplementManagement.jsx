@@ -243,7 +243,7 @@ Add Supplement
 
 <div
 key={s.id}
-className="bg-white rounded-xl shadow-sm border border-slate-200 overflow-hidden"
+className="relative z-10 bg-white rounded-xl shadow-sm border border-slate-200 overflow-hidden"
 >
 
 <div className="h-44 bg-slate-100 overflow-hidden">
@@ -289,11 +289,9 @@ Edit
 
 <button
 onClick={()=>handleDelete(s.id)}
-className="flex-1 py-1.5 text-sm font-medium text-red-500 border border-red-200 rounded-lg hover:bg-red-50 transition-colors"
+className="flex-1 py-1.5 text-sm font-medium text-red-500 border border-red-200 rounded-lg hover:bg-red-50 transition-colors pointer-events-auto"
 >
-
 Delete
-
 </button>
 
 </div>
