@@ -1,15 +1,10 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 
-const initialPlans = [
-{ id: 1, name: 'Basic Monthly', duration: '1 Month', price: 49, description: 'Access to gym floor, basic equipment, and locker rooms. Perfect for casual fitness enthusiasts.' },
-{ id: 2, name: 'Standard Quarterly', duration: '3 Months', price: 129, description: 'All Basic features plus group classes, sauna access, and one free personal training session.' },
-{ id: 3, name: 'Premium Semi-Annual', duration: '6 Months', price: 229, description: 'Full access to all facilities, unlimited group classes, 3 personal training sessions, and nutrition consultation.' },
-{ id: 4, name: 'Elite Annual', duration: '6 Months', price: 399, description: 'VIP access, unlimited personal training, priority booking, guest passes, and exclusive member events.' },
-];
+
 
 const emptyForm = { name: '', duration: '1 Month', price: '', description: '' };
 
-const durations = ['1 Month', '3 Months', '6 Months'];
+const durations = ['1 Month', '3 Months', '6 Months', '1 year'];
 
 const membersData = [
 {
@@ -46,11 +41,39 @@ return 'bg-emerald-100 text-emerald-700';
 
 const MembershipManagement = () => {
 
-const [plans, setPlans] = useState(initialPlans);
+const ownerEmail = localStorage.getItem("userEmail");    
+const [plans, setPlans] = useState([]);
+useEffect(() => {
+
+const fetchMemberships = async () => {
+
+try {
+
+const res = await fetch(
+`${import.meta.env.VITE_API_URL}/memberships/${ownerEmail}`
+);
+
+const data = await res.json();
+
+setPlans(data);
+
+} catch (err) {
+
+console.log("Membership fetch error", err);
+
+}
+
+};
+
+fetchMemberships();
+
+}, [ownerEmail]);
 const [memberships] = useState(membersData);
 const [showModal, setShowModal] = useState(false);
 const [editId, setEditId] = useState(null);
 const [form, setForm] = useState(emptyForm);
+
+
 
 const openAdd = () => {
 setForm(emptyForm);
@@ -69,29 +92,68 @@ setEditId(p?.id);
 setShowModal(true);
 };
 
-const handleDelete = (id) => {
-setPlans(plans?.filter(p => p?.id !== id));
-};
+const handleDelete = async (id) => {
 
-const handleSubmit = (e) => {
-e.preventDefault();
+try {
 
-if (editId) {
-setPlans(
-plans?.map(p =>
-p?.id === editId
-? { ...p, ...form, price: Number(form?.price) }
-: p
-)
+await fetch(
+`${import.meta.env.VITE_API_URL}/membership/${id}`,
+{
+method: "DELETE"
+}
 );
-} else {
-setPlans([
-...plans,
-{ id: Date.now(), ...form, price: Number(form?.price) }
-]);
+
+setPlans(plans.filter(p => p.id !== id));
+
+} catch (err) {
+
+console.log("Delete error", err);
+
 }
 
-setShowModal(false);
+};
+
+const handleSubmit = async (e) => {
+
+e.preventDefault();
+
+try {
+
+if (editId) {
+
+await fetch(
+`${import.meta.env.VITE_API_URL}/update-membership/${editId}`,
+{
+method: "PUT",
+headers: { "Content-Type": "application/json" },
+body: JSON.stringify(form)
+}
+);
+
+} else {
+
+await fetch(
+`${import.meta.env.VITE_API_URL}/add-membership`,
+{
+method: "POST",
+headers: { "Content-Type": "application/json" },
+body: JSON.stringify({
+gym_email: ownerEmail,
+...form
+})
+}
+);
+
+}
+
+window.location.reload();
+
+} catch (err) {
+
+console.log("Save error", err);
+
+}
+
 };
 
 return (
@@ -200,7 +262,7 @@ value={form?.name}
 onChange={(e) =>
 setForm({ ...form, name: e.target.value })
 }
-className="w-full border px-4 py-2 rounded"
+className="w-full border px-4 py-2 rounded  text-slate-900"
 />
 
 <select
@@ -208,7 +270,7 @@ value={form?.duration}
 onChange={(e) =>
 setForm({ ...form, duration: e.target.value })
 }
-className="w-full border px-4 py-2 rounded"
+className="w-full border px-4 py-2 rounded text-slate-900"
 >
 
 {durations?.map(d => (
@@ -226,7 +288,7 @@ value={form?.price}
 onChange={(e) =>
 setForm({ ...form, price: e.target.value })
 }
-className="w-full border px-4 py-2 rounded"
+className="w-full border px-4 py-2 rounded  text-slate-900"
 />
 
 <textarea
@@ -235,7 +297,7 @@ value={form?.description}
 onChange={(e) =>
 setForm({ ...form, description: e.target.value })
 }
-className="w-full border px-4 py-2 rounded"
+className="w-full border px-4 py-2 rounded  text-slate-900"
 />
 
 <div className="flex gap-3">
