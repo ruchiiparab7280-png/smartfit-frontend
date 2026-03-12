@@ -103,10 +103,25 @@ setShowModal(true);
 };
 
 
-// delete local
-const handleDelete = (id) => {
+const handleDelete = async (id) => {
 
-setSupplements(supplements.filter(s => s.id !== id));
+try{
+
+await fetch(
+`${import.meta.env.VITE_API_URL}/supplement/${id}`,
+{
+method:"DELETE"
+}
+);
+
+// refresh list
+fetchSupplements();
+
+}catch(err){
+
+console.log(err);
+
+}
 
 };
 
