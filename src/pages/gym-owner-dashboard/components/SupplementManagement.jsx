@@ -1,6 +1,25 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect} from 'react';
 
 
+useEffect(() => {
+
+  const fetchSupplements = async () => {
+
+    const ownerEmail = localStorage.getItem("email");
+
+    const res = await fetch(
+      `${import.meta.env.VITE_API_URL}/supplements/${ownerEmail}`
+    );
+
+    const data = await res.json();
+
+    setSupplements(data);
+
+  };
+
+  fetchSupplements();
+
+}, []);
 const initialSupplements = [
 { id: 1, name: 'Whey Protein Gold', price: 59.99, image: "https://img.rocket.new/generatedImages/rocket_gen_img_1aacf124c-1773068342201.png", description: 'Premium whey protein isolate with 25g protein per serving. Chocolate and vanilla flavors available.' },
 { id: 2, name: 'Creatine Monohydrate', price: 29.99, image: "https://img.rocket.new/generatedImages/rocket_gen_img_1bcabe25d-1773068341904.png", description: 'Pure micronized creatine for strength and power gains. Unflavored, mixes easily.' },
@@ -75,16 +94,45 @@ const SupplementManagement = () => {
       setForm((prev) => ({ ...prev, image: url }));
     }
   };
+  const ownerEmail = localStorage.getItem("email");
+  const handleSubmit = async (e) => {
 
-  const handleSubmit = (e) => {
-    e?.preventDefault();
-    if (editId) {
-      setSupplements(supplements?.map((s) => s?.id === editId ? { ...s, ...form, price: Number(form?.price) } : s));
-    } else {
-      setSupplements([...supplements, { id: Date.now(), ...form, price: Number(form?.price), image: imagePreview || 'https://images.unsplash.com/photo-1593095948071-474c5cc2989d?w=200&h=200&fit=crop' }]);
-    }
+  e.preventDefault();
+
+  try {
+
+    const ownerEmail = localStorage.getItem("email");
+
+    const res = await fetch(
+      `${import.meta.env.VITE_API_URL}/add-supplement`,
+      {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json"
+        },
+        body: JSON.stringify({
+          gym_email: ownerEmail,
+          name: form.name,
+          price: form.price,
+          image: imagePreview,
+          description: form.description
+        })
+      }
+    );
+
+    const data = await res.json();
+
+    alert("Supplement added ✅");
+
     setShowModal(false);
-  };
+
+  } catch (err) {
+
+    console.log(err);
+
+  }
+
+};
 
   return (
     <div>

@@ -48,6 +48,12 @@ data.map(async (gym, index) => {
 
   const trainers = await trainerRes.json();
 
+  const supplementRes = await fetch(
+`${import.meta.env.VITE_API_URL}/supplements/${gym.email}`
+);
+
+const supplements = await supplementRes.json();
+
  return {
   id: index + 1,
 
@@ -79,7 +85,12 @@ data.map(async (gym, index) => {
       image: t.image
     })),
 
-    supplements: []
+    supplements: supplements.map(s => ({
+  name: s.name,
+  price: s.price,
+  image: s.image,
+  description: s.description
+}))
   };
 
 })
