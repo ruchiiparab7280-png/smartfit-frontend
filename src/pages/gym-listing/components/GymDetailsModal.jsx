@@ -113,7 +113,7 @@ const scrollRight = () => {
             </div>
             <div className="text-left sm:text-right">
               <p className="text-sm text-muted-foreground mb-1">Starting from</p>
-              <p className="text-3xl font-bold text-primary">${gym?.price}/month</p>
+              <p className="text-3xl font-bold text-primary">₹{gym?.price}/month</p>
             </div>
           </div>
 
