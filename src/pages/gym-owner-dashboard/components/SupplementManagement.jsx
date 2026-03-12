@@ -99,7 +99,8 @@ setForm({
 name: s?.name,
 price: s?.price,
 description: s?.description,
-image: s?.image
+image: s?.image,
+stock_status: s?.stock_status  
 });
 
 setImagePreview(s?.image);
@@ -207,7 +208,7 @@ alert("Supplement added ✅");
 }
 
 setShowModal(false);
-
+setEditId(null);
 // refresh list
 fetchSupplements();
 
