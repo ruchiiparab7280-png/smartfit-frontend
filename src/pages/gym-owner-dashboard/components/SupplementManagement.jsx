@@ -1,6 +1,12 @@
 import React, { useState, useEffect } from "react";
 
-const emptyForm = { name: "", price: "", description: "", image: "" };
+const emptyForm = {
+  name: "",
+  price: "",
+  description: "",
+  image: "",
+  stock_status: "in_stock"
+};
 
 const supplementOrders = [
 {
@@ -154,6 +160,30 @@ e.preventDefault();
 
 try{
 
+if(editId){
+
+// UPDATE API
+await fetch(
+`${import.meta.env.VITE_API_URL}/update-supplement/${editId}`,
+{
+method:"PUT",
+headers:{
+"Content-Type":"application/json"
+},
+body:JSON.stringify({
+name:form.name,
+price:form.price,
+description:form.description,
+stock_status:form.stock_status
+})
+}
+);
+
+alert("Supplement updated ✅");
+
+}else{
+
+// ADD API
 await fetch(
 `${import.meta.env.VITE_API_URL}/add-supplement`,
 {
@@ -166,12 +196,15 @@ gym_email:ownerEmail,
 name:form.name,
 price:form.price,
 image:imagePreview,
-description:form.description
+description:form.description,
+stock_status:form.stock_status
 })
 }
 );
 
 alert("Supplement added ✅");
+
+}
 
 setShowModal(false);
 
@@ -185,7 +218,6 @@ console.log(err);
 }
 
 };
-
 
 return (
 
@@ -393,6 +425,24 @@ className="w-full px-4 py-2.5 rounded-lg border border-slate-200 focus:outline-n
 
 </div>
 
+<div>
+
+<label className="block text-sm font-semibold text-slate-900 mb-1">
+Stock Status
+</label>
+
+<select
+value={form.stock_status}
+onChange={(e)=>setForm({...form,stock_status:e.target.value})}
+className="w-full px-4 py-2.5 rounded-lg border border-slate-200 focus:outline-none focus:ring-2 focus:ring-blue-500 text-slate-900"
+>
+
+<option value="in_stock">In Stock</option>
+<option value="out_of_stock">Out of Stock</option>
+
+</select>
+
+</div>
 
 <div>
 
@@ -449,7 +499,7 @@ type="submit"
 className="flex-1 py-2.5 bg-blue-600 text-white font-semibold rounded-lg hover:bg-blue-700"
 >
 
-Add Supplement
+{editId ? "Update Supplement" : "Add Supplement"}
 
 </button>
 
