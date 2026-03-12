@@ -261,7 +261,7 @@ Delete
 
 <button
 onClick={()=>setShowModal(false)}
-className="text-slate-400 hover:text-slate-600"
+className="text-slate-900 hover:text-slate-600"
 >
 ✕
 </button>
