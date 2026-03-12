@@ -68,7 +68,9 @@ const LoginForm = () => {
       const data = await response.json();
 
       if (response.ok) {
-          console.log(data.user);
+         console.log(data.user);
+
+;
 
         // Save login info
         localStorage.setItem("isAuthenticated", "true");
@@ -78,6 +80,7 @@ const LoginForm = () => {
         localStorage.setItem("userStatus", data.user.status);
         localStorage.setItem("userId", data.user.id);
 
+        localStorage.setItem("paymentStatus", data.user.payment_status)
         // ROLE + APPROVAL BASED NAVIGATION
        // ROLE + STATUS BASED NAVIGATION
 
