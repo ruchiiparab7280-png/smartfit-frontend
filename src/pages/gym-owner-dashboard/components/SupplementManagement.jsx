@@ -44,7 +44,7 @@ const [editId, setEditId] = useState(null);
 const [form, setForm] = useState(emptyForm);
 const [imagePreview, setImagePreview] = useState("");
 
-const ownerEmail = localStorage.getItem("email");
+const ownerEmail = localStorage.getItem("userEmail");
 
 
 // fetch supplements
