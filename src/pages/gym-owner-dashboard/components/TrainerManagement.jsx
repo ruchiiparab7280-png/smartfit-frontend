@@ -306,7 +306,7 @@ required
 type="text"
 value={form?.name}
 onChange={(e)=>setForm({...form,name:e.target.value})}
-className="w-full px-4 py-2.5 rounded-lg border border-slate-200"
+className="w-full px-4 py-2.5 rounded-lg border border-slate-200 text-slate-800"
 />
 
 </div>
@@ -322,7 +322,7 @@ required
 type="text"
 value={form?.specialization}
 onChange={(e)=>setForm({...form,specialization:e.target.value})}
-className="w-full px-4 py-2.5 rounded-lg border border-slate-200"
+className="w-full px-4 py-2.5 rounded-lg border border-slate-200 text-slate-800"
 />
 
 </div>
@@ -339,7 +339,7 @@ type="number"
 min="0"
 value={form?.pricePerSession}
 onChange={(e)=>setForm({...form,pricePerSession:e.target.value})}
-className="w-full px-4 py-2.5 rounded-lg border border-slate-200"
+className="w-full px-4 py-2.5 rounded-lg border border-slate-200 text-slate-800"
 />
 
 </div>
