@@ -39,44 +39,48 @@ useEffect(() => {
   return;
 }
       const data = await res.json();
+const formattedGyms = await Promise.all(
+data.map(async (gym, index) => {
 
-     const formattedGyms = data.map((gym, index) => ({
-  id: index + 1,
+  const trainerRes = await fetch(
+    `${import.meta.env.VITE_API_URL}/trainers/${gym.email}`
+  );
 
-  name: gym.gym_name || "Gym name not mentioned",
-  address: gym.address || "Address not mentioned",
-  phone: gym.phone || "Not mentioned",
-  email: gym.email || "Not mentioned",
+  const trainers = await trainerRes.json();
 
-  distance: 2,
-  rating: 4.5,
-  reviews: 10,
+  return {
+    id: index + 1,
 
-  price: gym.monthly_fee || "Not mentioned yet",
-  members: gym.capacity || "Not mentioned yet",
+    name: gym.gym_name,
+    address: gym.address,
+    phone: gym.phone,
+    email: gym.email,
 
-  openTime:
-    gym.opening_time && gym.closing_time
-      ? `${gym.opening_time} - ${gym.closing_time}`
-      : "Not mentioned yet",
+    price: gym.monthly_fee,
+    members: gym.capacity,
 
-  image:
-    gym.image ||
-    "https://images.unsplash.com/photo-1583454110551-21f2fa2afe61",
+    openTime: `${gym.opening_time} - ${gym.closing_time}`,
 
-  description: gym.gym_description || "No description provided",
+    description: gym.gym_description,
 
-  amenities: gym.amenities
-    ? gym.amenities.split(",").map((a) => ({
-        name: a.trim(),
-        icon: "Check",
-      }))
-    : [],
+    amenities: gym.amenities
+      ? gym.amenities.split(",").map(a => ({
+          name: a.trim(),
+          icon: "Check"
+        }))
+      : [],
 
-  trainers: [],
-  supplements: [],
-}));
+    trainers: trainers.map(t => ({
+      name: t.name,
+      price: t.price,
+      image: t.image
+    })),
 
+    supplements: []
+  };
+
+})
+);
       setGyms(formattedGyms);
 
     } catch (error) {
