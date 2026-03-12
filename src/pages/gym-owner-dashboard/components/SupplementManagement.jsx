@@ -1,25 +1,7 @@
 import React, { useState, useEffect} from 'react';
 
 
-useEffect(() => {
 
-  const fetchSupplements = async () => {
-
-    const ownerEmail = localStorage.getItem("email");
-
-    const res = await fetch(
-      `${import.meta.env.VITE_API_URL}/supplements/${ownerEmail}`
-    );
-
-    const data = await res.json();
-
-    setSupplements(data);
-
-  };
-
-  fetchSupplements();
-
-}, []);
 const initialSupplements = [
 { id: 1, name: 'Whey Protein Gold', price: 59.99, image: "https://img.rocket.new/generatedImages/rocket_gen_img_1aacf124c-1773068342201.png", description: 'Premium whey protein isolate with 25g protein per serving. Chocolate and vanilla flavors available.' },
 { id: 2, name: 'Creatine Monohydrate', price: 29.99, image: "https://img.rocket.new/generatedImages/rocket_gen_img_1bcabe25d-1773068341904.png", description: 'Pure micronized creatine for strength and power gains. Unflavored, mixes easily.' },
@@ -63,7 +45,28 @@ date: "14 Mar 2026"
 ];
 
 const SupplementManagement = () => {
-  const [supplements, setSupplements] = useState(initialSupplements);
+  const [supplements, setSupplements] = useState([]);
+
+useEffect(() => {
+
+  const fetchSupplements = async () => {
+
+    const ownerEmail = localStorage.getItem("email");
+
+    const res = await fetch(
+      `${import.meta.env.VITE_API_URL}/supplements/${ownerEmail}`
+    );
+
+    const data = await res.json();
+
+    setSupplements(data);
+
+  };
+
+  fetchSupplements();
+
+}, []);
+
   const [orders] = useState(supplementOrders);
   const [showModal, setShowModal] = useState(false);
   const [editId, setEditId] = useState(null);
