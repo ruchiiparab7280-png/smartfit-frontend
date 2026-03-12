@@ -48,20 +48,23 @@ data.map(async (gym, index) => {
 
   const trainers = await trainerRes.json();
 
-  return {
-    id: index + 1,
+ return {
+  id: index + 1,
 
-    name: gym.gym_name,
-    address: gym.address,
-    phone: gym.phone,
-    email: gym.email,
+  name: gym.gym_name,
+  address: gym.address,
+  phone: gym.phone,
+  email: gym.email,
 
-    price: gym.monthly_fee,
-    members: gym.capacity,
+  price: gym.monthly_fee,
+  members: gym.capacity,
 
-    openTime: `${gym.opening_time} - ${gym.closing_time}`,
+  distance: Math.floor(Math.random() * 10) + 1, // add this
+  rating: 4, // add this
 
-    description: gym.gym_description,
+  openTime: `${gym.opening_time} - ${gym.closing_time}`,
+
+  description: gym.gym_description,
 
     amenities: gym.amenities
       ? gym.amenities.split(",").map(a => ({
