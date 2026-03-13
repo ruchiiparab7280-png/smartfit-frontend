@@ -54,6 +54,12 @@ data.map(async (gym, index) => {
 
 const supplements = await supplementRes.json();
 
+const membershipRes = await fetch(
+`${import.meta.env.VITE_API_URL}/memberships/${gym.email}`
+);
+
+const memberships = await membershipRes.json();
+
  return {
   id: index + 1,
 
@@ -85,12 +91,19 @@ const supplements = await supplementRes.json();
       image: t.image
     })),
 
-    supplements: supplements.map(s => ({
+  supplements: supplements.map(s => ({
   name: s.name,
   price: s.price,
   image: s.image,
   description: s.description
-}))
+})),
+  
+ memberships: memberships.map(m => ({
+    name: m.name,
+    price: m.price,
+    duration: m.duration,
+    description: m.description
+  }))
   };
 
 })
