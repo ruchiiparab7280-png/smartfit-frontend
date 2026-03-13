@@ -387,24 +387,24 @@ const scrollRight = () => {
       <input
         type="text"
         placeholder="Full Name"
-        className="w-full mb-3 p-2 border rounded"
+        className="w-full mb-3 p-2 border rounded  text-black"
       />
 
       <input
         type="text"
         placeholder="Phone Number"
-        className="w-full mb-4 p-2 border rounded"
+        className="w-full mb-4 p-2 border rounded  text-black"
       />
 
       <button
-        className="w-full bg-orange-500 text-white py-2 rounded"
+        className="w-full bg-orange-500 text-black py-2 rounded"
       >
         Confirm Booking
       </button>
 
       <button
         onClick={() => setShowBookingModal(false)}
-        className="mt-2 text-sm text-gray-400"
+        className="mt-2 text-sm text-gray-900"
       >
         Cancel
       </button>
