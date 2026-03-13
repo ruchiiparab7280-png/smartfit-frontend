@@ -27,33 +27,50 @@ const handlePayment = async () => {
 
   const order = await res.json();
 
-  const options = {
-    key: order.key,
-    amount: order.amount,
-    currency: "INR",
-    name: "SmartFit Gym",
-    description: selectedPlan.name,
-    order_id: order.id,
+const options = {
+  key: order.key,
+  amount: order.amount,
+  currency: "INR",
+  name: "SmartFit Gym",
+  description: selectedPlan.name,
+  order_id: order.id,
 
-    handler: async function (response) {
+  handler: async function (response) {
 
-      await fetch(`${import.meta.env.VITE_API_URL}/payment/verify`, {
-        method: "POST",
-        headers: {
-          "Content-Type": "application/json"
-        },
-        body: JSON.stringify(response)
-      });
+    // verify payment
+    await fetch(`${import.meta.env.VITE_API_URL}/payment/verify`, {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json"
+      },
+      body: JSON.stringify(response)
+    });
 
-      alert("Payment Successful 🎉");
+    // save membership
+    await fetch(`${import.meta.env.VITE_API_URL}/book-membership`, {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json"
+      },
+      body: JSON.stringify({
+        user_email: localStorage.getItem("userEmail"),
+        gym_email: gym.email,
+        plan_name: selectedPlan.name,
+        duration: selectedPlan.duration,   // 👈 add
+        price: selectedPlan.price,
+        start_date: new Date(),
+        payment_id: response.razorpay_payment_id
+      })
+    });
 
-    },
+    alert("Membership Activated 🎉");
 
-    theme: {
-      color: "#f97316"
-    }
-  };
+  },
 
+  theme: {
+    color: "#f97316"
+  }
+};
   const rzp = new window.Razorpay(options);
   rzp.open();
 };

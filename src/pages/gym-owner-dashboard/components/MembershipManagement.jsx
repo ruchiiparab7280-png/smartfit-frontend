@@ -1,37 +1,8 @@
 import React, { useState, useEffect } from 'react';
 
-
-
 const emptyForm = { name: '', duration: '1 Month', price: '', description: '' };
 
 const durations = ['1 Month', '3 Months', '6 Months', '1 year'];
-
-const membersData = [
-{
-id:1,
-name:"Rahul Sharma",
-plan:"Basic Monthly",
-startDate:"1 Mar 2026",
-endDate:"1 Apr 2026",
-amount:49
-},
-{
-id:2,
-name:"Priya Patel",
-plan:"Standard Quarterly",
-startDate:"5 Mar 2026",
-endDate:"5 Jun 2026",
-amount:129
-},
-{
-id:3,
-name:"Aman Verma",
-plan:"Premium Semi-Annual",
-startDate:"10 Mar 2026",
-endDate:"10 Sep 2026",
-amount:229
-}
-];
 
 const durationColor = (d) => {
 if (d === '1 Month') return 'bg-blue-100 text-blue-700';
@@ -41,8 +12,15 @@ return 'bg-emerald-100 text-emerald-700';
 
 const MembershipManagement = () => {
 
-const ownerEmail = localStorage.getItem("userEmail");    
+const ownerEmail = localStorage.getItem("userEmail");
+
 const [plans, setPlans] = useState([]);
+const [members, setMembers] = useState([]);
+
+const [showModal, setShowModal] = useState(false);
+const [editId, setEditId] = useState(null);
+const [form, setForm] = useState(emptyForm);
+
 useEffect(() => {
 
 const fetchMemberships = async () => {
@@ -65,15 +43,30 @@ console.log("Membership fetch error", err);
 
 };
 
+const fetchMembers = async () => {
+
+try {
+
+const res = await fetch(
+`${import.meta.env.VITE_API_URL}/gym-members/${ownerEmail}`
+);
+
+const data = await res.json();
+
+setMembers(data);
+
+} catch (err) {
+
+console.log("Members fetch error", err);
+
+}
+
+};
+
 fetchMemberships();
+fetchMembers();
 
 }, [ownerEmail]);
-const [memberships] = useState(membersData);
-const [showModal, setShowModal] = useState(false);
-const [editId, setEditId] = useState(null);
-const [form, setForm] = useState(emptyForm);
-
-
 
 const openAdd = () => {
 setForm(emptyForm);
@@ -175,9 +168,11 @@ Membership Management
 <button
 onClick={openAdd}
 className="flex items-center gap-2 px-5 py-2.5 bg-blue-600 text-white font-semibold rounded-lg hover:bg-blue-700"
+
 >
-Add Plan
-</button>
+
+Add Plan </button>
+
 </div>
 
 {/* Plans */}
@@ -199,8 +194,7 @@ className="bg-white rounded-xl shadow-sm border border-slate-200 p-6"
 </h3>
 
 <span className={`text-xs font-semibold px-2 py-1 rounded-full ${durationColor(plan?.duration)}`}>
-{plan?.duration}
-</span>
+{plan?.duration} </span>
 
 </div>
 
@@ -222,16 +216,18 @@ className="bg-white rounded-xl shadow-sm border border-slate-200 p-6"
 <button
 onClick={() => openEdit(plan)}
 className="flex-1 py-1.5 text-sm text-blue-600 border border-blue-200 rounded-lg"
+
 >
-Edit
-</button>
+
+Edit </button>
 
 <button
 onClick={() => handleDelete(plan?.id)}
 className="flex-1 py-1.5 text-sm text-red-500 border border-red-200 rounded-lg"
+
 >
-Delete
-</button>
+
+Delete </button>
 
 </div>
 
@@ -262,7 +258,7 @@ value={form?.name}
 onChange={(e) =>
 setForm({ ...form, name: e.target.value })
 }
-className="w-full border px-4 py-2 rounded  text-slate-900"
+className="w-full border px-4 py-2 rounded text-slate-900"
 />
 
 <select
@@ -271,9 +267,11 @@ onChange={(e) =>
 setForm({ ...form, duration: e.target.value })
 }
 className="w-full border px-4 py-2 rounded text-slate-900"
+
 >
 
 {durations?.map(d => (
+
 <option key={d} value={d}>
 {d}
 </option>
@@ -288,7 +286,7 @@ value={form?.price}
 onChange={(e) =>
 setForm({ ...form, price: e.target.value })
 }
-className="w-full border px-4 py-2 rounded  text-slate-900"
+className="w-full border px-4 py-2 rounded text-slate-900"
 />
 
 <textarea
@@ -297,7 +295,7 @@ value={form?.description}
 onChange={(e) =>
 setForm({ ...form, description: e.target.value })
 }
-className="w-full border px-4 py-2 rounded  text-slate-900"
+className="w-full border px-4 py-2 rounded text-slate-900"
 />
 
 <div className="flex gap-3">
@@ -345,7 +343,6 @@ Active Members
 <th className="px-4 py-3 text-left">Member</th>
 <th className="px-4 py-3 text-left">Plan</th>
 <th className="px-4 py-3 text-left">Start</th>
-<th className="px-4 py-3 text-left">End</th>
 <th className="px-4 py-3 text-left">Payment</th>
 </tr>
 
@@ -353,28 +350,24 @@ Active Members
 
 <tbody>
 
-{memberships?.map(member => (
+{members?.map(member => (
 
 <tr key={member?.id} className="border-t">
 
 <td className="px-4 py-3 font-medium">
-{member?.name}
+{member?.user_email}
 </td>
 
 <td className="px-4 py-3">
-{member?.plan}
+{member?.plan_name}
 </td>
 
 <td className="px-4 py-3">
-{member?.startDate}
-</td>
-
-<td className="px-4 py-3">
-{member?.endDate}
+{new Date(member?.start_date).toLocaleDateString()}
 </td>
 
 <td className="px-4 py-3 font-semibold text-blue-600">
-₹{member?.amount}
+₹{member?.price}
 </td>
 
 </tr>
