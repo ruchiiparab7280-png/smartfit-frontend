@@ -1,4 +1,4 @@
-import React, { useRef } from 'react';
+import React, { useRef, useState } from 'react';
 import Image from '../../../components/AppImage';
 import Icon from '../../../components/AppIcon';
 import Button from '../../../components/ui/Button';
@@ -7,6 +7,8 @@ const GymDetailsModal = ({ gym, isOpen, onClose }) => {
   if (!isOpen || !gym) return null;
 
  const scrollRef = useRef(null);
+const [showBookingModal, setShowBookingModal] = useState(false);
+const [selectedPlan, setSelectedPlan] = useState(null);
 
 const scrollLeft = () => {
   scrollRef.current.scrollBy({
@@ -175,10 +177,14 @@ const scrollRight = () => {
             </h3>
             <div className="grid sm:grid-cols-3 gap-4">
               {gym?.memberships?.map((plan, index) => (
-                <div
-                  key={index}
-                  className="p-4 border border-border rounded-lg hover:border-primary transition-base"
-                >
+  <div
+    key={index}
+    onClick={() => {
+      setSelectedPlan(plan);
+      setShowBookingModal(true);
+    }}
+    className="p-4 border border-border rounded-lg hover:border-primary transition-base cursor-pointer"
+  >
                   <h4 className="font-semibold text-foreground mb-2">{plan?.name}</h4>
                   <p className="text-2xl font-bold text-primary mb-2">
                    ₹{plan?.price}
@@ -355,6 +361,58 @@ const scrollRight = () => {
           </div>
         </div>
       </div>
+      {showBookingModal && (
+  <div className="fixed inset-0 flex items-center justify-center bg-black/60 z-50">
+
+    <div className="bg-card p-6 rounded-lg w-[400px]">
+
+      <h2 className="text-xl font-bold mb-4">
+        Select Membership
+      </h2>
+      <p className="text-sm text-muted-foreground mb-3">
+  {selectedPlan?.name} - ₹{selectedPlan?.price}/{selectedPlan?.duration}
+</p>
+
+      <input
+        type="date"
+        className="w-full mb-3 p-2 border rounded"
+      />
+
+      <select className="w-full mb-3 p-2 border rounded">
+        <option>9:00 AM</option>
+        <option>10:00 AM</option>
+        <option>11:00 AM</option>
+      </select>
+
+      <input
+        type="text"
+        placeholder="Full Name"
+        className="w-full mb-3 p-2 border rounded"
+      />
+
+      <input
+        type="text"
+        placeholder="Phone Number"
+        className="w-full mb-4 p-2 border rounded"
+      />
+
+      <button
+        className="w-full bg-orange-500 text-white py-2 rounded"
+      >
+        Confirm Booking
+      </button>
+
+      <button
+        onClick={() => setShowBookingModal(false)}
+        className="mt-2 text-sm text-gray-400"
+      >
+        Cancel
+      </button>
+
+    </div>
+
+  </div>
+)}
     </div>
   );
 };
