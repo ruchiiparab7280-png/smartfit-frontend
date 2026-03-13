@@ -27,6 +27,7 @@ const GymDetails = () => {
     closingTime: "",
     description: "",
     amenities: [],
+    upiId: ""
   });
 
   const [images, setImages] = useState([]);
@@ -131,7 +132,8 @@ setFormData({
             gym_description: formData.description,
             amenities: formData.amenities.join(", "),
             opening_time: formData.openingTime,
-            closing_time: formData.closingTime
+            closing_time: formData.closingTime,
+            upi_id: formData.upiId
           })
         }
       );
@@ -268,6 +270,20 @@ setFormData({
             />
           </div>
 
+<div>
+  <label className="block text-sm font-semibold text-slate-700 mb-2">
+    UPI ID (For Membership Payments)
+  </label>
+
+  <input
+    type="text"
+    name="upiId"
+    value={formData.upiId}
+    onChange={handleChange}
+    placeholder="example@upi"
+    className="w-full px-4 py-2.5 rounded-lg border border-slate-200 text-slate-800"
+  />
+</div>
           {/* Amenities */}
           <div className="md:col-span-2">
 
