@@ -206,7 +206,7 @@ className="bg-white rounded-xl shadow-sm border border-slate-200 p-6"
 
 <div className="text-right">
 <p className="text-2xl font-bold text-blue-600">
-${plan?.price}
+₹{plan?.price}
 </p>
 <p className="text-xs text-slate-400">per plan</p>
 </div>
@@ -374,7 +374,7 @@ Active Members
 </td>
 
 <td className="px-4 py-3 font-semibold text-blue-600">
-${member?.amount}
+₹{member?.amount}
 </td>
 
 </tr>
