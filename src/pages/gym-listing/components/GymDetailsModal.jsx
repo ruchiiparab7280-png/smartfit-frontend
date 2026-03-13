@@ -378,7 +378,7 @@ const scrollRight = () => {
         className="w-full mb-3 p-2 border rounded"
       />
 
-      <select className="w-full mb-3 p-2 border rounded">
+      <select className="w-full mb-3 p-2 border rounded text-black">
         <option>9:00 AM</option>
         <option>10:00 AM</option>
         <option>11:00 AM</option>
