@@ -1,143 +1,382 @@
-import React, { useState } from 'react';
-import Icon from '../../../components/AppIcon';
-import Button from '../../../components/ui/Button';
-import { Checkbox } from '../../../components/ui/Checkbox';
+import React, { useState } from "react";
+import Icon from "../../../components/AppIcon";
+import Button from "../../../components/ui/Button";
+import { Checkbox } from "../../../components/ui/Checkbox";
 
 const WorkoutPlanCard = () => {
-  const [workouts, setWorkouts] = useState([
-    {
-      id: 1,
-      day: "Monday",
-      exercises: [
-        { id: 1, name: "Bench Press", sets: "4 x 12", completed: true },
-        { id: 2, name: "Incline Dumbbell Press", sets: "3 x 10", completed: true },
-        { id: 3, name: "Cable Flyes", sets: "3 x 15", completed: false },
-        { id: 4, name: "Tricep Dips", sets: "3 x 12", completed: false }
-      ]
-    },
-    {
-      id: 2,
-      day: "Wednesday",
-      exercises: [
-        { id: 5, name: "Squats", sets: "4 x 10", completed: false },
-        { id: 6, name: "Leg Press", sets: "3 x 12", completed: false },
-        { id: 7, name: "Leg Curls", sets: "3 x 15", completed: false },
-        { id: 8, name: "Calf Raises", sets: "4 x 20", completed: false }
-      ]
-    },
-    {
-      id: 3,
-      day: "Friday",
-      exercises: [
-        { id: 9, name: "Deadlifts", sets: "4 x 8", completed: false },
-        { id: 10, name: "Pull-ups", sets: "3 x 10", completed: false },
-        { id: 11, name: "Barbell Rows", sets: "3 x 12", completed: false },
-        { id: 12, name: "Bicep Curls", sets: "3 x 15", completed: false }
-      ]
-    }
-  ]);
 
-  const [expandedDay, setExpandedDay] = useState(null);
+const [workouts,setWorkouts] = useState([]);
+const [expandedDay,setExpandedDay] = useState(null);
 
-  const toggleDay = (dayId) => {
-    setExpandedDay(expandedDay === dayId ? null : dayId);
-  };
+const [showForm,setShowForm] = useState(false);
 
-  const toggleExercise = (dayId, exerciseId) => {
-    setWorkouts(prev => prev?.map(day => {
-      if (day?.id === dayId) {
-        return {
-          ...day,
-          exercises: day?.exercises?.map(ex => 
-            ex?.id === exerciseId ? { ...ex, completed: !ex?.completed } : ex
-          )
-        };
-      }
-      return day;
-    }));
-  };
+const [day,setDay] = useState("");
+const [exercise,setExercise] = useState("");
+const [sets,setSets] = useState("");
 
-  const getCompletionPercentage = (exercises) => {
-    const completed = exercises?.filter(ex => ex?.completed)?.length;
-    return Math.round((completed / exercises?.length) * 100);
-  };
+const [exerciseList,setExerciseList] = useState([]);
 
-  return (
-    <div className="bg-card rounded-lg p-6 card-elevation-sm">
-      <div className="flex items-center justify-between mb-6">
-        <h2 className="text-2xl font-bold text-foreground">Weekly Workout Plan</h2>
-        <Button variant="outline" size="sm" iconName="Plus" iconPosition="left">
-          Add Workout
-        </Button>
-      </div>
-      <div className="space-y-4">
-        {workouts?.map((workout) => {
-          const completionPercentage = getCompletionPercentage(workout?.exercises);
-          const isExpanded = expandedDay === workout?.id;
+const [editing,setEditing] = useState(null);
 
-          return (
-            <div key={workout?.id} className="border border-border rounded-lg overflow-hidden">
-              <button
-                onClick={() => toggleDay(workout?.id)}
-                className="w-full px-5 py-4 bg-muted/30 hover:bg-muted/50 transition-base flex items-center justify-between"
-              >
-                <div className="flex items-center gap-3">
-                  <Icon name="Calendar" size={20} color="var(--color-primary)" />
-                  <span className="text-lg font-semibold text-foreground">{workout?.day}</span>
-                  <span className="text-sm text-muted-foreground">
-                    {workout?.exercises?.length} exercises
-                  </span>
-                </div>
-                <div className="flex items-center gap-4">
-                  <div className="flex items-center gap-2">
-                    <div className="w-32 h-2 bg-muted rounded-full overflow-hidden">
-                      <div 
-                        className="h-full bg-primary transition-all duration-300"
-                        style={{ width: `${completionPercentage}%` }}
-                      />
-                    </div>
-                    <span className="text-sm font-semibold text-foreground">{completionPercentage}%</span>
-                  </div>
-                  <Icon 
-                    name={isExpanded ? "ChevronUp" : "ChevronDown"} 
-                    size={20} 
-                  />
-                </div>
-              </button>
-              {isExpanded && (
-                <div className="p-5 space-y-3">
-                  {workout?.exercises?.map((exercise) => (
-                    <div 
-                      key={exercise?.id}
-                      className="flex items-center justify-between p-3 rounded-md hover:bg-muted/30 transition-base"
-                    >
-                      <div className="flex items-center gap-3">
-                        <Checkbox
-                          checked={exercise?.completed}
-                          onChange={() => toggleExercise(workout?.id, exercise?.id)}
-                        />
-                        <div>
-                          <p className={`font-medium ${exercise?.completed ? 'text-muted-foreground line-through' : 'text-foreground'}`}>
-                            {exercise?.name}
-                          </p>
-                          <p className="text-sm text-muted-foreground">{exercise?.sets}</p>
-                        </div>
-                      </div>
-                      <Icon 
-                        name={exercise?.completed ? "CheckCircle2" : "Circle"} 
-                        size={20}
-                        color={exercise?.completed ? "var(--color-success)" : "var(--color-muted-foreground)"}
-                      />
-                    </div>
-                  ))}
-                </div>
-              )}
-            </div>
-          );
-        })}
-      </div>
-    </div>
-  );
+const toggleDay = (id)=>{
+setExpandedDay(expandedDay === id ? null : id);
+};
+
+const toggleExercise = (dayId,exerciseId)=>{
+
+setWorkouts(prev =>
+prev.map(day=>{
+
+if(day.id === dayId){
+
+return{
+...day,
+exercises:day.exercises.map(ex =>
+ex.id === exerciseId
+? { ...ex,completed:!ex.completed }
+: ex
+)
+};
+
+}
+
+return day;
+
+})
+);
+
+};
+
+const getCompletionPercentage = (exercises)=>{
+
+if(exercises.length === 0) return 0;
+
+const completed = exercises.filter(e=>e.completed).length;
+
+return Math.round((completed/exercises.length)*100);
+
+};
+
+const addExercise = ()=>{
+
+if(!exercise || !sets) return;
+
+setExerciseList([
+...exerciseList,
+{
+id:Date.now(),
+name:exercise,
+sets:sets,
+completed:false
+}
+]);
+
+setExercise("");
+setSets("");
+
+};
+
+const saveWorkout = ()=>{
+
+if(!day || exerciseList.length === 0) return;
+
+const existing = workouts.find(w=>w.day === day);
+
+if(existing){
+
+setWorkouts(prev =>
+prev.map(w =>
+w.day === day
+? { ...w,exercises:[...w.exercises,...exerciseList] }
+: w
+)
+);
+
+}else{
+
+const newWorkout = {
+id:Date.now(),
+day:day,
+exercises:exerciseList
+};
+
+setWorkouts([...workouts,newWorkout]);
+
+setExpandedDay(newWorkout.id);
+
+}
+
+setExerciseList([]);
+setDay("");
+setShowForm(false);
+
+};
+
+const deleteExercise = (dayId,exerciseId)=>{
+
+setWorkouts(prev =>
+prev.map(day=>{
+
+if(day.id === dayId){
+
+return{
+...day,
+exercises:day.exercises.filter(e=>e.id !== exerciseId)
+};
+
+}
+
+return day;
+
+})
+);
+
+};
+
+const startEdit = (dayId,exercise)=>{
+
+setEditing({dayId,exerciseId:exercise.id});
+
+setExercise(exercise.name);
+setSets(exercise.sets);
+
+};
+
+const saveEdit = ()=>{
+
+setWorkouts(prev =>
+prev.map(day=>{
+
+if(day.id === editing.dayId){
+
+return{
+...day,
+exercises:day.exercises.map(ex =>
+ex.id === editing.exerciseId
+? { ...ex,name:exercise,sets:sets }
+: ex
+)
+};
+
+}
+
+return day;
+
+})
+);
+
+setEditing(null);
+setExercise("");
+setSets("");
+
+};
+
+return(
+
+<div className="bg-card rounded-lg p-6">
+
+<div className="flex justify-between mb-6">
+
+<h2 className="text-2xl font-bold text-foreground">
+Weekly Workout Plan
+</h2>
+
+<Button
+variant="outline"
+iconName="Plus"
+onClick={()=>setShowForm(!showForm)}
+>
+Add Workout
+</Button>
+
+</div>
+
+{showForm && (
+
+<div className="bg-muted p-4 rounded-lg mb-6 space-y-3">
+
+<select
+className="w-full p-2 rounded bg-card text-foreground border border-border"
+value={day}
+onChange={(e)=>setDay(e.target.value)}
+>
+
+<option value="">Select Day</option>
+<option>Monday</option>
+<option>Tuesday</option>
+<option>Wednesday</option>
+<option>Thursday</option>
+<option>Friday</option>
+<option>Saturday</option>
+<option>Sunday</option>
+
+</select>
+
+<input
+type="text"
+placeholder="Exercise Name"
+className="w-full p-2 rounded bg-card text-foreground border border-border"
+value={exercise}
+onChange={(e)=>setExercise(e.target.value)}
+/>
+
+<input
+type="text"
+placeholder="Sets (3 x 12)"
+className="w-full p-2 rounded bg-card text-foreground border border-border"
+value={sets}
+onChange={(e)=>setSets(e.target.value)}
+/>
+
+<Button onClick={addExercise}>
+Add Exercise
+</Button>
+
+<div className="space-y-2">
+
+{exerciseList.map(ex =>(
+
+<div key={ex.id} className="flex justify-between bg-background p-2 rounded">
+
+<span>{ex.name} - {ex.sets}</span>
+
+<button
+className="text-red-500"
+onClick={()=>setExerciseList(exerciseList.filter(e=>e.id!==ex.id))}
+>
+Delete
+</button>
+
+</div>
+
+))}
+
+</div>
+
+<Button onClick={saveWorkout}>
+Save Workout
+</Button>
+
+</div>
+
+)}
+
+<div className="space-y-4">
+
+{workouts.map(workout=>{
+
+const percent = getCompletionPercentage(workout.exercises);
+
+const expanded = expandedDay === workout.id;
+
+return(
+
+<div key={workout.id} className="border rounded-lg">
+
+<button
+onClick={()=>toggleDay(workout.id)}
+className="w-full flex justify-between p-4"
+>
+
+<span className="font-semibold">{workout.day}</span>
+
+<span>{percent}%</span>
+
+</button>
+
+{expanded && (
+
+<div className="p-4 space-y-3">
+
+{workout.exercises.map(exercise=>(
+
+<div key={exercise.id} className="flex justify-between items-center">
+
+<div className="flex items-center gap-3">
+
+<Checkbox
+checked={exercise.completed}
+onChange={()=>toggleExercise(workout.id,exercise.id)}
+/>
+
+<div>
+
+<p className={`${exercise.completed ? "line-through text-muted-foreground" : ""}`}>
+{exercise.name}
+</p>
+
+<p className="text-sm text-muted-foreground">
+{exercise.sets}
+</p>
+
+</div>
+
+</div>
+
+<div className="flex gap-4">
+
+<button
+className="text-blue-500"
+onClick={()=>startEdit(workout.id,exercise)}
+>
+Edit
+</button>
+
+<button
+className="text-red-500"
+onClick={()=>deleteExercise(workout.id,exercise.id)}
+>
+Delete
+</button>
+
+</div>
+
+</div>
+
+))}
+
+</div>
+
+)}
+
+</div>
+
+);
+
+})}
+
+</div>
+
+{editing && (
+
+<div className="bg-muted p-4 rounded-lg mt-6 space-y-3">
+
+<h3>Edit Exercise</h3>
+
+<input
+value={exercise}
+onChange={(e)=>setExercise(e.target.value)}
+className="w-full p-2 rounded bg-card text-foreground border border-border"
+/>
+
+<input
+value={sets}
+onChange={(e)=>setSets(e.target.value)}
+className="w-full p-2 rounded bg-card text-foreground border border-border"
+/>
+
+<Button onClick={saveEdit}>
+Save Changes
+</Button>
+
+</div>
+
+)}
+
+</div>
+
+);
+
 };
 
 export default WorkoutPlanCard;

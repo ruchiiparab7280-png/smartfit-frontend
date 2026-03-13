@@ -1,140 +1,145 @@
-import React, { useEffect } from 'react';
-import { useState } from "react";
-import { useNavigate } from 'react-router-dom';
-import MainNavigation from '../../components/MainNavigation';
-import Icon from '../../components/AppIcon';
-import ProfileCard from './components/ProfileCard';
-import MembershipCard from './components/MembershipCard';
-import WorkoutPlanCard from './components/WorkoutPlanCard';
-import ProgressChart from './components/ProgressChart';
-import BMICalculator from './components/BMICalculator';
-import RecommendedGymCard from './components/RecommendedGymCard';
-import StatsOverview from './components/StatsOverview';
+import React, { useState } from "react";
+import MainNavigation from "../../components/MainNavigation";
+import Icon from "../../components/AppIcon";
 
+import StatsOverview from "./components/StatsOverview";
+import ProfileCard from "./components/ProfileCard";
+import MembershipCard from "./components/MembershipCard";
+import WorkoutPlanCard from "./components/WorkoutPlanCard";
+import ProgressChart from "./components/ProgressChart";
+import BMICalculator from "./components/BMICalculator";
+import RecommendedGymCard from "./components/RecommendedGymCard";
 
-
-
+import FreeTrialRequests from "./components/FreeTrialRequests";
+import TrainerRequests from "./components/TrainerRequests";
+import SupplementOrders from "./components/SupplementOrders";
 
 const UserDashboard = () => {
-  const role = localStorage.getItem("userRole");
 
-useEffect(() => {
-  if (role === "owner") {
-    navigate("/partner-with-us");
-  }
-}, []);
+const [activeTab,setActiveTab] = useState("dashboard")
 
+const renderContent = () => {
 
-  const navigate = useNavigate();
-  const [dashboardData, setDashboardData] = useState(null);
+switch(activeTab){
 
- useEffect(() => {
+case "dashboard":
+return(
+<>
+<StatsOverview/>
+<div className="grid grid-cols-1 lg:grid-cols-2 gap-6 mt-6">
+<WorkoutPlanCard/>
+<ProgressChart/>
+</div>
+</>
+)
 
-  const isAuthenticated = localStorage.getItem('isAuthenticated') === 'true';
-  const userId = localStorage.getItem("userId");
+case "profile":
+return <ProfileCard/>
 
-  if (!isAuthenticated) {
-    navigate('/sign-in-sign-up');
-    return;
-  }
+case "membership":
+return <MembershipCard/>
 
-  fetch(`${import.meta.env.VITE_API_URL}/api/user/dashboard/${userId}`)
-    .then(res => res.json())
-    .then(data => {
-      setDashboardData(data);
-    });
+case "trial":
+return <FreeTrialRequests/>
 
-}, []);
+case "trainer":
+return <TrainerRequests/>
 
- 
+case "supplements":
+return <SupplementOrders/>
 
-if (!dashboardData) {
-  return <div className="text-white p-10">Loading Dashboard...</div>;
+case "workout":
+return (
+<div className="max-w-4xl">
+<WorkoutPlanCard/>
+</div>
+)
+
+case "bmi":
+return <BMICalculator/>
+
+case "gyms":
+return <RecommendedGymCard/>
+
+default:
+return <StatsOverview/>
+
 }
- 
-    
 
+}
 
-  return (
-    <div className="min-h-screen bg-background">
-      <MainNavigation />
-      <main className="main-content">
-        <div className="container-custom py-8">
-          <div className="mb-8">
-            <div className="flex items-center gap-3 mb-2">
-              <Icon name="LayoutDashboard" size={32} color="var(--color-primary)" />
-              <h1 className="text-4xl font-bold text-foreground">My Dashboard</h1>
-            </div>
-            <p className="text-lg text-muted-foreground">
-              Welcome back! Track your fitness journey and manage your memberships.
-            </p>
-          </div>
+return(
 
-        {dashboardData && <StatsOverview stats={dashboardData.stats} />}
+<div className="min-h-screen bg-background">
 
-          <div className="grid grid-cols-1 lg:grid-cols-3 gap-6 mb-6">
-            <div className="lg:col-span-2">
-             {dashboardData && <ProfileCard data={dashboardData.profile} />}
-            </div>
-            <div>
-              <BMICalculator />
-            </div>
-          </div>
+<MainNavigation/>
 
-          <div className="mb-6">
-            <div className="flex items-center justify-between mb-4">
-              <h2 className="text-2xl font-bold text-foreground">Active Memberships</h2>
-              <span className="text-sm text-muted-foreground">{memberships?.length} active</span>
-            </div>
-            <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-              {dashboardData?.memberships?.map((membership) =>
-  <MembershipCard key={membership.id} membership={membership} />
-)}
-            </div>
-          </div>
+{/* 👇 Navbar ke niche space */}
 
-          <div className="grid grid-cols-1 lg:grid-cols-2 gap-6 mb-6">
-            <WorkoutPlanCard />
-            <ProgressChart />
-          </div>
+<div className="flex pt-20">
 
-          <div className="mb-6">
-            <div className="flex items-center justify-between mb-4">
-              <div>
-                <h2 className="text-2xl font-bold text-foreground">Recommended Gyms</h2>
-                <p className="text-sm text-muted-foreground">Based on your location and preferences</p>
-              </div>
-            </div>
-            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-              {recommendedGyms?.map((gym) =>
-              <RecommendedGymCard key={gym?.id} gym={gym} />
-              )}
-            </div>
-          </div>
-        </div>
-      </main>
-      <footer className="bg-card border-t border-border py-8">
-        <div className="container-custom">
-          <div className="flex flex-col md:flex-row items-center justify-between gap-4">
-            <p className="text-sm text-muted-foreground">
-              &copy; {new Date()?.getFullYear()} Multi Gym Smart Fitness. All rights reserved.
-            </p>
-            <div className="flex items-center gap-6">
-              <a href="#" className="text-sm text-muted-foreground hover:text-primary transition-base">
-                Privacy Policy
-              </a>
-              <a href="#" className="text-sm text-muted-foreground hover:text-primary transition-base">
-                Terms of Service
-              </a>
-              <a href="#" className="text-sm text-muted-foreground hover:text-primary transition-base">
-                Support
-              </a>
-            </div>
-          </div>
-        </div>
-      </footer>
-    </div>);
+{/* SIDEBAR */}
 
-};
+<div className="w-64 bg-card border-r border-border min-h-screen p-6">
+
+<h2 className="text-xl font-bold mb-6">User Dashboard</h2>
+
+<div className="space-y-3">
+
+<button onClick={()=>setActiveTab("dashboard")} className="flex gap-3 items-center hover:text-primary">
+<Icon name="LayoutDashboard"/> Dashboard
+</button>
+
+<button onClick={()=>setActiveTab("profile")} className="flex gap-3 items-center hover:text-primary">
+<Icon name="User"/> Profile
+</button>
+
+<button onClick={()=>setActiveTab("membership")} className="flex gap-3 items-center hover:text-primary">
+<Icon name="CreditCard"/> Membership
+</button>
+
+<button onClick={()=>setActiveTab("trial")} className="flex gap-3 items-center hover:text-primary">
+<Icon name="Clock"/> Free Trial
+</button>
+
+<button onClick={()=>setActiveTab("trainer")} className="flex gap-3 items-center hover:text-primary">
+<Icon name="Users"/> Trainer Requests
+</button>
+
+<button onClick={()=>setActiveTab("supplements")} className="flex gap-3 items-center hover:text-primary">
+<Icon name="ShoppingBag"/> Supplements
+</button>
+
+<button onClick={()=>setActiveTab("workout")} className="flex gap-3 items-center hover:text-primary">
+<Icon name="Dumbbell"/> Workout Plan
+</button>
+
+<button onClick={()=>setActiveTab("bmi")} className="flex gap-3 items-center hover:text-primary">
+<Icon name="Activity"/> BMI Calculator
+</button>
+
+<button onClick={()=>setActiveTab("gyms")} className="flex gap-3 items-center hover:text-primary">
+<Icon name="MapPin"/> Recommended Gyms
+</button>
+
+</div>
+
+</div>
+
+{/* RIGHT CONTENT */}
+
+<div className="flex-1 p-8">
+
+{renderContent()}
+
+</div>
+
+</div>
+
+</div>
+
+)
+
+}
 
 export default UserDashboard;

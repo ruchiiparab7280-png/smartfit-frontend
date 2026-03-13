@@ -4,8 +4,10 @@ import Image from '../../../components/AppImage';
 import Button from '../../../components/ui/Button';
 import Input from '../../../components/ui/Input';
 
+const [isEditing, setIsEditing] = useState(false);
+const [editData, setEditData] = useState({});
 const ProfileCard = ({ data }) => {
- useState(data)
+
 
 const [profileData, setProfileData] = useState({
   name: data?.name || "",
