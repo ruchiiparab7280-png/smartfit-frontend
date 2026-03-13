@@ -52,15 +52,17 @@ const options = {
       headers: {
         "Content-Type": "application/json"
       },
-      body: JSON.stringify({
-        user_email: localStorage.getItem("userEmail"),
-        gym_email: gym.email,
-        plan_name: selectedPlan.name,
-        duration: selectedPlan.duration,   // 👈 add
-        price: selectedPlan.price,
-        start_date: new Date(),
-        payment_id: response.razorpay_payment_id
-      })
+body: JSON.stringify({
+user_email: localStorage.getItem("userEmail"),
+gym_email: gym.email,
+gym_name: gym.name,
+gym_city: gym.city,  
+plan_name: selectedPlan.name,
+duration: selectedPlan.duration,
+price: selectedPlan.price,
+start_date: new Date(),
+payment_id: response.razorpay_payment_id
+})
     });
 
     alert("Membership Activated 🎉");
