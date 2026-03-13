@@ -174,24 +174,19 @@ const scrollRight = () => {
               Membership Plans
             </h3>
             <div className="grid sm:grid-cols-3 gap-4">
-              {gym?.plans?.map((plan, index) => (
+              {gym?.memberships?.map((plan, index) => (
                 <div
                   key={index}
                   className="p-4 border border-border rounded-lg hover:border-primary transition-base"
                 >
                   <h4 className="font-semibold text-foreground mb-2">{plan?.name}</h4>
                   <p className="text-2xl font-bold text-primary mb-2">
-                    ${plan?.price}
+                   ₹{plan?.price}
                     <span className="text-sm text-muted-foreground font-normal">/{plan?.duration}</span>
                   </p>
-                  <ul className="space-y-1">
-                    {plan?.features?.map((feature, idx) => (
-                      <li key={idx} className="text-sm text-muted-foreground flex items-start">
-                        <Icon name="Check" size={16} className="mr-1 mt-0.5 text-success flex-shrink-0" />
-                        <span>{feature}</span>
-                      </li>
-                    ))}
-                  </ul>
+                 <p className="text-sm text-muted-foreground">
+                    {plan?.description}
+                  </p>
                 </div>
               ))}
             </div>
