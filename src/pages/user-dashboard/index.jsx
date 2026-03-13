@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import MainNavigation from "../../components/MainNavigation";
 import Icon from "../../components/AppIcon";
 
@@ -15,6 +15,62 @@ import TrainerRequests from "./components/TrainerRequests";
 import SupplementOrders from "./components/SupplementOrders";
 
 const UserDashboard = () => {
+
+const [membership,setMembership] = useState(null)
+useEffect(()=>{
+
+const fetchMembership = async ()=>{
+
+const email = localStorage.getItem("userEmail")
+
+const res = await fetch(`${import.meta.env.VITE_API_URL}/user-memberships/${email}`)
+
+const data = await res.json()
+
+if(data.length > 0){
+
+const start = new Date(data[0].start_date)
+
+let months = 1
+
+if(data[0].duration?.includes("3")) months = 3
+if(data[0].duration?.includes("6")) months = 6
+if(data[0].duration?.includes("12")) months = 12
+
+const expiry = new Date(start)
+expiry.setMonth(expiry.getMonth() + months)
+
+const today = new Date()
+const diff = Math.ceil((expiry - today) / (1000 * 60 * 60 * 24))
+
+let status = "Active"
+
+if(diff <= 7 && diff > 0){
+status = "Expiring Soon"
+}
+
+if(diff <= 0){
+status = "Expired"
+}
+
+setMembership({
+gymName:"Your Gym",
+location:"Your City",
+planType:data[0].plan_name,
+startDate:start.toLocaleDateString(),
+expiryDate:expiry.toLocaleDateString(),
+status:status,
+gymImage:"https://images.unsplash.com/photo-1571902943202-507ec2618e8f"
+})
+
+}
+
+}
+
+fetchMembership()
+
+},[])
+
 
 const [activeTab,setActiveTab] = useState("dashboard")
 
@@ -37,7 +93,23 @@ case "profile":
 return <ProfileCard/>
 
 case "membership":
-return <MembershipCard/>
+return membership ? (
+  <MembershipCard membership={membership}/>
+) : (
+  <div className="bg-card p-10 rounded-lg text-center">
+    <h2 className="text-xl font-semibold mb-2">No Active Membership</h2>
+    <p className="text-muted-foreground mb-4">
+      You haven't purchased any membership yet.
+    </p>
+
+    <button
+      onClick={()=>setActiveTab("gyms")}
+      className="bg-orange-500 text-white px-5 py-2 rounded"
+    >
+      Explore Gyms
+    </button>
+  </div>
+)
 
 case "trial":
 return <FreeTrialRequests/>
