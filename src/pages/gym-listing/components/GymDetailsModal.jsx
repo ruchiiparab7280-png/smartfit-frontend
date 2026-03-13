@@ -8,6 +8,55 @@ const GymDetailsModal = ({ gym, isOpen, onClose }) => {
 
  const scrollRef = useRef(null);
 const [showBookingModal, setShowBookingModal] = useState(false);
+const handlePayment = async () => {
+
+  if (!selectedPlan) {
+  alert("Please select a plan");
+  return;
+}
+
+  const res = await fetch(`${import.meta.env.VITE_API_URL}/payment/create-order`, {
+    method: "POST",
+    headers: {
+      "Content-Type": "application/json"
+    },
+    body: JSON.stringify({
+      amount: selectedPlan.price
+    })
+  });
+
+  const order = await res.json();
+
+  const options = {
+    key: order.key,
+    amount: order.amount,
+    currency: "INR",
+    name: "SmartFit Gym",
+    description: selectedPlan.name,
+    order_id: order.id,
+
+    handler: async function (response) {
+
+      await fetch(`${import.meta.env.VITE_API_URL}/payment/verify`, {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json"
+        },
+        body: JSON.stringify(response)
+      });
+
+      alert("Payment Successful 🎉");
+
+    },
+
+    theme: {
+      color: "#f97316"
+    }
+  };
+
+  const rzp = new window.Razorpay(options);
+  rzp.open();
+};
 const [selectedPlan, setSelectedPlan] = useState(null);
 
 const scrollLeft = () => {
@@ -396,11 +445,12 @@ const scrollRight = () => {
         className="w-full mb-4 p-2 border rounded  text-black"
       />
 
-      <button
-        className="w-full bg-orange-500 text-black py-2 rounded"
-      >
-        Confirm Booking
-      </button>
+     <button
+  onClick={handlePayment}
+  className="w-full bg-orange-500 text-white py-2 rounded"
+>
+  Confirm Booking
+</button>
 
       <button
         onClick={() => setShowBookingModal(false)}
