@@ -90,6 +90,7 @@ Trainer Requests
 <th className="py-2">Gym</th>
 <th className="py-2">Status</th>
 <th className="py-2">Action</th>
+<th className="py-2">Payment</th>
 </tr>
 
 </thead>
@@ -128,6 +129,11 @@ Complete Payment
 
 </td>
 
+<td className={`py-2 font-semibold ${
+t.payment_status === "paid" ? "text-green-600" : "text-red-500"
+}`}>
+{t.payment_status === "paid" ? "Paid" : "Unpaid"}
+</td>
 </tr>
 
 
