@@ -7,13 +7,46 @@ const GymDetailsModal = ({ gym, isOpen, onClose }) => {
   if (!isOpen || !gym) return null;
 
  const scrollRef = useRef(null);
+
+const [showTrainerModal,setShowTrainerModal] = useState(false);
+const [selectedTrainer,setSelectedTrainer] = useState(null);
+
+const [trainerDate,setTrainerDate] = useState("");
+const [trainerTime,setTrainerTime] = useState("");
+const [trainerName,setTrainerName] = useState("");
+const [trainerPhone,setTrainerPhone] = useState("");
 const [showBookingModal, setShowBookingModal] = useState(false);
 const handlePayment = async () => {
 
+const handleTrainerBooking = async () => {
+
+await fetch(`${import.meta.env.VITE_API_URL}/book-trainer`,{
+method:"POST",
+headers:{
+"Content-Type":"application/json"
+},
+body:JSON.stringify({
+user_email:localStorage.getItem("userEmail"),
+gym_email:gym.email,
+trainer_name:selectedTrainer.name,
+trainer_price:selectedTrainer.price,
+booking_date:trainerDate,
+booking_time:trainerTime,
+full_name:trainerName,
+phone:trainerPhone
+})
+})
+
+alert("Trainer request sent")
+
+setShowTrainerModal(false)
+
+}
   if (!selectedPlan) {
   alert("Please select a plan");
   return;
 }
+
 
   const res = await fetch(`${import.meta.env.VITE_API_URL}/payment/create-order`, {
     method: "POST",
@@ -321,7 +354,10 @@ const scrollRight = () => {
         </p>
 
         <button
-          onClick={() => alert("Trainer Booking Sent")}
+         onClick={() => {
+            setSelectedTrainer(trainer);
+            setShowTrainerModal(true);
+            }}
           className="mt-2 bg-orange-500 text-white px-3 py-1 rounded"
         >
           Book Trainer
@@ -429,7 +465,68 @@ const scrollRight = () => {
           </div>
         </div>
       </div>
-      {showBookingModal && (
+    {showTrainerModal && (
+
+<div className="fixed inset-0 flex items-center justify-center bg-black/60 z-50">
+
+<div className="bg-card p-6 rounded-lg w-[400px]">
+
+<h2 className="text-xl font-bold mb-4">
+Book Training Session
+</h2>
+
+<input
+type="date"
+value={trainerDate}
+onChange={(e)=>setTrainerDate(e.target.value)}
+className="w-full mb-3 p-2 border rounded"
+/>
+
+<select
+value={trainerTime}
+onChange={(e)=>setTrainerTime(e.target.value)}
+className="w-full mb-3 p-2 border rounded text-black"
+>
+<option>9:00 AM</option>
+<option>10:00 AM</option>
+<option>11:00 AM</option>
+</select>
+
+<input
+type="text"
+placeholder="Full Name"
+value={trainerName}
+onChange={(e)=>setTrainerName(e.target.value)}
+className="w-full mb-3 p-2 border rounded text-black"
+/>
+
+<input
+type="text"
+placeholder="Phone Number"
+value={trainerPhone}
+onChange={(e)=>setTrainerPhone(e.target.value)}
+className="w-full mb-4 p-2 border rounded text-black"
+/>
+
+<button
+onClick={handleTrainerBooking}
+className="w-full bg-orange-500 text-white py-2 rounded"
+>
+Confirm Booking
+</button>
+
+<button
+onClick={()=>setShowTrainerModal(false)}
+className="mt-2 text-sm text-gray-900"
+>
+Cancel
+</button>
+
+</div>
+
+</div>
+
+)}
   <div className="fixed inset-0 flex items-center justify-center bg-black/60 z-50">
 
     <div className="bg-card p-6 rounded-lg w-[400px]">
@@ -481,7 +578,7 @@ const scrollRight = () => {
     </div>
 
   </div>
-)}
+
     </div>
   );
 };
