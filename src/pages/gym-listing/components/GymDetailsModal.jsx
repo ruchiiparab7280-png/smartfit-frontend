@@ -29,6 +29,7 @@ headers:{
 body:JSON.stringify({
 user_email:localStorage.getItem("userEmail"),
 gym_email:gym.email,
+gym_name:gym.name,  
 trainer_name:selectedTrainer.name,
 trainer_price:selectedTrainer.price,
 date:trainerDate,

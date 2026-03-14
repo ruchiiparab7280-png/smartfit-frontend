@@ -1,19 +1,70 @@
-import React, { useState } from 'react';
+import React, { useEffect, useState } from "react";
 
-const initialRequests = [
-{ id: 1, name: 'David Kim', photo: "https://img.rocket.new/generatedImages/rocket_gen_img_104d03232-1770384667296.png", experience: '5 years', certification: 'NASM Certified Personal Trainer', status: 'pending' },
-{ id: 2, name: 'Sofia Martinez', photo: "https://img.rocket.new/generatedImages/rocket_gen_img_1b07b9f19-1773068340480.png", experience: '3 years', certification: 'ACE Certified Fitness Instructor', status: 'pending' },
-{ id: 3, name: 'James Okafor', photo: "https://img.rocket.new/generatedImages/rocket_gen_img_133a01858-1772261253235.png", experience: '7 years', certification: 'ISSA Certified Strength Coach', status: 'pending' },
-{ id: 4, name: 'Mei Lin', photo: "https://img.rocket.new/generatedImages/rocket_gen_img_15457b174-1773068340650.png", experience: '2 years', certification: 'ACSM Exercise Physiologist', status: 'pending' },
-{ id: 5, name: 'Ryan Thompson', photo: 'https://randomuser.me/api/portraits/men/67.jpg', experience: '4 years', certification: 'CrossFit Level 2 Trainer', status: 'approved' }];
 
 
 const TrainerRequests = () => {
-  const [requests, setRequests] = useState(initialRequests);
+  
+  const [requests,setRequests] = useState([])
 
-  const handleAction = (id, action) => {
-    setRequests(requests?.map((r) => r?.id === id ? { ...r, status: action } : r));
-  };
+  useEffect(()=>{
+
+const fetchRequests = async ()=>{
+
+const email = localStorage.getItem("userEmail")
+
+const res = await fetch(
+`${import.meta.env.VITE_API_URL}/trainer-requests/${email}`
+)
+
+const data = await res.json()
+
+const formatted = data.map((item)=>({
+id: item.id,
+photo: "https://randomuser.me/api/portraits/men/32.jpg",
+name: item.trainer_name,
+experience: item.date,
+certification: item.time,
+status: item.status
+}))
+
+setRequests(formatted)
+}
+
+fetchRequests()
+
+},[])
+
+const approveTrainer = async (id)=>{
+
+await fetch(
+`${import.meta.env.VITE_API_URL}/approve-trainer/${id}`,
+{
+method:"PUT"
+}
+)
+
+alert("Trainer approved")
+
+window.location.reload()
+
+}
+
+const rejectTrainer = async (id)=>{
+
+await fetch(
+`${import.meta.env.VITE_API_URL}/reject-trainer/${id}`,
+{
+method:"PUT"
+}
+)
+
+alert("Trainer rejected")
+
+window.location.reload()
+
+}
+
+  
 
   const total = requests?.length;
   const pending = requests?.filter((r) => r?.status === 'pending')?.length;
@@ -49,7 +100,7 @@ const TrainerRequests = () => {
         )}
       </div>
       <div className="space-y-4">
-        {requests?.map((req) =>
+       {requests.map((req) =>
         <div key={req?.id} className="bg-white rounded-xl shadow-sm border border-slate-200 p-5 flex flex-col sm:flex-row items-start sm:items-center gap-4">
             <img
             src={req?.photo}
@@ -60,6 +111,11 @@ const TrainerRequests = () => {
               <div className="flex flex-wrap items-center gap-2 mb-1">
                 <h3 className="font-bold text-slate-800">{req?.name}</h3>
                 <span className={`text-xs font-semibold px-2 py-0.5 rounded-full capitalize ${statusColor(req?.status)}`}>{req?.status}</span>
+                <p className={`text-sm font-semibold ${
+                     req.payment_status === "paid" ? "text-green-600" : "text-red-500"
+                              }`}>
+                        Payment: {req.payment_status === "paid" ? "Paid" : "Unpaid"}
+                                           </p>
               </div>
               <p className="text-sm text-slate-500"><span className="font-medium text-slate-600">Experience:</span> {req?.experience}</p>
               <p className="text-sm text-slate-500 mt-0.5"><span className="font-medium text-slate-600">Certification:</span> {req?.certification}</p>
@@ -67,13 +123,13 @@ const TrainerRequests = () => {
             {req?.status === 'pending' &&
           <div className="flex gap-2 flex-shrink-0">
                 <button
-              onClick={() => handleAction(req?.id, 'approved')}
+             onClick={() => approveTrainer(req?.id)}
               className="px-4 py-2 bg-green-600 text-white text-sm font-semibold rounded-lg hover:bg-green-700 transition-colors">
               
                   Approve
                 </button>
                 <button
-              onClick={() => handleAction(req?.id, 'rejected')}
+              onClick={() => rejectTrainer(req?.id)}
               className="px-4 py-2 bg-red-500 text-white text-sm font-semibold rounded-lg hover:bg-red-600 transition-colors">
               
                   Reject
