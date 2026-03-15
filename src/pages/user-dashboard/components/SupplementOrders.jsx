@@ -120,51 +120,86 @@ const downloadInvoice = (order) => {
 
 const doc = new jsPDF()
 
-// Title
-doc.setFontSize(20)
-doc.text("SmartFit Invoice", 20, 20)
+// Invoice title
+doc.setFont("helvetica","bold")
+doc.setFontSize(22)
+doc.text("SmartFit Invoice",20,20)
 
-// Divider
+// divider line
 doc.setLineWidth(0.5)
-doc.line(20, 25, 190, 25)
+doc.line(20,25,190,25)
 
-// Order info
-doc.setFontSize(12)
+// invoice date
+const now = new Date()
+const date = now.toLocaleDateString()
+const time = now.toLocaleTimeString()
 
-doc.text(`Order ID: ${order.id}`,20,40)
+doc.setFont("helvetica","normal")
+doc.setFontSize(11)
 
-doc.text(`Gym: ${order.gym_name}`,20,50)
+doc.text(`Invoice Date: ${date}`,150,35)
+doc.text(`Time: ${time}`,150,42)
 
-doc.text(`Supplement: ${order.supplement_name}`,20,60)
+// table headers
+doc.setFont("helvetica","bold")
 
-doc.text(`Price: ₹${order.price}`,20,70)
+let y = 60
 
-doc.text(`Quantity: ${order.quantity}`,20,80)
+doc.text("Item",20,y)
+doc.text("Gym",60,y)
+doc.text("Qty",110,y)
+doc.text("Price",130,y)
+doc.text("Payment",160,y)
 
-doc.text(`Payment Status: ${order.payment_status}`,20,90)
+doc.line(20,y+2,190,y+2)
 
-doc.text(`Pickup Date: ${order.pickup_date || "Not set"}`,20,100)
+// table data
+doc.setFont("helvetica","normal")
 
-doc.text(`Customer: ${order.user_email}`,20,110)
+y += 12
 
-// Footer
+doc.text(order.supplement_name,20,y)
+doc.text(order.gym_name,60,y)
+doc.text(String(order.quantity),110,y)
+doc.text(`₹ ${order.price}`,130,y)
+doc.text(order.payment_status,160,y)
+
+y += 15
+
+// pickup info
+doc.setFont("helvetica","bold")
+doc.text("Pickup Date:",20,y)
+
+doc.setFont("helvetica","normal")
+doc.text(order.pickup_date || "Not set",60,y)
+
+y += 10
+
+doc.setFont("helvetica","bold")
+doc.text("Customer:",20,y)
+
+doc.setFont("helvetica","normal")
+doc.text(order.user_email,60,y)
+
+// footer
 doc.setFontSize(10)
 
 doc.text(
-"Thank you for purchasing from SmartFit!",
+`Thank you for purchasing from ${order.gym_name}!`,
 20,
-140
+170
 )
 
 doc.text(
 "SmartFit Fitness Platform",
 20,
-150
+180
 )
 
 doc.save(`smartfit-invoice-${order.id}.pdf`)
 
 }
+
 
 
 export default SupplementOrders;
