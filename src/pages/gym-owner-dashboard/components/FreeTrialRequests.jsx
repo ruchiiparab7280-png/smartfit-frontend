@@ -52,7 +52,7 @@ t.id === id ? {...t,status:"rejected"} : t
 
 return(
 
-<div className="bg-white p-6 rounded-lg shadow">
+<div className="bg-black p-6 rounded-lg shadow">
 
 <h2 className="text-xl font-bold mb-4">
 Free Trial Requests
