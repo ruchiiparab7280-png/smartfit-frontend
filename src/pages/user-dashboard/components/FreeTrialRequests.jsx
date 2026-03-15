@@ -19,10 +19,15 @@ setTrials(data)
 
 }
 
+// first load
 fetchTrials()
 
-},[])
+// auto refresh every 5 seconds
+const interval = setInterval(fetchTrials,5000)
 
+return ()=>clearInterval(interval)
+
+},[])
 return (
 
 <div className="bg-card p-6 rounded-xl border border-border shadow">
@@ -54,12 +59,13 @@ Free Trial Requests
 <td className="py-2">{trial.date}</td>
 <td className="py-2">{trial.time}</td>
 <td className={`py-2 font-semibold ${
-trial.status === "Approved" ? "text-green-500" :
-trial.status === "Rejected" ? "text-red-500" :
+trial.status === "approved" ? "text-green-500" :
+trial.status === "rejected" ? "text-red-500" :
 "text-yellow-500"
 }`}>
 
-{trial.status}
+
+{trial.status.charAt(0).toUpperCase() + trial.status.slice(1)}
 
 </td>
 
