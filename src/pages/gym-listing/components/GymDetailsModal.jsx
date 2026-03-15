@@ -347,7 +347,7 @@ setShowBookingModal(true)
     Try this gym for free for one day before purchasing a membership.
   </p>
 
- <button
+<button
 onClick={() => setShowTrialModal(true)}
 className="bg-orange-500 hover:bg-orange-600 text-white px-4 py-2 rounded-md"
 >
