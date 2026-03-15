@@ -1,11 +1,28 @@
-import React from "react";
+import React, { useEffect, useState } from "react";
 
 const SupplementOrders = () => {
 
-const orders = [
-{ name:"Whey Protein", gym:"FitZone", price:"₹2500", status:"Delivered" },
-{ name:"Mass Gainer", gym:"Iron Gym", price:"₹1800", status:"Pending" }
-]
+const [orders,setOrders] = useState([])
+
+useEffect(()=>{
+
+const fetchOrders = async () => {
+
+const email = localStorage.getItem("userEmail")
+
+const res = await fetch(
+`${import.meta.env.VITE_API_URL}/user-supplement-orders/${email}`
+)
+
+const data = await res.json()
+
+setOrders(data)
+
+}
+
+fetchOrders()
+
+},[])
 
 return (
 
@@ -23,29 +40,64 @@ Supplement Orders
 <th className="py-2">Supplement</th>
 <th className="py-2">Gym</th>
 <th className="py-2">Price</th>
-<th className="py-2">Status</th>
+<th className="py-2">Payment</th>
+<th className="py-2">Pickup Date</th>
+<th className="py-2">Invoice</th>
 </tr>
 
 </thead>
 
 <tbody className="text-foreground">
 
-{orders.map((order,i)=>(
+{orders.map((order)=> (
 
-<tr key={i} className="border-b border-border">
+<tr key={order.id} className="border-b border-border">
 
-<td className="py-2">{order.name}</td>
+<td className="py-2">
+{order.supplement_name}
+</td>
 
-<td className="py-2">{order.gym}</td>
+<td className="py-2">
+{order.gym_name}
+</td>
 
-<td className="py-2">{order.price}</td>
+<td className="py-2">
+₹{order.price}
+</td>
 
 <td className={`py-2 font-semibold ${
-order.status === "Delivered" ? "text-green-500" :
-"text-yellow-500"
+order.payment_status === "paid"
+? "text-green-500"
+: "text-yellow-500"
 }`}>
+{order.payment_status}
+</td>
 
-{order.status}
+<td className="py-2">
+{order.pickup_date || "Waiting for owner"}
+</td>
+
+<td className="py-2">
+
+{order.payment_status === "paid" ? (
+
+<button
+onClick={()=>downloadInvoice(order)}
+className="bg-blue-500 text-white px-3 py-1 rounded text-xs"
+
+>
+
+Download
+
+</button>
+
+):(
+
+<span className="text-gray-400 text-xs">
+No Invoice
+</span>
+
+)}
 
 </td>
 
@@ -60,6 +112,36 @@ order.status === "Delivered" ? "text-green-500" :
 </div>
 
 )
+
+}
+
+const downloadInvoice = (order) => {
+
+const content = `
+SmartFit Invoice
+
+Gym: ${order.gym_name}
+
+Supplement: ${order.supplement_name}
+
+Price: ₹${order.price}
+
+Payment: ${order.payment_status}
+
+Pickup Date: ${order.pickup_date}
+`
+
+const blob = new Blob([content],{type:"text/plain"})
+
+const url = URL.createObjectURL(blob)
+
+const a = document.createElement("a")
+
+a.href = url
+
+a.download = "invoice.txt"
+
+a.click()
 
 }
 
