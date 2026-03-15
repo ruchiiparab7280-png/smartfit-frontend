@@ -91,12 +91,14 @@ const memberships = await membershipRes.json();
       image: t.image
     })),
 
-  supplements: supplements.map(s => ({
-  name: s.name,
-  price: s.price,
-  image: s.image,
-  description: s.description
+ supplements: supplements.map(s => ({
+id: s.id,
+name: s.name,
+price: s.price,
+image: s.image,
+description: s.description
 })),
+
   
  memberships: memberships.map(m => ({
     name: m.name,

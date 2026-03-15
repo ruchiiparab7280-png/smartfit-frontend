@@ -24,6 +24,14 @@ const [trialName,setTrialName] = useState("")
 const [trialPhone,setTrialPhone] = useState("")
 
 const [showBookingModal, setShowBookingModal] = useState(false);
+
+const [showSupplementModal,setShowSupplementModal] = useState(false)
+const [selectedSupplement,setSelectedSupplement] = useState(null)
+
+const [supplementQty,setSupplementQty] = useState(1)
+const [paymentMethod,setPaymentMethod] = useState("online")
+const [pickupDate,setPickupDate] = useState("")
+
 const handleTrialBooking = async () => {
 
 await fetch(`${import.meta.env.VITE_API_URL}/book-free-trial`,{
@@ -48,6 +56,33 @@ alert("Free Trial Request Sent")
 setShowTrialModal(false)
 
 }
+
+const handleSupplementOrder = async () => {
+
+await fetch(`${import.meta.env.VITE_API_URL}/order-supplement`,{
+method:"POST",
+headers:{
+"Content-Type":"application/json"
+},
+body:JSON.stringify({
+user_email:localStorage.getItem("userEmail"),
+gym_email:gym.email,
+gym_name:gym.name,
+supplement_name:selectedSupplement.name,
+price:selectedSupplement.price,
+quantity:supplementQty,
+payment_method:paymentMethod,
+payment_status: paymentMethod === "online" ? "paid" : "pending",
+pickup_date: paymentMethod === "gym" ? pickupDate : null
+})
+})
+
+alert("Supplement order placed")
+
+setShowSupplementModal(false)
+
+}
+
 const handleTrainerBooking = async () => {
 
 await fetch(`${import.meta.env.VITE_API_URL}/book-trainer`,{
@@ -436,11 +471,16 @@ Book Free Trial
           ₹{item.price}
         </p>
 
-        <button
-          className="mt-2 bg-orange-500 text-white px-3 py-1 rounded"
-        >
-          Buy Now
-        </button>
+    <button
+onClick={()=>{
+setSelectedSupplement(item)
+setShowSupplementModal(true)
+}}
+className="mt-2 bg-orange-500 text-white px-3 py-1 rounded"
+
+>
+
+Buy Now </button>
 
       </div>
 
@@ -625,6 +665,77 @@ Cancel
 </div>
 
 )}
+
+{showSupplementModal && (
+
+<div className="fixed inset-0 flex items-center justify-center bg-black/60 z-50">
+
+<div className="bg-card p-6 rounded-lg w-[400px]">
+
+<h2 className="text-xl font-bold mb-4">
+Buy Supplement
+</h2>
+
+<p className="mb-3">
+{selectedSupplement?.name} - ₹{selectedSupplement?.price}
+</p>
+
+<label className="text-sm">Quantity</label>
+<input
+type="number"
+value={supplementQty}
+onChange={(e)=>setSupplementQty(e.target.value)}
+className="w-full mb-3 p-2 border rounded"
+/>
+
+<label className="text-sm">Payment Method</label>
+<select
+value={paymentMethod}
+onChange={(e)=>setPaymentMethod(e.target.value)}
+className="w-full mb-3 p-2 border rounded text-black"
+
+>
+
+<option value="online">Pay Online</option>
+<option value="gym">Pay at Gym</option>
+
+</select>
+
+{paymentMethod === "gym" && (
+
+<> <label className="text-sm">Pickup Date</label>
+<input
+type="date"
+value={pickupDate}
+onChange={(e)=>setPickupDate(e.target.value)}
+className="w-full mb-3 p-2 border rounded"
+/>
+</>
+
+)}
+
+<button
+onClick={handleSupplementOrder}
+className="w-full bg-orange-500 text-white py-2 rounded"
+
+>
+
+Confirm Order </button>
+
+<button
+onClick={()=>setShowSupplementModal(false)}
+className="mt-2 text-sm text-gray-900"
+
+>
+
+Cancel </button>
+
+</div>
+
+</div>
+
+)}
+
   {showBookingModal && (
 <div className="fixed inset-0 flex items-center justify-center bg-black/60 z-50">
 
