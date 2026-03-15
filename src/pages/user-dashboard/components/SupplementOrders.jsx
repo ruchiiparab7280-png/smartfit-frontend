@@ -1,4 +1,5 @@
 import React, { useEffect, useState } from "react";
+import jsPDF from "jspdf";
 
 const SupplementOrders = () => {
 
@@ -117,32 +118,53 @@ No Invoice
 
 const downloadInvoice = (order) => {
 
-const content = `
-SmartFit Invoice
+const doc = new jsPDF()
 
-Gym: ${order.gym_name}
+// Title
+doc.setFontSize(20)
+doc.text("SmartFit Invoice", 20, 20)
 
-Supplement: ${order.supplement_name}
+// Divider
+doc.setLineWidth(0.5)
+doc.line(20, 25, 190, 25)
 
-Price: ₹${order.price}
+// Order info
+doc.setFontSize(12)
 
-Payment: ${order.payment_status}
+doc.text(`Order ID: ${order.id}`,20,40)
 
-Pickup Date: ${order.pickup_date}
-`
+doc.text(`Gym: ${order.gym_name}`,20,50)
 
-const blob = new Blob([content],{type:"text/plain"})
+doc.text(`Supplement: ${order.supplement_name}`,20,60)
 
-const url = URL.createObjectURL(blob)
+doc.text(`Price: ₹${order.price}`,20,70)
 
-const a = document.createElement("a")
+doc.text(`Quantity: ${order.quantity}`,20,80)
 
-a.href = url
+doc.text(`Payment Status: ${order.payment_status}`,20,90)
 
-a.download = "invoice.txt"
+doc.text(`Pickup Date: ${order.pickup_date || "Not set"}`,20,100)
 
-a.click()
+doc.text(`Customer: ${order.user_email}`,20,110)
+
+// Footer
+doc.setFontSize(10)
+
+doc.text(
+"Thank you for purchasing from SmartFit!",
+20,
+140
+)
+
+doc.text(
+"SmartFit Fitness Platform",
+20,
+150
+)
+
+doc.save(`smartfit-invoice-${order.id}.pdf`)
 
 }
+
 
 export default SupplementOrders;
