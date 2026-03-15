@@ -1,12 +1,27 @@
-import React from "react";
+import React, { useState, useEffect } from "react";
 
 const FreeTrialRequests = () => {
+const [trials,setTrials] = useState([])
 
-const trials = [
-{ gym:"Iron Paradise", date:"12 Mar", status:"Pending" },
-{ gym:"FitZone", date:"10 Mar", status:"Approved" },
-{ gym:"Muscle Factory", date:"8 Mar", status:"Rejected" },
-]
+useEffect(()=>{
+
+const fetchTrials = async ()=>{
+
+const email = localStorage.getItem("userEmail")
+
+const res = await fetch(
+`${import.meta.env.VITE_API_URL}/user-free-trials/${email}`
+)
+
+const data = await res.json()
+
+setTrials(data)
+
+}
+
+fetchTrials()
+
+},[])
 
 return (
 
@@ -23,6 +38,7 @@ Free Trial Requests
 <tr>
 <th className="py-2">Gym</th>
 <th className="py-2">Date</th>
+<th className="py-2">Time</th>
 <th className="py-2">Status</th>
 </tr>
 
@@ -34,10 +50,9 @@ Free Trial Requests
 
 <tr key={i} className="border-b border-border">
 
-<td className="py-2">{trial.gym}</td>
-
+<td className="py-2">{trial.gym_name}</td>
 <td className="py-2">{trial.date}</td>
-
+<td className="py-2">{trial.time}</td>
 <td className={`py-2 font-semibold ${
 trial.status === "Approved" ? "text-green-500" :
 trial.status === "Rejected" ? "text-red-500" :
