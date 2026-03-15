@@ -59,29 +59,119 @@ setShowTrialModal(false)
 
 const handleSupplementOrder = async () => {
 
+if(paymentMethod === "online"){
+
+const res = await fetch(`${import.meta.env.VITE_API_URL}/payment/create-order`,{
+method:"POST",
+headers:{
+"Content-Type":"application/json"
+},
+body:JSON.stringify({
+amount:selectedSupplement.price * supplementQty
+})
+})
+
+const order = await res.json()
+
+const options = {
+
+key:order.key,
+amount:order.amount,
+currency:"INR",
+name:"SmartFit",
+description:selectedSupplement.name,
+order_id:order.id,
+
+handler: async function (response){
+
+await fetch(`${import.meta.env.VITE_API_URL}/payment/verify`,{
+method:"POST",
+headers:{
+"Content-Type":"application/json"
+},
+body:JSON.stringify(response)
+})
+
 await fetch(`${import.meta.env.VITE_API_URL}/order-supplement`,{
 method:"POST",
 headers:{
 "Content-Type":"application/json"
 },
 body:JSON.stringify({
+
 user_email:localStorage.getItem("userEmail"),
+
 gym_email:gym.email,
 gym_name:gym.name,
+
 supplement_name:selectedSupplement.name,
+
 price:selectedSupplement.price,
+
 quantity:supplementQty,
-payment_method:paymentMethod,
-payment_status: paymentMethod === "online" ? "paid" : "pending",
-pickup_date: paymentMethod === "gym" ? pickupDate : null
+
+payment_method:"online",
+
+payment_status:"paid",
+
+pickup_date:null
+
 })
 })
 
-alert("Supplement order placed")
+alert("Payment successful 🎉")
+
+setShowSupplementModal(false)
+
+},
+
+theme:{
+color:"#f97316"
+}
+
+}
+
+const rzp = new window.Razorpay(options)
+
+rzp.open()
+
+}else{
+
+await fetch(`${import.meta.env.VITE_API_URL}/order-supplement`,{
+method:"POST",
+headers:{
+"Content-Type":"application/json"
+},
+body:JSON.stringify({
+
+user_email:localStorage.getItem("userEmail"),
+
+gym_email:gym.email,
+gym_name:gym.name,
+
+supplement_name:selectedSupplement.name,
+
+price:selectedSupplement.price,
+
+quantity:supplementQty,
+
+payment_method:"gym",
+
+payment_status:"pending",
+
+pickup_date:pickupDate
+
+})
+})
+
+alert("Order placed. Pay at gym.")
 
 setShowSupplementModal(false)
 
 }
+
+}
+
 
 const handleTrainerBooking = async () => {
 
