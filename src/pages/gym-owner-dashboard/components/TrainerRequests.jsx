@@ -1,12 +1,11 @@
 import React, { useEffect, useState } from "react";
 
-
-
 const TrainerRequests = () => {
-  
-  const [requests,setRequests] = useState([])
 
-  useEffect(()=>{
+const [requests,setRequests] = useState([])
+const [filter,setFilter] = useState("all")
+const [search,setSearch] = useState("")
+const [sort,setSort] = useState("latest")
 
 const fetchRequests = async ()=>{
 
@@ -20,17 +19,31 @@ const data = await res.json()
 
 const formatted = data.map((item)=>({
 id: item.id,
-photo: "https://randomuser.me/api/portraits/men/32.jpg",
-name: item.trainer_name,
-experience: item.date,
-certification: item.time,
+
+trainer: item.trainer_name,
+user: item.full_name,
+phone: item.phone,
+
+date: item.date,
+time: item.time,
+
 status: item.status
 }))
 
 setRequests(formatted)
+
 }
 
+useEffect(()=>{
+
 fetchRequests()
+
+// ⚡ live update every 5 sec
+const interval = setInterval(()=>{
+fetchRequests()
+},5000)
+
+return ()=>clearInterval(interval)
 
 },[])
 
@@ -44,8 +57,7 @@ method:"PUT"
 )
 
 alert("Trainer approved")
-
-window.location.reload()
+fetchRequests()
 
 }
 
@@ -59,88 +71,174 @@ method:"PUT"
 )
 
 alert("Trainer rejected")
-
-window.location.reload()
+fetchRequests()
 
 }
 
-  
+const total = requests.length
+const pending = requests.filter(r=>r.status==="pending").length
+const approved = requests.filter(r=>r.status==="approved").length
+const rejected = requests.filter(r=>r.status==="rejected").length
 
-  const total = requests?.length;
-  const pending = requests?.filter((r) => r?.status === 'pending')?.length;
-  const approved = requests?.filter((r) => r?.status === 'approved')?.length;
-  const rejected = requests?.filter((r) => r?.status === 'rejected')?.length;
+// 🔎 filter + search
+let filteredRequests = requests.filter((r)=>{
 
-  const statusColor = (status) => {
-    if (status === 'approved') return 'bg-green-100 text-green-700';
-    if (status === 'rejected') return 'bg-red-100 text-red-600';
-    return 'bg-amber-100 text-amber-700';
-  };
+if(filter!=="all" && r.status!==filter) return false
 
-  return (
-    <div>
-      <div className="mb-6">
-        <h2 className="text-2xl font-bold text-slate-800">Trainer Requests</h2>
-        <p className="text-slate-500 mt-1">Review and manage trainer applications</p>
-      </div>
-      <div className="grid grid-cols-2 md:grid-cols-4 gap-4 mb-8">
-        {[
-        { label: 'Total Requests', value: total, color: 'bg-blue-600', icon: '📋' },
-        { label: 'Pending Approval', value: pending, color: 'bg-amber-500', icon: '⏳' },
-        { label: 'Approved', value: approved, color: 'bg-green-600', icon: '✅' },
-        { label: 'Rejected', value: rejected, color: 'bg-red-500', icon: '❌' }]?.
-        map((card) =>
-        <div key={card?.label} className="bg-white rounded-xl shadow-sm border border-slate-200 p-4">
-            <div className="flex items-center justify-between mb-2">
-              <span className="text-2xl">{card?.icon}</span>
-              <span className={`text-2xl font-bold text-white ${card?.color} w-10 h-10 rounded-lg flex items-center justify-center text-lg`}>{card?.value}</span>
-            </div>
-            <p className="text-sm font-medium text-slate-600">{card?.label}</p>
-          </div>
-        )}
-      </div>
-      <div className="space-y-4">
-       {requests.map((req) =>
-        <div key={req?.id} className="bg-white rounded-xl shadow-sm border border-slate-200 p-5 flex flex-col sm:flex-row items-start sm:items-center gap-4">
-            <img
-            src={req?.photo}
-            alt={`${req?.name} trainer application photo`}
-            className="w-14 h-14 rounded-full object-cover border-2 border-slate-200 flex-shrink-0" />
-          
-            <div className="flex-1 min-w-0">
-              <div className="flex flex-wrap items-center gap-2 mb-1">
-                <h3 className="font-bold text-slate-800">{req?.name}</h3>
-                <span className={`text-xs font-semibold px-2 py-0.5 rounded-full capitalize ${statusColor(req?.status)}`}>{req?.status}</span>
-                <p className={`text-sm font-semibold ${
-                     req.payment_status === "paid" ? "text-green-600" : "text-red-500"
-                              }`}>
-                        Payment: {req.payment_status === "paid" ? "Paid" : "Unpaid"}
-                                           </p>
-              </div>
-              <p className="text-sm text-slate-500"><span className="font-medium text-slate-600">Experience:</span> {req?.experience}</p>
-              <p className="text-sm text-slate-500 mt-0.5"><span className="font-medium text-slate-600">Certification:</span> {req?.certification}</p>
-            </div>
-            {req?.status === 'pending' &&
-          <div className="flex gap-2 flex-shrink-0">
-                <button
-             onClick={() => approveTrainer(req?.id)}
-              className="px-4 py-2 bg-green-600 text-white text-sm font-semibold rounded-lg hover:bg-green-700 transition-colors">
-              
-                  Approve
-                </button>
-                <button
-              onClick={() => rejectTrainer(req?.id)}
-              className="px-4 py-2 bg-red-500 text-white text-sm font-semibold rounded-lg hover:bg-red-600 transition-colors">
-              
-                  Reject
-                </button>
-              </div>
-          }
-          </div>
-        )}
-      </div>
-    </div>);
+if(search && !r.user.toLowerCase().includes(search.toLowerCase()))
+return false
 
-};
+return true
+
+})
+
+// 📅 sorting
+filteredRequests.sort((a,b)=>{
+
+if(sort==="latest") return new Date(b.date) - new Date(a.date)
+if(sort==="oldest") return new Date(a.date) - new Date(b.date)
+
+return 0
+
+})
+
+const statusColor = (status)=>{
+if(status==="approved") return "bg-green-100 text-green-700"
+if(status==="rejected") return "bg-red-100 text-red-600"
+return "bg-amber-100 text-amber-700"
+}
+
+return (
+
+<div>
+
+<h2 className="text-2xl font-bold mb-6">Trainer Requests</h2>
+
+{/* 🔔 Notification */}
+{pending > 0 && (
+<div className="mb-4 bg-amber-100 text-amber-700 p-3 rounded-lg">
+🔔 You have {pending} pending trainer requests
+</div>
+)}
+
+{/* Search + Sort */}
+<div className="flex gap-4 mb-6">
+
+<input
+type="text"
+placeholder="Search user..."
+value={search}
+onChange={(e)=>setSearch(e.target.value)}
+className="border p-2 rounded-lg"
+/>
+
+<select
+value={sort}
+onChange={(e)=>setSort(e.target.value)}
+className="border p-2 rounded-lg"
+>
+<option value="latest">Latest</option>
+<option value="oldest">Oldest</option>
+</select>
+
+</div>
+
+<div className="grid grid-cols-2 md:grid-cols-4 gap-4 mb-8">
+
+<div
+onClick={()=>setFilter("all")}
+className="cursor-pointer bg-white rounded-xl shadow-sm border border-slate-200 p-4"
+>
+Total Requests: {total}
+</div>
+
+<div
+onClick={()=>setFilter("pending")}
+className="cursor-pointer bg-white rounded-xl shadow-sm border border-slate-200 p-4"
+>
+Pending: {pending}
+</div>
+
+<div
+onClick={()=>setFilter("approved")}
+className="cursor-pointer bg-white rounded-xl shadow-sm border border-slate-200 p-4"
+>
+Approved: {approved}
+</div>
+
+<div
+onClick={()=>setFilter("rejected")}
+className="cursor-pointer bg-white rounded-xl shadow-sm border border-slate-200 p-4"
+>
+Rejected: {rejected}
+</div>
+
+</div>
+
+<div className="space-y-4">
+
+{filteredRequests.map((req)=>(
+<div key={req.id} className="bg-white rounded-xl shadow-sm border border-slate-200 p-5 flex justify-between items-center">
+
+<div>
+
+<h3 className="font-bold text-slate-800">
+Trainer: {req.trainer}
+</h3>
+
+<p className="text-sm text-slate-600">
+User: {req.user}
+</p>
+
+<p className="text-sm text-slate-600">
+Phone: {req.phone}
+</p>
+
+<p className="text-sm text-slate-500">
+Date: {req.date}
+</p>
+
+<p className="text-sm text-slate-500">
+Time: {req.time}
+</p>
+
+<span className={`text-xs font-semibold px-2 py-1 rounded ${statusColor(req.status)}`}>
+{req.status}
+</span>
+
+</div>
+
+{req.status==="pending" && (
+
+<div className="flex gap-2">
+
+<button
+onClick={()=>approveTrainer(req.id)}
+className="px-4 py-2 bg-green-600 text-white rounded-lg"
+>
+Approve
+</button>
+
+<button
+onClick={()=>rejectTrainer(req.id)}
+className="px-4 py-2 bg-red-500 text-white rounded-lg"
+>
+Reject
+</button>
+
+</div>
+
+)}
+
+</div>
+))}
+
+</div>
+
+</div>
+
+)
+
+}
 
 export default TrainerRequests;
