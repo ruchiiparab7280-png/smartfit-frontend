@@ -16,9 +16,38 @@ const [trainerTime,setTrainerTime] = useState("");
 const [trainerName,setTrainerName] = useState("");
 const [trainerPhone,setTrainerPhone] = useState("");
 
+const [showTrialModal,setShowTrialModal] = useState(false)
 
+const [trialDate,setTrialDate] = useState("")
+const [trialTime,setTrialTime] = useState("")
+const [trialName,setTrialName] = useState("")
+const [trialPhone,setTrialPhone] = useState("")
 
 const [showBookingModal, setShowBookingModal] = useState(false);
+const handleTrialBooking = async () => {
+
+await fetch(`${import.meta.env.VITE_API_URL}/book-free-trial`,{
+method:"POST",
+headers:{
+"Content-Type":"application/json"
+},
+body:JSON.stringify({
+user_email:localStorage.getItem("userEmail"),
+gym_email:gym.email,
+gym_name:gym.name,
+gym_city:gym.city,
+user_name:trialName,
+user_phone:trialPhone,
+date:trialDate,
+time:trialTime
+})
+})
+
+alert("Free Trial Request Sent")
+
+setShowTrialModal(false)
+
+}
 const handleTrainerBooking = async () => {
 
 await fetch(`${import.meta.env.VITE_API_URL}/book-trainer`,{
@@ -318,12 +347,12 @@ setShowBookingModal(true)
     Try this gym for free for one day before purchasing a membership.
   </p>
 
-  <button
-    onClick={() => alert("Free Trial Request Sent!")}
-    className="bg-orange-500 hover:bg-orange-600 text-white px-4 py-2 rounded-md"
-  >
-    Book Free Trial
-  </button>
+ <button
+onClick={() => setShowTrialModal(true)}
+className="bg-orange-500 hover:bg-orange-600 text-white px-4 py-2 rounded-md"
+>
+Book Free Trial
+</button>
 
 </div>
 
@@ -523,6 +552,69 @@ Confirm Booking
 
 <button
 onClick={()=>setShowTrainerModal(false)}
+className="mt-2 text-sm text-gray-900"
+>
+Cancel
+</button>
+
+</div>
+
+</div>
+
+)}
+
+{showTrialModal && (
+
+<div className="fixed inset-0 flex items-center justify-center bg-black/60 z-50">
+
+<div className="bg-card p-6 rounded-lg w-[400px]">
+
+<h2 className="text-xl font-bold mb-4">
+Book Free Trial
+</h2>
+
+<input
+type="date"
+value={trialDate}
+onChange={(e)=>setTrialDate(e.target.value)}
+className="w-full mb-3 p-2 border rounded"
+/>
+
+<select
+value={trialTime}
+onChange={(e)=>setTrialTime(e.target.value)}
+className="w-full mb-3 p-2 border rounded text-black"
+>
+<option value="9:00 AM">9:00 AM</option>
+<option value="10:00 AM">10:00 AM</option>
+<option value="11:00 AM">11:00 AM</option>
+</select>
+
+<input
+type="text"
+placeholder="Full Name"
+value={trialName}
+onChange={(e)=>setTrialName(e.target.value)}
+className="w-full mb-3 p-2 border rounded text-black"
+/>
+
+<input
+type="text"
+placeholder="Phone Number"
+value={trialPhone}
+onChange={(e)=>setTrialPhone(e.target.value)}
+className="w-full mb-4 p-2 border rounded text-black"
+/>
+
+<button
+onClick={handleTrialBooking}
+className="w-full bg-orange-500 text-white py-2 rounded"
+>
+Confirm Booking
+</button>
+
+<button
+onClick={()=>setShowTrialModal(false)}
 className="mt-2 text-sm text-gray-900"
 >
 Cancel
