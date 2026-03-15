@@ -97,6 +97,9 @@ trial.status === "rejected" ? "text-red-500" :
 
 <td className="space-x-2">
 
+{trial.status === "pending" && (
+
+<>
 <button
 onClick={()=>approveTrial(trial.id)}
 className="bg-green-500 text-white px-3 py-1 rounded"
@@ -110,6 +113,9 @@ className="bg-red-500 text-white px-3 py-1 rounded"
 >
 Reject
 </button>
+</>
+
+)}
 
 </td>
 

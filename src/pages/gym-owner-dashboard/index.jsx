@@ -21,7 +21,7 @@ const menuItems = [
   { id: "dashboard", label: "Dashboard", icon: <LayoutDashboard size={18} /> },
   { id: "gym-details", label: "Edit Gym Details", icon: <Building2 size={18} /> },
   { id: "trial-requests", label: "Free Trial Requests", icon: <Gift size={18} /> },
-  { id: "trial-requests", label: "Free Trial Requests", icon: <UserPlus size={18} /> },
+  
   { id: "trainers", label: "Trainer Management", icon: <Users size={18} /> },
   { id: "trainer-requests", label: "Trainer Requests", icon: <UserPlus size={18} /> },
   { id: "supplements", label: "Supplement Management", icon: <Pill size={18} /> },
