@@ -8,43 +8,14 @@ const emptyForm = {
   stock_status: "in_stock"
 };
 
-const supplementOrders = [
-{
-id: 101,
-customer: "Rahul Sharma",
-supplement: "Whey Protein Gold",
-quantity: 1,
-total: 59.99,
-paymentMethod: "Online",
-paymentStatus: "Paid",
-date: "12 Mar 2026"
-},
-{
-id: 102,
-customer: "Aman Verma",
-supplement: "Creatine Monohydrate",
-quantity: 2,
-total: 59.98,
-paymentMethod: "Cash on Purchase",
-paymentStatus: "Pending",
-date: "13 Mar 2026"
-},
-{
-id: 103,
-customer: "Priya Patel",
-supplement: "BCAA Recovery",
-quantity: 1,
-total: 34.99,
-paymentMethod: "Online",
-paymentStatus: "Paid",
-date: "14 Mar 2026"
-}
-];
+
 
 const SupplementManagement = () => {
 
 const [supplements, setSupplements] = useState([]);
-const [orders] = useState(supplementOrders);
+const [orders,setOrders] = useState([]);
+
+
 const [showModal, setShowModal] = useState(false);
 const [editId, setEditId] = useState(null);
 const [form, setForm] = useState(emptyForm);
@@ -76,9 +47,57 @@ console.log(err);
 
 useEffect(() => {
 
-fetchSupplements();
+fetchSupplements()
+fetchOrders()
 
-}, []);
+}, [])
+
+
+const fetchOrders = async () => {
+
+try{
+
+const res = await fetch(
+`${import.meta.env.VITE_API_URL}/supplement-orders/${ownerEmail}`
+)
+
+const data = await res.json()
+
+setOrders(data)
+
+}catch(err){
+
+console.log(err)
+
+}
+
+
+}
+
+const setPickupDate = async (id) => {
+
+const date = prompt("Enter pickup date (YYYY-MM-DD)")
+
+if(!date) return
+
+await fetch(`${import.meta.env.VITE_API_URL}/set-pickup-date/${id}`,{
+
+method:"PUT",
+
+headers:{
+"Content-Type":"application/json"
+},
+
+body:JSON.stringify({
+pickup_date:date,
+status:"approved"
+})
+
+})
+
+fetchOrders()
+
+}
 
 
 // open add modal
@@ -558,60 +577,54 @@ Supplement Orders
 <tr key={order.id} className="border-t border-slate-100">
 
 <td className="px-4 py-3 font-medium text-slate-900">
-
-{order.customer}
-
+{order.user_email}
 </td>
 
 <td className="px-4 py-3 text-slate-900">
-
-{order.supplement}
-
+{order.supplement_name}
 </td>
 
 <td className="px-4 py-3">
-
 {order.quantity}
-
 </td>
 
 <td className="px-4 py-3 font-semibold text-blue-600">
+₹{order.price}
+</td>
 
-₹{order.total}
+<td className="px-4 py-3">
+{order.payment_method}
+</td>
 
+<td className="px-4 py-3">
+{order.payment_status}
+</td>
+
+<td className="px-4 py-3">
+{order.pickup_date || "Not set"}
 </td>
 
 <td className="px-4 py-3">
 
-{order.paymentMethod}
+<button
+onClick={()=>setPickupDate(order.id)}
+className="bg-green-500 text-white px-2 py-1 rounded text-xs"
 
-</td>
-
-<td className="px-4 py-3">
-
-<span
-className={`px-2 py-1 text-xs rounded-full font-medium ${
-order.paymentStatus === "Paid"
-? "bg-green-100 text-green-700"
-: "bg-yellow-100 text-yellow-700"
-}`}
 >
 
-{order.paymentStatus}
+Set Pickup
 
-</span>
-
-</td>
-
-<td className="px-4 py-3 text-slate-900">
-
-{order.date}
+</button>
 
 </td>
 
 </tr>
 
 ))}
+
+
+
+
 
 </tbody>
 
