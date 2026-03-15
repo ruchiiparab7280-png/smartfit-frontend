@@ -1,5 +1,6 @@
 import React, { useState } from 'react';
 import GymDetails from './components/GymDetails';
+import FreeTrialRequests from "./components/FreeTrialRequests";
 import TrainerManagement from './components/TrainerManagement';
 import TrainerRequests from './components/TrainerRequests';
 import SupplementManagement from './components/SupplementManagement';
@@ -10,6 +11,7 @@ import {
   Building2,
   Users,
   UserPlus,
+  Gift,
   Pill,
   CreditCard,
   DollarSign
@@ -18,6 +20,8 @@ import {
 const menuItems = [
   { id: "dashboard", label: "Dashboard", icon: <LayoutDashboard size={18} /> },
   { id: "gym-details", label: "Edit Gym Details", icon: <Building2 size={18} /> },
+  { id: "trial-requests", label: "Free Trial Requests", icon: <Gift size={18} /> },
+  { id: "trial-requests", label: "Free Trial Requests", icon: <UserPlus size={18} /> },
   { id: "trainers", label: "Trainer Management", icon: <Users size={18} /> },
   { id: "trainer-requests", label: "Trainer Requests", icon: <UserPlus size={18} /> },
   { id: "supplements", label: "Supplement Management", icon: <Pill size={18} /> },
@@ -48,6 +52,7 @@ const GymOwnerDashboard = () => {
   const renderContent = () => {
     switch (activeSection) {
       case 'gym-details': return <GymDetails />;
+      case "trial-requests": return <FreeTrialRequests />;
       case 'trainers': return <TrainerManagement />;
       case 'trainer-requests': return <TrainerRequests />;
       case 'supplements': return <SupplementManagement />;
