@@ -156,22 +156,22 @@ setFormData({
     <div>
 
       <div className="mb-6">
-        <h2 className="text-2xl font-bold text-slate-800">Edit Gym Details</h2>
-        <p className="text-slate-500 mt-1">
+        <h2 className="text-2xl font-bold text-white">Edit Gym Details</h2>
+        <p className="text-slate-400 mt-1">
           Update your gym's information and settings
         </p>
       </div>
 
       <form
         onSubmit={handleSave}
-        className="bg-white rounded-xl shadow-sm border border-slate-200 p-6"
+        className="bg-[#111827] rounded-xl shadow-lg border border-slate-800 p-6"
       >
 
         <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
 
           {/* Gym Name */}
           <div>
-            <label className="block text-sm font-semibold text-slate-700 mb-2">
+            <label className="block text-sm font-semibold text-slate-300 mb-2">
               Gym Name
             </label>
             <input
@@ -179,13 +179,13 @@ setFormData({
               name="gymName"
               value={formData.gymName}
               onChange={handleChange}
-              className="w-full px-4 py-2.5 rounded-lg border border-slate-200 text-slate-800"
+             className="w-full px-4 py-2.5 rounded-lg bg-[#0f172a] border border-slate-700 text-white"
             />
           </div>
 
           {/* Contact */}
           <div>
-            <label className="block text-sm font-semibold text-slate-700 mb-2">
+            <label className="block text-sm font-semibold text-slate-300 mb-2">
               Contact Number
             </label>
             <input
@@ -193,13 +193,13 @@ setFormData({
               name="contactNumber"
               value={formData.contactNumber}
               onChange={handleChange}
-              className="w-full px-4 py-2.5 rounded-lg border border-slate-200 text-slate-800"
+              className="w-full px-4 py-2.5 rounded-lg bg-[#0f172a] border border-slate-700 text-white"
             />
           </div>
 
           {/* Address */}
           <div className="md:col-span-2">
-            <label className="block text-sm font-semibold text-slate-700 mb-2">
+            <label className="block text-sm font-semibold text-slate-300 mb-2">
               Gym Address
             </label>
             <input
@@ -207,13 +207,13 @@ setFormData({
               name="address"
               value={formData.address}
               onChange={handleChange}
-              className="w-full px-4 py-2.5 rounded-lg border border-slate-200 text-slate-800"
+              className="w-full px-4 py-2.5 rounded-lg bg-[#0f172a] border border-slate-700 text-white"
             />
           </div>
 
           {/* Email */}
           <div>
-            <label className="block text-sm font-semibold text-slate-700 mb-2">
+            <label className="block text-sm font-semibold text-slate-300 mb-2">
               Email Address
             </label>
             <input
@@ -221,7 +221,7 @@ setFormData({
               name="email"
               value={formData.email}
               onChange={handleChange}
-              className="w-full px-4 py-2.5 rounded-lg border border-slate-200 text-slate-800"
+              className="w-full px-4 py-2.5 rounded-lg bg-[#0f172a] border border-slate-700 text-white"
             />
           </div>
 
@@ -229,7 +229,7 @@ setFormData({
           <div className="grid grid-cols-2 gap-4">
 
             <div>
-              <label className="block text-sm font-semibold text-slate-700 mb-2">
+              <label className="block text-sm font-semibold text-slate-300 mb-2">
                 Opening Time
               </label>
               <input
@@ -237,12 +237,12 @@ setFormData({
                 name="openingTime"
                 value={formData.openingTime}
                 onChange={handleChange}
-                className="w-full px-4 py-2.5 rounded-lg border border-slate-200 text-slate-800"
+                className="w-full px-4 py-2.5 rounded-lg bg-[#0f172a] border border-slate-700 text-white"
               />
             </div>
 
             <div>
-              <label className="block text-sm font-semibold text-slate-700 mb-2">
+              <label className="block text-sm font-semibold text-slate-300 mb-2">
                 Closing Time
               </label>
               <input
@@ -250,7 +250,7 @@ setFormData({
                 name="closingTime"
                 value={formData.closingTime}
                 onChange={handleChange}
-                className="w-full px-4 py-2.5 rounded-lg border border-slate-200 text-slate-800"
+                className="w-full px-4 py-2.5 rounded-lg bg-[#0f172a] border border-slate-700 text-white"
               />
             </div>
 
@@ -258,7 +258,7 @@ setFormData({
 
           {/* Description */}
           <div className="md:col-span-2">
-            <label className="block text-sm font-semibold text-slate-700 mb-2">
+            <label className="block text-sm font-semibold text-slate-300 mb-2">
               Gym Description
             </label>
             <textarea
@@ -266,12 +266,12 @@ setFormData({
               value={formData.description}
               onChange={handleChange}
               rows={4}
-              className="w-full px-4 py-2.5 rounded-lg border border-slate-200 text-slate-800"
+              className="w-full px-4 py-2.5 rounded-lg bg-[#0f172a] border border-slate-700 text-white"
             />
           </div>
 
 <div>
-  <label className="block text-sm font-semibold text-slate-700 mb-2">
+  <label className="block text-sm font-semibold text-slate-300 mb-2">
     UPI ID (For Membership Payments)
   </label>
 
@@ -281,13 +281,13 @@ setFormData({
     value={formData.upiId}
     onChange={handleChange}
     placeholder="example@upi"
-    className="w-full px-4 py-2.5 rounded-lg border border-slate-200 text-slate-800"
+    className="w-full px-4 py-2.5 rounded-lg bg-[#0f172a] border border-slate-700 text-white"
   />
 </div>
           {/* Amenities */}
           <div className="md:col-span-2">
 
-            <label className="block text-sm font-semibold text-slate-700 mb-3">
+            <label className="block text-sm font-semibold text-slate-300 mb-3">
               Amenities & Features
             </label>
 
@@ -297,12 +297,12 @@ setFormData({
 
                 <label
                   key={item}
-                  className="flex items-center gap-2 text-sm text-slate-900 font-medium"
+                  className="flex items-center gap-2 text-sm text-slate-300 font-medium"
                 >
 
                   <input
                     type="checkbox"
-                    className="accent-blue-600"
+                    className="accent-orange-500"
                     checked={formData.amenities.includes(item)}
                     onChange={() => handleAmenityChange(item)}
                   />
@@ -352,7 +352,7 @@ setFormData({
         <button
   type="button"
   onClick={handleSave}
-  className="mt-6 px-6 py-2 bg-blue-600 text-white rounded-lg cursor-pointer"
+  className="mt-6 px-6 py-2 bg-orange-500 hover:bg-orange-600 text-white rounded-lg cursor-pointer"
 >
   Save Changes
 </button>
