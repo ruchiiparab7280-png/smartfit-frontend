@@ -63,7 +63,7 @@ const GymOwnerDashboard = () => {
   };
 
   return (
-    <div className="flex h-screen bg-slate-50 overflow-hidden">
+    <div className="flex h-screen bg-[#0b1220] overflow-hidden text-white">
       {/* Mobile overlay */}
       {sidebarOpen && (
         <div
@@ -129,7 +129,7 @@ const GymOwnerDashboard = () => {
       {/* Main content */}
       <div className="flex-1 flex flex-col min-w-0 overflow-hidden">
         {/* Top bar */}
-        <header className="bg-white border-b border-slate-200 px-4 lg:px-6 py-4 flex items-center justify-between flex-shrink-0">
+        <header className="bg-[#0f172a] border-b border-slate-800 px-4 lg:px-6 py-4 flex items-center justify-between flex-shrink-0">
           <div className="flex items-center gap-3">
             <button
               onClick={() => setSidebarOpen(true)}
@@ -140,7 +140,7 @@ const GymOwnerDashboard = () => {
               </svg>
             </button>
             <div>
-              <h1 className="text-lg font-bold text-slate-800">
+             <h1 className="text-lg font-bold text-white">
                 {menuItems?.find(m => m?.id === activeSection)?.label || 'Dashboard'}
               </h1>
               <p className="text-xs text-slate-400 hidden sm:block">SmartFit Multi Gym Management</p>
@@ -169,36 +169,36 @@ const GymOwnerDashboard = () => {
 const DashboardHome = ({ setActiveSection }) => (
   <div>
     <div className="mb-6">
-      <h2 className="text-2xl font-bold text-slate-800">Welcome back, Gym Owner 👋</h2>
-      <p className="text-slate-500 mt-1">Here's what's happening at SmartFit Multi Gym today</p>
+      <h2 className="text-2xl font-bold text-white">Welcome back, Gym Owner 👋</h2>
+      <p className="text-slate-400 mt-1">Here's what's happening at SmartFit Multi Gym today</p>
     </div>
 
     {/* Stat cards */}
     <div className="grid grid-cols-1 sm:grid-cols-2 xl:grid-cols-4 gap-5 mb-8">
       {statCards?.map(card => (
-        <div key={card?.label} className={`bg-white rounded-xl shadow-sm border border-slate-200 border-l-4 ${card?.color} p-5`}>
+        <div key={card?.label} className={`bg-[#111827] rounded-xl shadow-lg border border-slate-800 border-l-4 ${card?.color} p-5`}>
           <div className="flex items-center justify-between mb-3">
             <span className="text-2xl">{card?.icon}</span>
             <span className={`text-xs font-semibold px-2 py-0.5 rounded-full ${
               card?.positive ? 'bg-green-100 text-green-700' : 'bg-red-100 text-red-600'
             }`}>{card?.change}</span>
           </div>
-          <p className="text-2xl font-bold text-slate-800">{card?.value}</p>
-          <p className="text-sm text-slate-500 mt-1">{card?.label}</p>
+          <p className="text-2xl font-bold text-white">{card?.value}</p>
+          <p className="text-sm text-slate-400 mt-1">{card?.label}</p>
         </div>
       ))}
     </div>
 
     {/* Quick actions + Activity */}
     <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
-      <div className="lg:col-span-2 bg-white rounded-xl shadow-sm border border-slate-200 p-6">
-        <h3 className="font-bold text-slate-800 mb-4">Recent Activity</h3>
+      <div className="lg:col-span-2 bg-[#111827] rounded-xl shadow-sm border border-slate-800 p-6">
+        <h3 className="font-bold text-white mb-4">Recent Activity</h3>
         <div className="space-y-3">
           {recentActivity?.map((item, i) => (
-            <div key={i} className="flex items-start gap-3 py-2 border-b border-slate-50 last:border-0">
+            <div key={i} className="flex items-start gap-3 py-2 border-b border-slate-800 last:border-0">
               <div className="w-2 h-2 rounded-full bg-blue-500 mt-2 flex-shrink-0"></div>
               <div className="flex-1 min-w-0">
-                <p className="text-sm text-slate-700">{item?.text}</p>
+                <p className="text-sm text-slate-300">{item?.text}</p>
                 <p className="text-xs text-slate-400 mt-0.5">{item?.time}</p>
               </div>
             </div>
@@ -206,15 +206,15 @@ const DashboardHome = ({ setActiveSection }) => (
         </div>
       </div>
 
-      <div className="bg-white rounded-xl shadow-sm border border-slate-200 p-6">
+      <div className="bg-[#111827] rounded-xl shadow-sm border border-slate-800 p-6">
         <h3 className="font-bold text-slate-800 mb-4">Quick Actions</h3>
         <div className="space-y-2">
           {[
-            { label: 'Add New Trainer', section: 'trainers', color: 'bg-blue-50 text-blue-700 hover:bg-blue-100' },
-            { label: 'Review Requests', section: 'trainer-requests', color: 'bg-amber-50 text-amber-700 hover:bg-amber-100' },
-            { label: 'Add Supplement', section: 'supplements', color: 'bg-purple-50 text-purple-700 hover:bg-purple-100' },
-            { label: 'New Membership Plan', section: 'memberships', color: 'bg-emerald-50 text-emerald-700 hover:bg-emerald-100' },
-            { label: 'View Earnings', section: 'earnings', color: 'bg-slate-50 text-slate-700 hover:bg-slate-100' },
+            { label: 'Add New Trainer', section: 'trainers', color: 'bg-orange-500 text-white hover:bg-orange-600' },
+            { label: 'Review Requests', section: 'trainer-requests', color: 'bg-orange-500 text-white hover:bg-orange-600' },
+            { label: 'Add Supplement', section: 'supplements', color: 'bg-orange-500 text-white hover:bg-orange-600' },
+            { label: 'New Membership Plan', section: 'memberships', color: 'bg-orange-500 text-white hover:bg-orange-600bg-orange-500 text-white hover:bg-orange-600' },
+            { label: 'View Earnings', section: 'earnings', color: 'bg-orange-500 text-white hover:bg-orange-600' },
           ]?.map(action => (
             <button
               key={action?.label}
