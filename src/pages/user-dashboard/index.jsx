@@ -15,7 +15,7 @@ import TrainerRequests from "./components/TrainerRequests";
 import SupplementOrders from "./components/SupplementOrders";
 
 const UserDashboard = () => {
-
+const [profile,setProfile] = useState(null)
 const [membership,setMembership] = useState(null)
 useEffect(()=>{
 
@@ -71,6 +71,31 @@ fetchMembership()
 
 },[])
 
+useEffect(()=>{
+
+const fetchProfile = async ()=>{
+
+const email = localStorage.getItem("userEmail")
+
+try{
+
+const res = await fetch(`${import.meta.env.VITE_API_URL}/user-profile/${email}`)
+
+const data = await res.json()
+
+setProfile(data)
+
+}catch(err){
+
+console.log("Profile fetch error",err)
+
+}
+
+}
+
+fetchProfile()
+
+},[])
 
 const [activeTab,setActiveTab] = useState("dashboard")
 
@@ -90,7 +115,7 @@ return(
 )
 
 case "profile":
-return <ProfileCard/>
+return <ProfileCard data={profile}/>
 
 case "membership":
 return membership ? (
