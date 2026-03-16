@@ -169,11 +169,11 @@ return (
 <div className="flex items-center justify-between mb-6">
 
 <div>
-<h2 className="text-2xl font-bold text-slate-800">
+<h2 className="text-2xl font-bold text-white">
 Trainer Management
 </h2>
 
-<p className="text-slate-500 mt-1">
+<p className="text-slate-400 mt-1">
 {trainers?.length} trainers in your gym
 </p>
 
@@ -181,7 +181,7 @@ Trainer Management
 
 <button
 onClick={openAdd}
-className="flex items-center gap-2 px-5 py-2.5 bg-blue-600 text-white font-semibold rounded-lg hover:bg-blue-700 transition-colors"
+className="flex items-center gap-2 px-5 py-2.5 bg-orange-500 text-white font-semibold rounded-lg hover:bg-orange-600 transition-colors"
 >
 
 <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -200,7 +200,7 @@ Add Trainer
 
 <div
 key={trainer?.id}
-className="bg-white rounded-xl shadow-sm border border-slate-200 p-5 flex flex-col items-center text-center"
+className="bg-[#111827] rounded-xl shadow-lg shadow-blue-900/40 border border-slate-800 p-5 flex flex-col items-center text-center"
 >
 
 <img
@@ -208,7 +208,7 @@ src={trainer?.photo}
 className="w-20 h-20 rounded-full object-cover border-4 border-blue-100 mb-3"
 />
 
-<h3 className="font-bold text-slate-800 text-base">
+<h3 className="font-bold text-white text-base">
 {trainer?.name}
 </h3>
 
@@ -216,9 +216,9 @@ className="w-20 h-20 rounded-full object-cover border-4 border-blue-100 mb-3"
 {trainer?.specialization}
 </span>
 
-<p className="text-slate-600 text-sm mt-2 font-semibold">
+<p className="text-slate-300 text-sm mt-2 font-semibold">
 ₹{trainer?.pricePerSession}
-<span className="font-normal text-slate-400">
+<span className="font-normal text-slate-500">
 /session
 </span>
 </p>
