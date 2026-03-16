@@ -52,15 +52,15 @@ t.id === id ? {...t,status:"rejected"} : t
 
 return(
 
-<div className="bg-black p-6 rounded-lg shadow">
+<div className="bg-[#111827] p-6 rounded-xl border border-slate-800 shadow-lg shadow-blue-900/40">
 
-<h2 className="text-xl font-bold mb-4">
+<h2 className="text-xl font-bold mb-4 text-white">
 Free Trial Requests
 </h2>
 
-<table className="w-full text-left">
+<table className="w-full text-left text-slate-300">
 
-<thead className="border-b">
+<thead className="border-b border-slate-800">
 
 <tr>
 <th>User</th>
@@ -77,7 +77,7 @@ Free Trial Requests
 
 {trials.map((trial,i)=>(
 
-<tr key={i} className="border-b">
+<tr key={i} className="border-b border-slate-800">
 
 <td className="py-2">{trial.user_name}</td>
 
