@@ -5,7 +5,7 @@ import Button from '../../../components/ui/Button';
 import Input from '../../../components/ui/Input';
 
 
-const ProfileCard = ({ data }) => {
+const ProfileCard = ({ data, updateProfile }) => {
 
 const [isEditing, setIsEditing] = useState(false);
 const [editData, setEditData] = useState({});
@@ -70,9 +70,10 @@ location:editData.location
 const data = await res.json()
 
 console.log(data)
-
+updateProfile(editData)
 setProfileData({...editData})
 setIsEditing(false)
+
 
 }catch(err){
 
