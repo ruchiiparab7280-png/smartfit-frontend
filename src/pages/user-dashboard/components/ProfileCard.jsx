@@ -36,8 +36,8 @@ useEffect(() => {
       joinDate: data?.created_at 
   ? new Date(data.created_at).toLocaleDateString()
   : "N/A",
-      avatar: "https://via.placeholder.com/150",
-      avatarAlt: "User"
+    avatar: `https://ui-avatars.com/api/?name=${data?.name}&background=0D8ABC&color=fff`
+   
     });
   }
 }, [data]);
