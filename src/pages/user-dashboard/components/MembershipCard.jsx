@@ -41,15 +41,15 @@ const MembershipCard = ({ membership }) => {
           </span>
         </div>
       </div>
-      <div className="flex items-center gap-2 text-muted-foreground">
-       <Icon name="Building"/>
-          <span>{membership?.gymName}</span>
-               
+     <div className="flex items-center gap-2">
+<Icon name="Building" size={16}/>
+<span>{membership?.gymName}</span>
+</div>
 
-             <div className="flex items-center gap-2 text-muted-foreground">
-               <Icon name="MapPin"/>
-                      <span>{membership?.location}</span>
-                         </div>
+<div className="flex items-center gap-2">
+<Icon name="MapPin" size={16}/>
+<span>{membership?.location}</span>
+</div>
         <div className="space-y-3 mb-4">
           <div className="flex items-center justify-between">
             <span className="text-sm text-muted-foreground flex items-center gap-2">
@@ -103,8 +103,8 @@ const MembershipCard = ({ membership }) => {
           )}
         </div>
       </div>
-    </div>
-  );
+   
+  );  
 };
 
 export default MembershipCard;
