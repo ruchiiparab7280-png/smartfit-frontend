@@ -1,10 +1,29 @@
-import React from 'react';
+import React, {  useEffect } from 'react';
 import { Link } from 'react-router-dom';
 import Icon from '../../../components/AppIcon';
 import Image from '../../../components/AppImage';
 import Button from '../../../components/ui/Button';
 
 const RecommendedGymCard = ({ gym }) => {
+
+  useEffect(()=>{
+
+const renewGym = localStorage.getItem("renewGym")
+
+if(renewGym){
+
+const gym = gyms.find(g => g.email === renewGym)
+
+if(gym){
+setSelectedGym(gym)
+setShowModal(true)
+}
+
+localStorage.removeItem("renewGym")
+
+}
+
+},[gyms])
   return (
     <div className="bg-card rounded-lg overflow-hidden card-elevation-sm border border-border hover:card-elevation-md transition-smooth">
       <div className="h-48 overflow-hidden relative">

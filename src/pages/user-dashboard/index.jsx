@@ -124,7 +124,13 @@ return <ProfileCard data={profile} updateProfile={updateProfile}/>
 
 case "membership":
 return membership ? (
-  <MembershipCard membership={membership}/>
+<MembershipCard 
+membership={membership} 
+goToGyms={(gymEmail)=>{
+localStorage.setItem("renewGym",gymEmail)
+setActiveTab("gyms")
+}}
+/>
 ) : (
   <div className="bg-card p-10 rounded-lg text-center">
     <h2 className="text-xl font-semibold mb-2">No Active Membership</h2>

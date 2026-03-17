@@ -3,7 +3,7 @@ import Icon from '../../../components/AppIcon';
 import Image from '../../../components/AppImage';
 import Button from '../../../components/ui/Button';
 
-const MembershipCard = ({ membership }) => {
+const MembershipCard = ({ membership, goToGyms }) => {
 
 const getStatusColor = (status) => {
 switch (status) {
@@ -28,115 +28,121 @@ return diffDays;
 
 const daysRemaining = getDaysRemaining(membership?.expiryDate);
 
-return ( <div className="bg-card rounded-lg overflow-hidden border border-border">
+return (
 
-  {/* Gym Image */}
-  <div className="h-40 overflow-hidden relative">
-    <Image
-      src={membership?.gymImage}
-      alt="Gym"
-      className="w-full h-full object-cover"
-    />
+<div className="bg-card rounded-lg overflow-hidden border border-border">
 
-    <div className="absolute top-3 right-3">
-      <span className={`px-3 py-1 rounded-full text-xs font-semibold border ${getStatusColor(membership?.status)}`}>
-        {membership?.status}
-      </span>
-    </div>
-  </div>
+{/* Gym Image */}
 
-  {/* Card Content */}
-  <div className="p-6">
+<div className="h-40 overflow-hidden relative">
+<Image
+src={membership?.gymImage}
+alt="Gym"
+className="w-full h-full object-cover"
+/>
 
-    {/* Gym Name */}
-    <div className="flex items-center gap-2 mb-2">
-      <Icon name="Building" size={16}/>
-      <span className="font-semibold text-lg">{membership?.gymName}</span>
-    </div>
-
-    {/* Location */}
-    <div className="flex items-center gap-2 text-muted-foreground mb-4">
-      <Icon name="MapPin" size={16}/>
-      <span>{membership?.location}</span>
-    </div>
-
-    {/* Membership Details */}
-    <div className="space-y-3 mb-6">
-
-      <div className="flex justify-between">
-        <span className="text-muted-foreground flex items-center gap-2">
-          <Icon name="CreditCard" size={14}/>
-          Plan Type
-        </span>
-        <span className="font-semibold">{membership?.planType}</span>
-      </div>
-
-      <div className="flex justify-between">
-        <span className="text-muted-foreground flex items-center gap-2">
-          <Icon name="Calendar" size={14}/>
-          Start Date
-        </span>
-        <span className="font-semibold">{membership?.startDate}</span>
-      </div>
-
-      <div className="flex justify-between">
-        <span className="text-muted-foreground flex items-center gap-2">
-          <Icon name="CalendarCheck" size={14}/>
-          Expiry Date
-        </span>
-        <span className="font-semibold">{membership?.expiryDate}</span>
-      </div>
-
-      {daysRemaining > 0 && (
-        <div className="flex justify-between">
-          <span className="text-muted-foreground flex items-center gap-2">
-            <Icon name="Clock" size={14}/>
-            Days Remaining
-          </span>
-
-          <span className={`font-semibold ${daysRemaining <= 7 ? 'text-warning' : ''}`}>
-            {daysRemaining} days
-          </span>
-        </div>
-      )}
-
-    </div>
-
-    {/* Buttons */}
-    <div className="flex gap-3">
-
-      {(membership?.status === 'Active' || membership?.status === 'Expiring Soon') ? (
-        <>
-         <Button
-onClick={()=>window.location.href=`/gym-plans/${membership?.gymEmail}`}
->
-Renew
-</Button>
-
-          <Button
-            variant="outline"
-            iconName="Eye"
-            iconPosition="left"
-          >
-            View
-          </Button>
-        </>
-      ) : (
-        <Button
-          iconName="RotateCcw"
-          iconPosition="left"
-          fullWidth
-        >
-          Reactivate
-        </Button>
-      )}
-
-    </div>
-
-  </div>
+<div className="absolute top-3 right-3">
+<span className={`px-3 py-1 rounded-full text-xs font-semibold border ${getStatusColor(membership?.status)}`}>
+{membership?.status}
+</span>
+</div>
 </div>
 
+{/* Card Content */}
 
+<div className="p-6">
+
+{/* Gym Name */}
+
+<div className="flex items-center gap-2 mb-2">
+<Icon name="Building" size={16}/>
+<span className="font-semibold text-lg">{membership?.gymName}</span>
+</div>
+
+{/* Location */}
+
+<div className="flex items-center gap-2 text-muted-foreground mb-4">
+<Icon name="MapPin" size={16}/>
+<span>{membership?.location}</span>
+</div>
+
+{/* Membership Details */}
+
+<div className="space-y-3 mb-6">
+
+<div className="flex justify-between">
+<span className="text-muted-foreground flex items-center gap-2">
+<Icon name="CreditCard" size={14}/>
+Plan Type
+</span>
+<span className="font-semibold">{membership?.planType}</span>
+</div>
+
+<div className="flex justify-between">
+<span className="text-muted-foreground flex items-center gap-2">
+<Icon name="Calendar" size={14}/>
+Start Date
+</span>
+<span className="font-semibold">{membership?.startDate}</span>
+</div>
+
+<div className="flex justify-between">
+<span className="text-muted-foreground flex items-center gap-2">
+<Icon name="CalendarCheck" size={14}/>
+Expiry Date
+</span>
+<span className="font-semibold">{membership?.expiryDate}</span>
+</div>
+
+{daysRemaining > 0 && (
+
+<div className="flex justify-between">
+<span className="text-muted-foreground flex items-center gap-2">
+<Icon name="Clock" size={14}/>
+Days Remaining
+</span>
+
+<span className={`font-semibold ${daysRemaining <= 7 ? 'text-warning' : ''}`}>
+{daysRemaining} days </span>
+
+</div>
+)}
+
+</div>
+
+{/* Buttons */}
+
+<div className="flex gap-3">
+
+{(membership?.status === 'Active' || membership?.status === 'Expiring Soon') ? (
+<> <Button onClick={()=>goToGyms(membership?.gymEmail)}>
+Renew
+</Button>
+<Button
+variant="outline"
+iconName="Eye"
+iconPosition="left"
+
+>
+
+View </Button>
+</>
+) : (
+<Button
+iconName="RotateCcw"
+iconPosition="left"
+fullWidth
+onClick={goToGyms}
+
+>
+
+Reactivate </Button>
+)}
+
+</div>
+
+</div>
+</div>
 );
 };
 
