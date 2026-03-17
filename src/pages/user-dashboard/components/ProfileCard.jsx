@@ -43,11 +43,40 @@ useEffect(() => {
     setEditData({ ...profileData });
   };
 
-  const handleSave = () => {
-    setProfileData({ ...editData });
-    setIsEditing(false);
-  };
+const handleSave = async () => {
 
+const email = localStorage.getItem("userEmail")
+
+try{
+
+const res = await fetch(`${import.meta.env.VITE_API_URL}/update-user-profile/${email}`,{
+method:"PUT",
+headers:{
+"Content-Type":"application/json"
+},
+body:JSON.stringify({
+name:editData.name,
+phone:editData.phone,
+age:editData.age,
+gender:editData.gender,
+location:editData.location
+})
+})
+
+const data = await res.json()
+
+console.log(data)
+
+setProfileData({...editData})
+setIsEditing(false)
+
+}catch(err){
+
+console.log("Update error",err)
+
+}
+
+};
   const handleCancel = () => {
     setEditData({ ...profileData });
     setIsEditing(false);
