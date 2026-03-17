@@ -17,7 +17,9 @@ const [profileData, setProfileData] = useState({
   age: data?.age || "",
   gender: data?.gender || "",
   location: data?.location || "",
-  joinDate: "N/A",
+joinDate: data?.created_at 
+  ? new Date(data.created_at).toLocaleDateString()
+  : "N/A",
   avatar: "https://via.placeholder.com/150",
   avatarAlt: "User"
 });
@@ -31,7 +33,9 @@ useEffect(() => {
       age: data?.age || "",
       gender: data?.gender || "",
       location: data?.location || "",
-      joinDate: "N/A",
+      joinDate: data?.created_at 
+  ? new Date(data.created_at).toLocaleDateString()
+  : "N/A",
       avatar: "https://via.placeholder.com/150",
       avatarAlt: "User"
     });
