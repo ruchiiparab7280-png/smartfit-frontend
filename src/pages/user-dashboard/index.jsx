@@ -15,8 +15,9 @@ import TrainerRequests from "./components/TrainerRequests";
 import SupplementOrders from "./components/SupplementOrders";
 
 const UserDashboard = () => {
+const [profile,setProfile] = useState(null)  
 const updateProfile = (newData) => {
-  setProfile(newData)
+setProfile(newData)
 }
 const [membership,setMembership] = useState(null)
 useEffect(()=>{

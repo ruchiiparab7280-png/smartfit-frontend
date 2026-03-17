@@ -70,8 +70,10 @@ location:editData.location
 const data = await res.json()
 
 console.log(data)
-updateProfile(editData)
 setProfileData({...editData})
+if(updateProfile){
+updateProfile(editData)
+}
 setIsEditing(false)
 
 
