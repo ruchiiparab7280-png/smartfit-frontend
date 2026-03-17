@@ -107,11 +107,11 @@ return ( <div className="bg-card rounded-lg overflow-hidden border border-border
 
       {(membership?.status === 'Active' || membership?.status === 'Expiring Soon') ? (
         <>
-          <Button
-            onClick={() => window.location.href=`/gym-plans/${membership?.gymEmail}`}
-          >
-            Renew
-          </Button>
+         <Button
+onClick={()=>window.location.href=`/gym-plans/${membership?.gymEmail}`}
+>
+Renew
+</Button>
 
           <Button
             variant="outline"

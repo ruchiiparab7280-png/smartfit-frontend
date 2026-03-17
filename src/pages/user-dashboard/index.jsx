@@ -59,6 +59,7 @@ status = "Expired"
 setMembership({
 gymName:data[0].gym_name,
 location:data[0].gym_city,
+gymEmail:data[0].gym_email,
 planType:data[0].plan_name,
 startDate:start.toLocaleDateString(),
 expiryDate:expiry.toLocaleDateString(),
