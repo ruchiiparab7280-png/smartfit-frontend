@@ -30,7 +30,6 @@ const daysRemaining = getDaysRemaining(membership?.expiryDate);
 
 return ( <div className="bg-card rounded-lg overflow-hidden border border-border">
 
-```
   {/* Gym Image */}
   <div className="h-40 overflow-hidden relative">
     <Image
