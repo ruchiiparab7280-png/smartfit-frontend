@@ -41,13 +41,15 @@ const MembershipCard = ({ membership }) => {
           </span>
         </div>
       </div>
-      <div className="p-5">
-        <h3 className="text-xl font-bold text-foreground mb-2">{membership?.gymName}</h3>
-        <p className="text-sm text-muted-foreground mb-4 flex items-center gap-2">
-          <Icon name="MapPin" size={14} />
-          {membership?.location}
-        </p>
+      <div className="flex items-center gap-2 text-muted-foreground">
+       <Icon name="Building"/>
+          <span>{membership?.gymName}</span>
+               
 
+             <div className="flex items-center gap-2 text-muted-foreground">
+               <Icon name="MapPin"/>
+                      <span>{membership?.location}</span>
+                         </div>
         <div className="space-y-3 mb-4">
           <div className="flex items-center justify-between">
             <span className="text-sm text-muted-foreground flex items-center gap-2">
@@ -86,9 +88,10 @@ const MembershipCard = ({ membership }) => {
         <div className="flex gap-2">
           {membership?.status === 'Active' || membership?.status === 'Expiring Soon' ? (
             <>
-              <Button variant="default" size="sm" fullWidth iconName="RefreshCw" iconPosition="left">
-                Renew
-              </Button>
+       <Button
+                onClick={()=>window.location.href=`/gym-plans/${membership.gymEmail}`}>
+                    Renew
+                   </Button>
               <Button variant="outline" size="sm" iconName="Eye" iconPosition="left">
                 View
               </Button>
