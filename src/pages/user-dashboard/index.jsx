@@ -15,6 +15,7 @@ import TrainerRequests from "./components/TrainerRequests";
 import SupplementOrders from "./components/SupplementOrders";
 
 const UserDashboard = () => {
+const [workouts,setWorkouts] = useState([])
 const [profile,setProfile] = useState(null)  
 const updateProfile = (newData) => {
 setProfile(newData)
@@ -113,7 +114,7 @@ return(
 <>
 <StatsOverview/>
 <div className="grid grid-cols-1 lg:grid-cols-2 gap-6 mt-6">
-<WorkoutPlanCard/>
+<WorkoutPlanCard workouts={workouts} setWorkouts={setWorkouts}/>
 <ProgressChart/>
 </div>
 </>
@@ -159,7 +160,7 @@ return <SupplementOrders/>
 case "workout":
 return (
 <div className="max-w-4xl">
-<WorkoutPlanCard/>
+<WorkoutPlanCard workouts={workouts} setWorkouts={setWorkouts}/>
 </div>
 )
 

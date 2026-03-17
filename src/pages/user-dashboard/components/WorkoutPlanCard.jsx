@@ -3,9 +3,9 @@ import Icon from "../../../components/AppIcon";
 import Button from "../../../components/ui/Button";
 import { Checkbox } from "../../../components/ui/Checkbox";
 
-const WorkoutPlanCard = () => {
+const WorkoutPlanCard = ({workouts,setWorkouts}) => {
 
-const [workouts,setWorkouts] = useState([]);
+
 const [expandedDay,setExpandedDay] = useState(null);
 
 const [showForm,setShowForm] = useState(false);
@@ -76,9 +76,33 @@ setSets("");
 
 };
 
-const saveWorkout = ()=>{
+const saveWorkout = async ()=>{
 
 if(!day || exerciseList.length === 0) return;
+
+const user_email = localStorage.getItem("userEmail")
+
+try{
+
+const res = await fetch(`${import.meta.env.VITE_API_URL}/add-workout`,{
+method:"POST",
+headers:{
+"Content-Type":"application/json"
+},
+body: JSON.stringify({
+user_email,
+day,
+exercises: exerciseList
+})
+})
+
+const data = await res.json()
+
+console.log(data)
+
+}catch(err){
+console.log("Workout save error",err)
+}
 
 const existing = workouts.find(w=>w.day === day);
 
