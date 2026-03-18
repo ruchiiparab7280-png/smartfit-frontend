@@ -28,6 +28,10 @@ const [showBookingModal, setShowBookingModal] = useState(false);
 const [showSupplementModal,setShowSupplementModal] = useState(false)
 const [selectedSupplement,setSelectedSupplement] = useState(null)
 
+const [showReviewModal,setShowReviewModal] = useState(false)
+const [reviewRating,setReviewRating] = useState(5)
+const [reviewComment,setReviewComment] = useState("")
+
 const [supplementQty,setSupplementQty] = useState(1)
 const [paymentMethod,setPaymentMethod] = useState("online")
 const [pickupDate,setPickupDate] = useState("")
@@ -57,6 +61,30 @@ setShowTrialModal(false)
 
 }
 
+const handleReviewSubmit = async () => {
+
+await fetch(`${import.meta.env.VITE_API_URL}/add-review`,{
+method:"POST",
+headers:{
+"Content-Type":"application/json"
+},
+body:JSON.stringify({
+
+gym_email:gym.email,
+user_email:localStorage.getItem("userEmail"),
+rating:reviewRating,
+comment:reviewComment
+
+})
+})
+
+alert("Review submitted successfully ⭐")
+
+setShowReviewModal(false)
+setReviewComment("")
+setReviewRating(5)
+
+}
 const handleSupplementOrder = async () => {
 
 if(paymentMethod === "online"){
@@ -616,13 +644,13 @@ Buy Now </button>
           </div>
 
           <div className="flex flex-col sm:flex-row space-y-2 sm:space-y-0 sm:space-x-3">
-            <Button
-              variant="default"
+           <Button
+               variant="default"
               fullWidth
-              iconName="Calendar"
+              iconName="Star"
               iconPosition="left"
-            >
-              Book a Visit
+              onClick={()=>setShowReviewModal(true)}>
+              Write Review
             </Button>
             <Button
               variant="outline"
@@ -838,7 +866,58 @@ Cancel </button>
 </div>
 
 )}
+{showReviewModal && (
 
+<div className="fixed inset-0 flex items-center justify-center bg-black/60 z-50">
+
+<div className="bg-card p-6 rounded-lg w-[400px]">
+
+<h2 className="text-xl font-bold mb-4">
+Write a Review
+</h2>
+
+<label className="text-sm">Rating</label>
+
+<select
+value={reviewRating}
+onChange={(e)=>setReviewRating(e.target.value)}
+className="w-full mb-3 p-2 border rounded text-black"
+>
+
+<option value="5">⭐⭐⭐⭐⭐</option>
+<option value="4">⭐⭐⭐⭐</option>
+<option value="3">⭐⭐⭐</option>
+<option value="2">⭐⭐</option>
+<option value="1">⭐</option>
+
+</select>
+
+<textarea
+placeholder="Write your experience..."
+value={reviewComment}
+onChange={(e)=>setReviewComment(e.target.value)}
+className="w-full mb-4 p-2 border rounded text-black"
+/>
+
+<button
+onClick={handleReviewSubmit}
+className="w-full bg-orange-500 text-white py-2 rounded"
+>
+Submit Review
+</button>
+
+<button
+onClick={()=>setShowReviewModal(false)}
+className="mt-2 text-sm text-gray-900"
+>
+Cancel
+</button>
+
+</div>
+
+</div>
+
+)}
   {showBookingModal && (
 <div className="fixed inset-0 flex items-center justify-center bg-black/60 z-50">
 
