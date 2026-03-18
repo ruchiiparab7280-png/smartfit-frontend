@@ -123,13 +123,15 @@ fetchProfile()
 
 },[])
 
-const calculateStreak = (workouts)=>{
+const calculateStreak = (workouts) => {
 
 let streak = 0
 
-for(let i=workouts.length-1;i>=0;i--){
+for(let i = 0; i < workouts.length; i++){
 
-if(workouts[i].completed){
+const allCompleted = workouts[i].exercises?.every(ex => ex.completed)
+
+if(allCompleted){
 streak++
 }else{
 break
@@ -138,6 +140,23 @@ break
 }
 
 return streak
+
+}
+const calculateCalories = (workouts) => {
+
+let total = 0
+
+workouts.forEach(day=>{
+if(day.exercises){
+day.exercises.forEach(ex=>{
+if(ex.completed){
+total += 8
+}
+})
+}
+})
+
+return total
 
 }
 
