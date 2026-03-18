@@ -240,23 +240,23 @@ const options = {
     });
 
     // save membership
-    await fetch(`${import.meta.env.VITE_API_URL}/book-membership`, {
-      method: "POST",
-      headers: {
-        "Content-Type": "application/json"
-      },
+   await fetch(`${import.meta.env.VITE_API_URL}/book-membership`, {
+method: "POST",
+headers: {
+"Content-Type": "application/json"
+},
 body: JSON.stringify({
 user_email: localStorage.getItem("userEmail"),
 gym_email: gym.email,
 gym_name: gym.gym_name,
-gym_city: gym.gym_city, 
+gym_city: gym.gym_city,
 plan_name: selectedPlan.name,
 duration: selectedPlan.duration,
 price: selectedPlan.price,
-start_date: new Date(),
+start_date: new Date().toISOString(),
 payment_id: response.razorpay_payment_id
 })
-    });
+});
 
     alert("Membership Activated 🎉");
 
