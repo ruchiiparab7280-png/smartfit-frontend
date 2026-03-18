@@ -89,14 +89,17 @@ headers:{
 "Content-Type":"application/json"
 },
 body:JSON.stringify({
-
 gym_email:gym.email,
 user_email:localStorage.getItem("userEmail"),
 rating:reviewRating,
 comment:reviewComment
+})
+})
 
-})
-})
+// 🔥 fetch reviews again
+const res = await fetch(`${import.meta.env.VITE_API_URL}/reviews/${gym.email}`)
+const data = await res.json()
+setReviews(data)
 
 alert("Review submitted successfully ⭐")
 
@@ -427,7 +430,7 @@ const scrollRight = () => {
               <div className="flex items-center space-x-2 mb-2">
                 {renderStars(gym?.rating)}
                 <span className="text-sm text-muted-foreground">
-                  {gym?.rating} ({gym?.reviews} reviews)
+                 {gym?.rating} ({reviews.length} reviews)
                 </span>
               </div>
               <div className="flex items-center text-muted-foreground">
