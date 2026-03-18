@@ -115,7 +115,8 @@ Days Remaining
 <div className="flex gap-3">
 
 {(membership?.status === 'Active' || membership?.status === 'Expiring Soon') ? (
-<> <Button onClick={()=>goToGyms(membership?.gymEmail)}>
+<> <Button
+onClick={()=>goToGyms(membership?.gymEmail)}>
 Renew
 </Button>
 <Button

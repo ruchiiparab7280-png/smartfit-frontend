@@ -248,7 +248,7 @@ headers: {
 body: JSON.stringify({
 user_email: localStorage.getItem("userEmail"),
 gym_email: gym.email,
-gym_name: gym.gym_name,
+gym_name: gym.name,
 gym_city: gym.city,
 plan_name: selectedPlan.name,
 duration: selectedPlan.duration,
@@ -270,6 +270,7 @@ payment_id: response.razorpay_payment_id
   rzp.open();
 };
 const [selectedPlan, setSelectedPlan] = useState(null);
+const [startDate,setStartDate] = useState("")
 
 const scrollLeft = () => {
   scrollRef.current.scrollBy({
@@ -838,10 +839,12 @@ Cancel </button>
   {selectedPlan?.name} - ₹{selectedPlan?.price}/{selectedPlan?.duration}
 </p>
 
-      <input
-        type="date"
-        className="w-full mb-3 p-2 border rounded"
-      />
+     <input
+type="date"
+value={startDate}
+onChange={(e)=>setStartDate(e.target.value)}
+className="w-full mb-3 p-2 border rounded"
+/>
 
       <select className="w-full mb-3 p-2 border rounded text-black">
         <option>9:00 AM</option>

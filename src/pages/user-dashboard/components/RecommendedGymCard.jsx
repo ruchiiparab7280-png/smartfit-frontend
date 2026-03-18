@@ -1,98 +1,118 @@
-import React, {  useEffect } from 'react';
-import { Link } from 'react-router-dom';
-import Icon from '../../../components/AppIcon';
-import Image from '../../../components/AppImage';
-import Button from '../../../components/ui/Button';
+import React, { useEffect, useState } from "react";
+import Icon from "../../../components/AppIcon";
+import Image from "../../../components/AppImage";
+import Button from "../../../components/ui/Button";
+import GymDetailsModal from "../../gym-listing/components/GymDetailsModal";
 
-const RecommendedGymCard = ({ gym }) => {
+const RecommendedGymCard = () => {
 
-  useEffect(()=>{
+const [gyms,setGyms] = useState([])
+const [selectedGym,setSelectedGym] = useState(null)
+const [showModal,setShowModal] = useState(false)
+
+
+// FETCH GYMS
+
+useEffect(()=>{
+
+const fetchGyms = async ()=>{
+
+const res = await fetch(`${import.meta.env.VITE_API_URL}/api/gyms`)
+const data = await res.json()
+
+setGyms(data)
+
+}
+
+fetchGyms()
+
+},[])
+
+
+// 🔥 RENEW AUTO OPEN
+
+useEffect(()=>{
 
 const renewGym = localStorage.getItem("renewGym")
 
-if(renewGym){
+if(renewGym && gyms.length > 0){
 
 const gym = gyms.find(g => g.email === renewGym)
 
 if(gym){
+
 setSelectedGym(gym)
 setShowModal(true)
-}
 
 localStorage.removeItem("renewGym")
 
 }
 
+}
+
 },[gyms])
-  return (
-    <div className="bg-card rounded-lg overflow-hidden card-elevation-sm border border-border hover:card-elevation-md transition-smooth">
-      <div className="h-48 overflow-hidden relative">
-        <Image 
-          src={gym?.image} 
-          alt={gym?.imageAlt}
-          className="w-full h-full object-cover"
-        />
-        <div className="absolute top-3 right-3 bg-card/95 backdrop-blur-sm px-3 py-1 rounded-full flex items-center gap-1">
-          <Icon name="Star" size={14} color="var(--color-warning)" />
-          <span className="text-sm font-semibold text-foreground">{gym?.rating}</span>
-        </div>
-        {gym?.featured && (
-          <div className="absolute top-3 left-3 bg-primary px-3 py-1 rounded-full">
-            <span className="text-xs font-semibold text-primary-foreground">Featured</span>
-          </div>
-        )}
-      </div>
-      <div className="p-5">
-        <h3 className="text-xl font-bold text-foreground mb-2">{gym?.name}</h3>
-        <p className="text-sm text-muted-foreground mb-3 flex items-center gap-2">
-          <Icon name="MapPin" size={14} />
-          {gym?.location}
-        </p>
 
-        <div className="flex items-center gap-4 mb-4">
-          <div className="flex items-center gap-1 text-sm text-muted-foreground">
-            <Icon name="Navigation" size={14} />
-            <span>{gym?.distance}</span>
-          </div>
-          <div className="flex items-center gap-1 text-sm text-muted-foreground">
-            <Icon name="DollarSign" size={14} />
-            <span>{gym?.priceRange}</span>
-          </div>
-          <div className="flex items-center gap-1 text-sm text-muted-foreground">
-            <Icon name="Users" size={14} />
-            <span>{gym?.members}</span>
-          </div>
-        </div>
 
-        <div className="flex flex-wrap gap-2 mb-4">
-          {gym?.amenities?.slice(0, 3)?.map((amenity, index) => (
-            <span 
-              key={index}
-              className="px-2 py-1 bg-muted/50 text-xs font-medium text-foreground rounded-md"
-            >
-              {amenity}
-            </span>
-          ))}
-          {gym?.amenities?.length > 3 && (
-            <span className="px-2 py-1 bg-muted/50 text-xs font-medium text-muted-foreground rounded-md">
-              +{gym?.amenities?.length - 3} more
-            </span>
-          )}
-        </div>
+// OPEN MODAL
 
-        <div className="flex gap-2">
-          <Link to="/gym-listing" className="flex-1">
-            <Button variant="default" size="sm" fullWidth iconName="Eye" iconPosition="left">
-              View Details
-            </Button>
-          </Link>
-          <Button variant="outline" size="sm" iconName="Heart" iconPosition="left">
-            Save
-          </Button>
-        </div>
-      </div>
-    </div>
-  );
-};
+const openGym = (gym)=>{
+setSelectedGym(gym)
+setShowModal(true)
+}
+
+
+return(
+
+<div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+
+{gyms.map((gym,index)=>(
+
+<div
+key={index}
+className="bg-card rounded-lg border border-border overflow-hidden hover:shadow-lg transition"
+>
+
+<Image
+src={gym?.image || "https://images.unsplash.com/photo-1571902943202-507ec2618e8f"}
+alt={gym?.name}
+className="h-48 w-full object-cover"
+/>
+
+<div className="p-5">
+
+<h3 className="text-lg font-bold mb-1">{gym?.name}</h3>
+
+<p className="text-sm text-muted-foreground flex items-center gap-2 mb-3">
+<Icon name="MapPin" size={14}/>
+{gym?.city || gym?.address}
+</p>
+
+<Button
+fullWidth
+iconName="Eye"
+iconPosition="left"
+onClick={()=>openGym(gym)}
+>
+View Details
+</Button>
+
+</div>
+
+</div>
+
+))}
+
+
+<GymDetailsModal
+gym={selectedGym}
+isOpen={showModal}
+onClose={()=>setShowModal(false)}
+/>
+
+</div>
+
+)
+
+}
 
 export default RecommendedGymCard;
