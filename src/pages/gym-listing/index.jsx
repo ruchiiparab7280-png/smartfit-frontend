@@ -123,13 +123,14 @@ const memberships = await membershipRes.json();
   members: gym.capacity,
 
  distance: userLocation
-  ? calculateDistance(
-      userLocation.lat,
-      userLocation.lng,
-      gym.latitude,
-      gym.longitude
-    ).toFixed(1)
-  
+  ? parseFloat(
+      calculateDistance(
+        userLocation.lat,
+        userLocation.lng,
+        gym.latitude,
+        gym.longitude
+      ).toFixed(1)
+    )
   : 0, // add this
   rating: 4, // add this
 
