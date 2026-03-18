@@ -25,6 +25,37 @@ const GymListing = () => {
   const [selectedGym, setSelectedGym] = useState(null);
   const [showDetailsModal, setShowDetailsModal] = useState(false);
   const [gyms, setGyms] = useState([]);
+  const [userLocation, setUserLocation] = useState(null);
+
+  useEffect(() => {
+
+if (navigator.geolocation) {
+
+navigator.geolocation.getCurrentPosition(
+
+(position) => {
+
+const lat = position.coords.latitude;
+const lng = position.coords.longitude;
+
+console.log("USER LOCATION:", lat, lng);
+
+setUserLocation({
+lat,
+lng
+});
+
+},
+
+(error) => {
+console.log("Location permission denied");
+}
+
+);
+
+}
+
+}, []);
 useEffect(() => {
 
   const fetchGyms = async () => {
