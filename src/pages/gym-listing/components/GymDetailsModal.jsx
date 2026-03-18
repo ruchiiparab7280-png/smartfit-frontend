@@ -1,4 +1,4 @@
-import React, { useRef, useState } from 'react';
+import React, { useRef, useState,useEffect } from 'react';
 import Image from '../../../components/AppImage';
 import Icon from '../../../components/AppIcon';
 import Button from '../../../components/ui/Button';
@@ -31,10 +31,30 @@ const [selectedSupplement,setSelectedSupplement] = useState(null)
 const [showReviewModal,setShowReviewModal] = useState(false)
 const [reviewRating,setReviewRating] = useState(5)
 const [reviewComment,setReviewComment] = useState("")
+const [reviews,setReviews] = useState([])
+useEffect(()=>{
 
+const fetchReviews = async () => {
+
+const res = await fetch(
+`${import.meta.env.VITE_API_URL}/reviews/${gym.email}`
+)
+
+const data = await res.json()
+
+setReviews(data)
+
+}
+
+if(gym?.email){
+fetchReviews()
+}
+
+},[gym])
 const [supplementQty,setSupplementQty] = useState(1)
 const [paymentMethod,setPaymentMethod] = useState("online")
 const [pickupDate,setPickupDate] = useState("")
+
 
 const handleTrialBooking = async () => {
 
@@ -642,7 +662,42 @@ Buy Now </button>
               </div>
             </div>
           </div>
+          <div className="mb-6">
 
+<h3 className="text-lg font-semibold text-foreground mb-3 flex items-center">
+<Icon name="Star" size={20} className="mr-2" />
+Reviews
+</h3>
+
+{reviews.length === 0 ? (
+
+<p className="text-muted-foreground text-sm">
+No reviews yet
+</p>
+
+) : (
+
+reviews.map((review,index)=>(
+<div key={index} className="p-3 border-b border-border">
+
+<p className="font-semibold text-sm">
+{review.user_email}
+</p>
+
+<p className="text-yellow-500">
+{"⭐".repeat(review.rating)}
+</p>
+
+<p className="text-muted-foreground text-sm">
+{review.comment}
+</p>
+
+</div>
+))
+
+)}
+
+</div>
           <div className="flex flex-col sm:flex-row space-y-2 sm:space-y-0 sm:space-x-3">
            <Button
                variant="default"
