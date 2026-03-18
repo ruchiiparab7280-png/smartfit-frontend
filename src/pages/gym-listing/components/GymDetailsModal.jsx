@@ -229,7 +229,7 @@ const options = {
   order_id: order.id,
 
   handler: async function (response) {
-
+   console.log("GYM OBJECT:", gym);
     // verify payment
     await fetch(`${import.meta.env.VITE_API_URL}/payment/verify`, {
       method: "POST",
