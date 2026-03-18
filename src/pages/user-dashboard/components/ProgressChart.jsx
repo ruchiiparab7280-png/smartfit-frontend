@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState } from "react";
 import {
 LineChart,
 Line,
@@ -10,48 +10,58 @@ CartesianGrid,
 Tooltip,
 Legend,
 ResponsiveContainer
-} from 'recharts';
+} from "recharts";
 
-import Icon from '../../../components/AppIcon';
-import Button from '../../../components/ui/Button';
+import Icon from "../../../components/AppIcon";
+import Button from "../../../components/ui/Button";
+
+const ProgressChart = ({ workouts }) => {
+
+const [chartType,setChartType] = useState("workouts")
+
+/* WORKOUT SESSIONS DATA */
+
+const workoutData = workouts.map((day,index)=>({
+month:`Day ${index+1}`,
+sessions: day.exercises.length
+}))
 
 
-const ProgressChart = () => {
+/* CALORIES AUTO CALCULATION */
 
-const [chartType,setChartType] = useState("weight");
+const caloriesData = workouts.map((day,index)=>{
 
-const weightData = [
-{ month:"Jan",weight:185,target:180 },
-{ month:"Feb",weight:183,target:178 },
-{ month:"Mar",weight:180,target:176 },
-{ month:"Apr",weight:178,target:174 },
-{ month:"May",weight:176,target:172 },
-{ month:"Jun",weight:174,target:170 }
-];
+let calories = 0
 
-const workoutData = [
-{ month:"Jan",sessions:12 },
-{ month:"Feb",sessions:16 },
-{ month:"Mar",sessions:14 },
-{ month:"Apr",sessions:18 },
-{ month:"May",sessions:20 },
-{ month:"Jun",sessions:22 }
-];
+day.exercises.forEach(ex=>{
+if(ex.completed){
+calories += 8
+}
+})
 
-const caloriesData = [
-{ month:"Jan",burned:2400,consumed:2200 },
-{ month:"Feb",burned:2600,consumed:2100 },
-{ month:"Mar",burned:2500,consumed:2000 },
-{ month:"Apr",burned:2700,consumed:2100 },
-{ month:"May",burned:2800,consumed:2000 },
-{ month:"Jun",burned:2900,consumed:1900 }
-];
+return{
+month:`Day ${index+1}`,
+burned: calories
+}
+
+})
+
+
+/* WEIGHT DATA (placeholder until weight tracking added) */
+
+const weightData = workouts.map((day,index)=>({
+month:`Day ${index+1}`,
+weight:180 - index,
+target:170
+}))
+
 
 const chartOptions = [
 { id:"weight",label:"Weight Progress",icon:"TrendingDown" },
 { id:"workouts",label:"Workout Sessions",icon:"Activity" },
 { id:"calories",label:"Calorie Tracking",icon:"Flame" }
-];
+]
+
 
 return(
 
@@ -84,9 +94,13 @@ onClick={()=>setChartType(option.id)}
 
 </div>
 
+
 {/* CHART */}
 
 <div className="w-full h-[320px]">
+
+
+{/* WEIGHT CHART */}
 
 {chartType === "weight" && (
 
@@ -124,7 +138,7 @@ dataKey="target"
 stroke="var(--color-success)"
 strokeWidth={2}
 strokeDasharray="5 5"
-name="Target"
+name="Target Weight"
 />
 
 </LineChart>
@@ -132,6 +146,9 @@ name="Target"
 </ResponsiveContainer>
 
 )}
+
+
+{/* WORKOUT SESSIONS */}
 
 {chartType === "workouts" && (
 
@@ -168,6 +185,9 @@ name="Workout Sessions"
 
 )}
 
+
+{/* CALORIES */}
+
 {chartType === "calories" && (
 
 <ResponsiveContainer width="100%" height="100%">
@@ -198,14 +218,6 @@ strokeWidth={3}
 name="Calories Burned"
 />
 
-<Line
-type="monotone"
-dataKey="consumed"
-stroke="var(--color-warning)"
-strokeWidth={3}
-name="Calories Consumed"
-/>
-
 </LineChart>
 
 </ResponsiveContainer>
@@ -214,69 +226,10 @@ name="Calories Consumed"
 
 </div>
 
-{/* STATS */}
-
-<div className="grid grid-cols-1 sm:grid-cols-3 gap-4 mt-6">
-
-<div className="bg-muted/30 rounded-lg p-4">
-
-<div className="flex items-center gap-2 mb-2">
-<Icon name="Target" size={20} color="var(--color-primary)" />
-<span className="text-sm text-muted-foreground">Current Goal</span>
 </div>
 
-<p className="text-2xl font-bold text-foreground">
-170 lbs
-</p>
+)
 
-<p className="text-xs text-muted-foreground mt-1">
-4 lbs to go
-</p>
+}
 
-</div>
-
-
-<div className="bg-muted/30 rounded-lg p-4">
-
-<div className="flex items-center gap-2 mb-2">
-<Icon name="TrendingUp" size={20} color="var(--color-success)" />
-<span className="text-sm text-muted-foreground">Progress Rate</span>
-</div>
-
-<p className="text-2xl font-bold text-foreground">
-1.8 lbs/mo
-</p>
-
-<p className="text-xs text-muted-foreground mt-1">
-On track
-</p>
-
-</div>
-
-
-<div className="bg-muted/30 rounded-lg p-4">
-
-<div className="flex items-center gap-2 mb-2">
-<Icon name="Calendar" size={20} color="var(--color-accent)" />
-<span className="text-sm text-muted-foreground">Est. Completion</span>
-</div>
-
-<p className="text-2xl font-bold text-foreground">
-Aug 2025
-</p>
-
-<p className="text-xs text-muted-foreground mt-1">
-2 months left
-</p>
-
-</div>
-
-</div>
-
-</div>
-
-);
-
-};
-
-export default ProgressChart;
+export default ProgressChart

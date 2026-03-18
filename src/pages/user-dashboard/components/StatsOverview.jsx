@@ -10,7 +10,7 @@ const StatsOverview = ({ stats }) => {
       icon: "CreditCard",
       color: "var(--color-primary)",
       bgColor: "bg-primary/10",
-      change: "+1 this month",
+    change: "",
       changeType: "positive"
     },
     {
@@ -20,7 +20,7 @@ const StatsOverview = ({ stats }) => {
       icon: "Activity",
       color: "var(--color-accent)",
       bgColor: "bg-accent/10",
-      change: "+4 from last month",
+      change: "",
       changeType: "positive"
     },
     {
