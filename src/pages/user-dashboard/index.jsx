@@ -104,6 +104,32 @@ fetchProfile()
 
 },[])
 
+const calculateStreak = (workouts) => {
+
+if(workouts.length === 0) return 0
+
+let streak = 0
+let today = new Date()
+
+for(let i = workouts.length - 1; i >= 0; i--){
+
+const workoutDate = new Date(workouts[i].date)
+
+const diffDays = Math.floor(
+(today - workoutDate) / (1000*60*60*24)
+)
+
+if(diffDays === streak){
+streak++
+}else{
+break
+}
+
+}
+
+return streak
+}
+
 const [activeTab,setActiveTab] = useState("dashboard")
 
 const renderContent = () => {
@@ -118,9 +144,7 @@ stats={{
 active_memberships: membership ? 1 : 0,
 workouts_this_month: workouts.length,
 calories_burned: 0,
-streak: workouts.filter(day =>
-day.exercises.some(ex => ex.completed)
-).length
+streak: calculateStreak(workouts)
 }}
 />
 

@@ -92,6 +92,7 @@ headers:{
 body: JSON.stringify({
 user_email,
 day,
+date: new Date().toISOString(),
 exercises: exerciseList
 })
 })
