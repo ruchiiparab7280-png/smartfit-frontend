@@ -30,6 +30,7 @@ const email = localStorage.getItem("userEmail")
 const res = await fetch(`${import.meta.env.VITE_API_URL}/user-memberships/${email}`)
 
 const data = await res.json()
+console.log("membership data:", data)
 
 if(data.length > 0){
 
