@@ -249,7 +249,7 @@ body: JSON.stringify({
 user_email: localStorage.getItem("userEmail"),
 gym_email: gym.email,
 gym_name: gym.gym_name,
-gym_city: gym.gym_city,
+gym_city: gym.city,
 plan_name: selectedPlan.name,
 duration: selectedPlan.duration,
 price: selectedPlan.price,
