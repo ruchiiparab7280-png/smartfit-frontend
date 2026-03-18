@@ -11,6 +11,25 @@ import SortControls from './components/SortControls';
 import GymDetailsModal from './components/GymDetailsModal';
 
 const GymListing = () => {
+  const calculateDistance = (lat1, lon1, lat2, lon2) => {
+
+const R = 6371;
+
+const dLat = (lat2 - lat1) * Math.PI / 180;
+const dLon = (lon2 - lon1) * Math.PI / 180;
+
+const a =
+Math.sin(dLat/2) * Math.sin(dLat/2) +
+Math.cos(lat1 * Math.PI/180) *
+Math.cos(lat2 * Math.PI/180) *
+Math.sin(dLon/2) *
+Math.sin(dLon/2);
+
+const c = 2 * Math.atan2(Math.sqrt(a), Math.sqrt(1-a));
+
+return R * c;
+
+};
   const [filters, setFilters] = useState({
     distance: 10,
     priceRange: { min: 0, max: 5000 }, 
@@ -102,7 +121,14 @@ const memberships = await membershipRes.json();
   price: gym.monthly_fee,
   members: gym.capacity,
 
-  distance: Math.floor(Math.random() * 10) + 1, // add this
+  distance: userLocation
+? calculateDistance(
+userLocation.lat,
+userLocation.lng,
+gym.latitude || 0,
+gym.longitude || 0
+).toFixed(1)
+: 0, // add this
   rating: 4, // add this
 
   openTime: `${gym.opening_time} - ${gym.closing_time}`,
