@@ -80,6 +80,25 @@ fetchMembership()
 
 useEffect(()=>{
 
+const fetchWorkouts = async ()=>{
+
+const email = localStorage.getItem("userEmail")
+
+const res = await fetch(
+`${import.meta.env.VITE_API_URL}/user-workouts/${email}`
+)
+
+const data = await res.json()
+
+setWorkouts(data)
+
+}
+
+fetchWorkouts()
+
+},[])
+useEffect(()=>{
+
 const fetchProfile = async ()=>{
 
 const email = localStorage.getItem("userEmail")
@@ -104,22 +123,13 @@ fetchProfile()
 
 },[])
 
-const calculateStreak = (workouts) => {
-
-if(workouts.length === 0) return 0
+const calculateStreak = (workouts)=>{
 
 let streak = 0
-let today = new Date()
 
-for(let i = workouts.length - 1; i >= 0; i--){
+for(let i=workouts.length-1;i>=0;i--){
 
-const workoutDate = new Date(workouts[i].date)
-
-const diffDays = Math.floor(
-(today - workoutDate) / (1000*60*60*24)
-)
-
-if(diffDays === streak){
+if(workouts[i].completed){
 streak++
 }else{
 break
@@ -128,6 +138,7 @@ break
 }
 
 return streak
+
 }
 
 const [activeTab,setActiveTab] = useState("dashboard")
@@ -143,7 +154,7 @@ return(
 stats={{
 active_memberships: membership ? 1 : 0,
 workouts_this_month: workouts.length,
-calories_burned: 0,
+calories_burned: calculateCalories(workouts),
 streak: calculateStreak(workouts)
 }}
 />
