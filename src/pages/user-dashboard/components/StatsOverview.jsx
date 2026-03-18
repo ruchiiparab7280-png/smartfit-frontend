@@ -36,7 +36,7 @@ const StatsOverview = ({ stats }) => {
     {
       id: 4,
       label: "Current Streak",
-      value: stats?.streak + " days" || 0,
+     value: (stats?.streak || 0) + " days",
       icon: "Zap",
       color: "var(--color-warning)",
       bgColor: "bg-warning/10",

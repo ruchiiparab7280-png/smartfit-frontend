@@ -113,11 +113,20 @@ switch(activeTab){
 case "dashboard":
 return(
 <>
-<StatsOverview/>
+<StatsOverview
+stats={{
+active_memberships: membership ? 1 : 0,
+workouts_this_month: workouts.length,
+calories_burned: 0,
+streak: workouts.length
+}}
+/>
+
 <div className="grid grid-cols-1 lg:grid-cols-2 gap-6 mt-6">
 <WorkoutPlanCard workouts={workouts} setWorkouts={setWorkouts}/>
 <ProgressChart/>
 </div>
+
 </>
 )
 
