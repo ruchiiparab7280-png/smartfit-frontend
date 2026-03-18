@@ -117,18 +117,19 @@ const memberships = await membershipRes.json();
   address: gym.address,
   phone: gym.phone,
   email: gym.email,
-
+  latitude: gym.latitude,
+  longitude: gym.longitude,
   price: gym.monthly_fee,
   members: gym.capacity,
 
-  distance: userLocation
-? calculateDistance(
-userLocation.lat,
-userLocation.lng,
-gym.latitude || 0,
-gym.longitude || 0
-).toFixed(1)
-: 0, // add this
+ distance: userLocation
+  ? calculateDistance(
+      userLocation.lat,
+      userLocation.lng,
+      gym.latitude,
+      gym.longitude
+    ).toFixed(1)
+  : 0, // add this
   rating: 4, // add this
 
   openTime: `${gym.opening_time} - ${gym.closing_time}`,
