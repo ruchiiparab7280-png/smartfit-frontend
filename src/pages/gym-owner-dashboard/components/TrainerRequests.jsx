@@ -129,13 +129,14 @@ type="text"
 placeholder="Search user..."
 value={search}
 onChange={(e)=>setSearch(e.target.value)}
-className="border p-2 rounded-lg"
+  className="bg-[#111827] text-white placeholder-gray-400 border border-slate-800 p-2 rounded-lg focus:outline-none focus:ring-2"
 />
+
 
 <select
 value={sort}
 onChange={(e)=>setSort(e.target.value)}
-className="border p-2 rounded-lg"
+className="bg-[#111827] text-white border border-slate-800 p-2 rounded-lg focus:outline-none focus:ring-2"
 >
 <option value="latest">Latest</option>
 <option value="oldest">Oldest</option>
