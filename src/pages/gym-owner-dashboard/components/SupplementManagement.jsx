@@ -249,7 +249,7 @@ return (
 
 <div>
 
-<h2 className="text-2xl font-bold text-slate-800">
+<h2 className="text-2xl font-bold text-slate-200">
 Supplement Management
 </h2>
 
@@ -261,7 +261,7 @@ Supplement Management
 
 <button
 onClick={openAdd}
-className="flex items-center gap-2 px-5 py-2.5 bg-blue-600 text-white font-semibold rounded-lg hover:bg-blue-700 transition-colors"
+lassName="flex items-center gap-2 px-5 py-2.5 bg-orange-500 text-white font-semibold rounded-lg hover:bg-orange-600 transition-colors"
 >
 
 <svg
