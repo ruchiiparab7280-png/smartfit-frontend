@@ -25,7 +25,7 @@ const ForgotPassword = () => {
     const data = await res.json();
 
     if (res.ok) {
-      setMessage("Reset link will be sent soon ✅");
+      setMessage("Reset link sent to your email 📧");
     } else {
       setMessage(data.message);
     }

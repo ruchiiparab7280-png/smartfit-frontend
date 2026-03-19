@@ -1,15 +1,21 @@
 import React, { useState } from "react";
-import { useParams } from "react-router-dom";
+import { useParams, useNavigate } from "react-router-dom";
 
 const UpdatePassword = () => {
 
   const { token } = useParams();
+  const navigate = useNavigate();
 
   const [password, setPassword] = useState("");
   const [message, setMessage] = useState("");
 
   const handleSubmit = async (e) => {
     e.preventDefault();
+
+    if (!password) {
+      setMessage("Enter new password ❌");
+      return;
+    }
 
     try {
       const res = await fetch(`${import.meta.env.VITE_API_URL}/reset-password`, {
@@ -24,12 +30,18 @@ const UpdatePassword = () => {
 
       if (res.ok) {
         setMessage("Password updated successfully ✅");
+
+        // 🔥 redirect after 2 sec
+        setTimeout(() => {
+          navigate("/sign-in-sign-up");
+        }, 2000);
+
       } else {
         setMessage(data.message);
       }
 
     } catch {
-      setMessage("Error ❌");
+      setMessage("Server error ❌");
     }
   };
 
@@ -55,7 +67,7 @@ const UpdatePassword = () => {
 
         </form>
 
-        {message && <p className="mt-3">{message}</p>}
+        {message && <p className="mt-3 text-center">{message}</p>}
 
       </div>
     </div>
