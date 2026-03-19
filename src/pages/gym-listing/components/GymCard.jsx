@@ -21,7 +21,7 @@ const GymCard = ({ gym, onViewDetails, onContact }) => {
     action();
   };
 
-  // ⭐ Stars render
+  // ⭐ Stars
   const renderStars = (rating) => {
     return Array.from({ length: 5 }, (_, index) => (
       <Icon
@@ -29,7 +29,6 @@ const GymCard = ({ gym, onViewDetails, onContact }) => {
         name={index < Math.floor(rating) ? 'Star' : 'StarOff'}
         size={16}
         color={index < Math.floor(rating) ? '#F59E0B' : '#D1D5DB'}
-        className="fill-current"
       />
     ));
   };
@@ -66,11 +65,13 @@ const GymCard = ({ gym, onViewDetails, onContact }) => {
           </div>
         </div>
 
-        {/* LOCATION */}
+        {/* 📍 LOCATION (FIXED FOR YOUR DATA) */}
         <div className="flex items-center text-muted-foreground text-sm mb-3">
           <Icon name="MapPin" size={16} className="mr-1" />
           <span className="line-clamp-1">
-            {gym?.location || "Location not available"}
+            {gym?.address
+              ? `${gym.address}, ${gym.city}`
+              : "Location not available"}
           </span>
         </div>
 
@@ -95,7 +96,7 @@ const GymCard = ({ gym, onViewDetails, onContact }) => {
           </div>
         </div>
 
-        {/* AMENITIES */}
+        {/* 🧩 AMENITIES (OBJECT SUPPORT) */}
         <div className="mb-3">
           <div className="flex flex-wrap gap-2">
             {gym?.amenities?.slice(0, 3)?.map((amenity, index) => (
@@ -103,13 +104,13 @@ const GymCard = ({ gym, onViewDetails, onContact }) => {
                 key={index}
                 className="inline-flex items-center px-2 py-1 bg-muted text-muted-foreground rounded-md text-xs"
               >
-                {typeof amenity === "string" ? amenity : amenity?.name}
+                {amenity?.name}
               </span>
             ))}
           </div>
         </div>
 
-        {/* PRICE + RATING */}
+        {/* 💰 PRICE + ⭐ RATING */}
         <div className="flex items-center justify-between mb-4">
 
           <div>
@@ -128,7 +129,7 @@ const GymCard = ({ gym, onViewDetails, onContact }) => {
 
         </div>
 
-        {/* BUTTONS */}
+        {/* 🔘 BUTTONS */}
         <div className="flex space-x-2">
           <Button
             variant="outline"
