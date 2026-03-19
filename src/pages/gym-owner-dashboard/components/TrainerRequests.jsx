@@ -147,28 +147,28 @@ className="border p-2 rounded-lg"
 
 <div
 onClick={()=>setFilter("all")}
-className="cursor-pointer bg-white rounded-xl shadow-sm border border-slate-200 p-4"
+className="cursor-pointer bg-orange-500 rounded-xl shadow-sm border border-slate-200 p-4"
 >
 Total Requests: {total}
 </div>
 
 <div
 onClick={()=>setFilter("pending")}
-className="cursor-pointer bg-white rounded-xl shadow-sm border border-slate-200 p-4"
+className="cursor-pointer bg-orange-500 rounded-xl shadow-sm border border-slate-200 p-4"
 >
 Pending: {pending}
 </div>
 
 <div
 onClick={()=>setFilter("approved")}
-className="cursor-pointer bg-white rounded-xl shadow-sm border border-slate-200 p-4"
+className="cursor-pointer bg-orange-500 rounded-xl shadow-sm border border-slate-200 p-4"
 >
 Approved: {approved}
 </div>
 
 <div
 onClick={()=>setFilter("rejected")}
-className="cursor-pointer bg-white rounded-xl shadow-sm border border-slate-200 p-4"
+className="cursor-pointer bg-orange-500 rounded-xl shadow-sm border border-slate-200 p-4"
 >
 Rejected: {rejected}
 </div>
@@ -182,23 +182,23 @@ Rejected: {rejected}
 
 <div>
 
-<h3 className="font-bold text-slate-800">
+<h3 className="font-bold text-slate-200">
 Trainer: {req.trainer}
 </h3>
 
-<p className="text-sm text-slate-600">
+<p className="text-sm text-slate-200">
 User: {req.user}
 </p>
 
-<p className="text-sm text-slate-600">
+<p className="text-sm text-slate-200">
 Phone: {req.phone}
 </p>
 
-<p className="text-sm text-slate-500">
+<p className="text-sm text-slate-200">
 Date: {req.date}
 </p>
 
-<p className="text-sm text-slate-500">
+<p className="text-sm text-slate-200">
 Time: {req.time}
 </p>
 
