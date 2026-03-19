@@ -261,7 +261,7 @@ Supplement Management
 
 <button
 onClick={openAdd}
-lassName="flex items-center gap-2 px-5 py-2.5 bg-orange-500 text-white font-semibold rounded-lg hover:bg-orange-600 transition-colors"
+className="flex items-center gap-2 px-5 py-2.5 bg-orange-500 text-white font-semibold rounded-lg hover:bg-orange-600 transition-colors"
 >
 
 <svg
