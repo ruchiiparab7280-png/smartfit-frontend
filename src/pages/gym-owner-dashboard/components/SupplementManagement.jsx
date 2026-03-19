@@ -295,10 +295,10 @@ Add Supplement
 
 <div
 key={s.id}
-className="relative z-10 bg-white rounded-xl shadow-sm border border-slate-200 overflow-hidden"
+className="relative z-10 bg-[#111827] rounded-xl shadow-sm border border-slate-800 overflow-hidden"
 >
 
-<div className="h-44 bg-slate-100 overflow-hidden">
+<div className="h-44 bg-[#111827] overflow-hidden">
 
 <img
 src={s.image}
@@ -310,19 +310,19 @@ className="w-full h-full object-cover"
 
 <div className="p-4">
 
-<h3 className="font-bold text-slate-800">
+<h3 className="font-bold text-slate-200">
 
 {s.name}
 
 </h3>
 
-<p className="text-blue-600 font-bold text-lg mt-1">
+<p className="text-orange-500 font-bold text-lg mt-1">
 
 ₹{s.price}
 
 </p>
 
-<p className="text-slate-500 text-sm mt-2 line-clamp-2">
+<p className="text-slate-200 text-sm mt-2 line-clamp-2">
 
 {s.description}
 
@@ -363,11 +363,11 @@ Delete
 
 <div className="fixed inset-0 bg-black/50 flex items-center justify-center z-50 p-4">
 
-<div className="bg-white rounded-2xl shadow-xl w-full max-w-md p-6">
+<div className="bg-[#111827] rounded-2xl shadow-xl w-full max-w-md p-6">
 
 <div className="flex items-center justify-between mb-5">
 
-<h3 className="text-lg font-bold text-slate-800">
+<h3 className="text-lg font-bold text-slate-200">
 
 {editId ? "Edit Supplement" : "Add Supplement"}
 
@@ -375,7 +375,7 @@ Delete
 
 <button
 onClick={()=>setShowModal(false)}
-className="text-slate-400 hover:text-slate-600"
+className="text-slate-200 hover:text-slate-600"
 >
 
 ✕
@@ -392,7 +392,7 @@ className="space-y-4"
 
 <div>
 
-<label className="block text-sm font-semibold text-slate-900 mb-1">
+<label className="block text-sm font-semibold text-slate-200 mb-1">
 
 Supplement Name
 
@@ -403,7 +403,7 @@ required
 type="text"
 value={form.name}
 onChange={e=>setForm({...form,name:e.target.value})}
-className="w-full px-4 py-2.5 rounded-lg border border-slate-200 focus:outline-none focus:ring-2 focus:ring-blue-500 text-slate-900"
+className="w-full px-4 py-2.5 rounded-lg border border-slate-200 focus:outline-none focus:ring-2 focus:ring-blue-500 text-slate-200"
 />
 
 </div>
@@ -411,7 +411,7 @@ className="w-full px-4 py-2.5 rounded-lg border border-slate-200 focus:outline-n
 
 <div>
 
-<label className="block text-sm font-semibold text-slate-900 mb-1">
+<label className="block text-sm font-semibold text-slate-200 mb-1">
 
 Price (₹)
 
@@ -430,7 +430,7 @@ className="w-full px-4 py-2.5 rounded-lg border border-slate-200 focus:outline-n
 
 <div>
 
-<label className="block text-sm font-semibold text-slate-900 mb-1">
+<label className="block text-sm font-semibold text-slate-200 mb-1">
 
 Description
 
@@ -447,7 +447,7 @@ className="w-full px-4 py-2.5 rounded-lg border border-slate-200 focus:outline-n
 
 <div>
 
-<label className="block text-sm font-semibold text-slate-900 mb-1">
+<label className="block text-sm font-semibold text-slate-200 mb-1">
 Stock Status
 </label>
 
@@ -466,7 +466,7 @@ className="w-full px-4 py-2.5 rounded-lg border border-slate-200 focus:outline-n
 
 <div>
 
-<label className="block text-sm font-semibold text-slate-900 mb-1">
+<label className="block text-sm font-semibold text-slate-200 mb-1">
 
 Product Image
 
@@ -516,7 +516,7 @@ Cancel
 
 <button
 type="submit"
-className="flex-1 py-2.5 bg-blue-600 text-white font-semibold rounded-lg hover:bg-blue-700"
+className="flex-1 py-2.5 bg-orange-500 text-white font-semibold rounded-lg hover:bg-blue-700"
 >
 
 {editId ? "Update Supplement" : "Add Supplement"}
@@ -538,17 +538,17 @@ className="flex-1 py-2.5 bg-blue-600 text-white font-semibold rounded-lg hover:b
 
 <div className="mt-10">
 
-<h3 className="text-xl font-bold text-slate-900 mb-4">
+<h3 className="text-xl font-bold text-slate-200 mb-4">
 
 Supplement Orders
 
 </h3>
 
-<div className="bg-white rounded-xl border border-slate-200 overflow-hidden">
+<div className="bg-[#111827] rounded-xl border border-slate-800 overflow-hidden">
 
 <table className="w-full text-sm">
 
-<thead className="bg-slate-100 text-slate-900">
+<thead className="bg-slate-800 text-slate-200">
 
 <tr>
 
@@ -574,13 +574,13 @@ Supplement Orders
 
 {orders.map(order => (
 
-<tr key={order.id} className="border-t border-slate-100">
+<tr key={order.id} className="border-t border-slate-800">
 
-<td className="px-4 py-3 font-medium text-slate-900">
+<td className="px-4 py-3 font-medium text-slate-200">
 {order.user_email}
 </td>
 
-<td className="px-4 py-3 text-slate-900">
+<td className="px-4 py-3 text-slate-200">
 {order.supplement_name}
 </td>
 
