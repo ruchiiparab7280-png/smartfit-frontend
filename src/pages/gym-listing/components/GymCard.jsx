@@ -8,7 +8,7 @@ const GymCard = ({ gym, onViewDetails, onContact }) => {
 
   const navigate = useNavigate();
 
-  // 🔐 Login Check Function
+  // 🔐 Login Check
   const checkLoginAndProceed = (action) => {
     const isAuth = localStorage.getItem("isAuthenticated") === "true";
 
@@ -21,6 +21,7 @@ const GymCard = ({ gym, onViewDetails, onContact }) => {
     action();
   };
 
+  // ⭐ Stars render
   const renderStars = (rating) => {
     return Array.from({ length: 5 }, (_, index) => (
       <Icon
@@ -35,50 +36,66 @@ const GymCard = ({ gym, onViewDetails, onContact }) => {
 
   return (
     <div className="bg-card rounded-lg overflow-hidden card-elevation-md hover-lift transition-smooth border border-border">
+      
+      {/* IMAGE */}
       <div className="relative h-48 overflow-hidden">
         <Image
           src={gym?.image}
-          alt={gym?.imageAlt}
+          alt={gym?.name}
           className="w-full h-full object-cover"
         />
-        {gym?.featured && (
-          <div className="absolute top-3 right-3 bg-accent text-accent-foreground px-3 py-1 rounded-md text-sm font-medium">
-            Featured
+
+        {/* 📍 Distance */}
+        {gym?.distance ? (
+          <div className="absolute top-3 left-3 bg-black/70 text-white px-2 py-1 rounded text-xs">
+            {gym.distance} km away
           </div>
-        )}
-        <div className="absolute bottom-3 left-3 bg-background/90 backdrop-blur-sm px-3 py-1 rounded-md text-sm font-medium">
-          {gym?.distance} km away
-        </div>
+        ) : null}
       </div>
 
       <div className="p-4">
+        
+        {/* NAME + STARS */}
         <div className="flex items-start justify-between mb-2">
           <h3 className="text-lg font-semibold text-foreground line-clamp-1">
             {gym?.name}
           </h3>
+
           <div className="flex items-center space-x-1 ml-2">
-            {renderStars(gym?.rating)}
+            {renderStars(gym?.rating || 4)}
           </div>
         </div>
 
+        {/* LOCATION */}
         <div className="flex items-center text-muted-foreground text-sm mb-3">
           <Icon name="MapPin" size={16} className="mr-1" />
-          <span className="line-clamp-1">{gym?.address}</span>
+          <span className="line-clamp-1">
+            {gym?.location || "Location not available"}
+          </span>
         </div>
 
+        {/* EXTRA INFO */}
         <div className="flex items-center justify-between mb-3 pb-3 border-b border-border">
           <div className="flex items-center space-x-4">
-            <div className="flex items-center text-sm text-muted-foreground">
-              <Icon name="Users" size={16} className="mr-1" />
-              <span>{gym?.members}+ members</span>
-            </div>
-            <div className="flex items-center text-sm text-muted-foreground">
-              <Icon name="Clock" size={16} className="mr-1" />
-              <span>{gym?.openTime}</span>
-            </div>
+
+            {gym?.members && (
+              <div className="flex items-center text-sm text-muted-foreground">
+                <Icon name="Users" size={16} className="mr-1" />
+                <span>{gym.members}+ members</span>
+              </div>
+            )}
+
+            {gym?.openTime && (
+              <div className="flex items-center text-sm text-muted-foreground">
+                <Icon name="Clock" size={16} className="mr-1" />
+                <span>{gym.openTime}</span>
+              </div>
+            )}
+
           </div>
         </div>
 
+        {/* AMENITIES */}
         <div className="mb-3">
           <div className="flex flex-wrap gap-2">
             {gym?.amenities?.slice(0, 3)?.map((amenity, index) => (
@@ -86,32 +103,32 @@ const GymCard = ({ gym, onViewDetails, onContact }) => {
                 key={index}
                 className="inline-flex items-center px-2 py-1 bg-muted text-muted-foreground rounded-md text-xs"
               >
-                <Icon name={amenity?.icon} size={12} className="mr-1" />
-                {amenity?.name}
+                {typeof amenity === "string" ? amenity : amenity?.name}
               </span>
             ))}
-            {gym?.amenities?.length > 3 && (
-              <span className="inline-flex items-center px-2 py-1 bg-muted text-muted-foreground rounded-md text-xs">
-                +{gym?.amenities?.length - 3} more
-              </span>
-            )}
           </div>
         </div>
 
+        {/* PRICE + RATING */}
         <div className="flex items-center justify-between mb-4">
+
           <div>
             <p className="text-xs text-muted-foreground">Starting from</p>
-            <p className="text-xl font-bold text-primary">₹{gym?.price}/month</p>
+            <p className="text-xl font-bold text-primary">
+              {gym?.price ? `₹${gym.price}/month` : "Price not available"}
+            </p>
           </div>
+
           <div className="text-right">
             <p className="text-xs text-muted-foreground">Rating</p>
             <p className="text-lg font-semibold text-foreground">
-              {gym?.rating} ({gym?.reviews})
+              {gym?.rating ? `${gym.rating} ★` : "New"}
             </p>
           </div>
+
         </div>
 
-        {/* 🔒 Protected Buttons */}
+        {/* BUTTONS */}
         <div className="flex space-x-2">
           <Button
             variant="outline"
