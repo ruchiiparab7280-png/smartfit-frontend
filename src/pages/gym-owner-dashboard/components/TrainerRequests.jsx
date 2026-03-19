@@ -178,7 +178,7 @@ Rejected: {rejected}
 <div className="space-y-4">
 
 {filteredRequests.map((req)=>(
-<div key={req.id} className="bg-white rounded-xl shadow-sm border border-slate-200 p-5 flex justify-between items-center">
+<div key={req.id} className="bg-[#111827] text-white rounded-xl shadow-lg border border-slate-800 p-5 flex justify-between items-center">
 
 <div>
 
