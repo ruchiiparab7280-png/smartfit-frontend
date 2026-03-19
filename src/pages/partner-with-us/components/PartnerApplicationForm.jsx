@@ -150,8 +150,8 @@ const PartnerApplicationForm = () => {
     if (!formData?.state) newErrors.state = 'State is required';
     if (!formData?.zipCode?.trim()) {
       newErrors.zipCode = 'ZIP code is required';
-    } else if (!/^\d{5}$/?.test(formData?.zipCode)) {
-      newErrors.zipCode = 'ZIP code must be 5 digits';
+    } else if (!/^\d{6}$/?.test(formData?.zipCode)) {
+      newErrors.zipCode = 'ZIP code must be 6 digits';
     }
     if (!formData?.gymType) newErrors.gymType = 'Gym type is required';
     if (!formData?.establishedYear) {
@@ -445,7 +445,7 @@ if (role !== "owner") {
                 value={formData?.zipCode}
                 onChange={handleInputChange}
                 error={errors?.zipCode}
-                maxLength="5"
+                maxLength="6"
                 required
               />
             </div>
