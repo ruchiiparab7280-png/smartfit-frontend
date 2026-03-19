@@ -253,7 +253,7 @@ return (
 Supplement Management
 </h2>
 
-<p className="text-slate-500 mt-1">
+<p className="text-slate-200 mt-1">
 {supplements.length} products in inventory
 </p>
 
