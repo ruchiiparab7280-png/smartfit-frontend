@@ -4,6 +4,8 @@ import ScrollToTop from "components/ScrollToTop";
 import ErrorBoundary from "components/ErrorBoundary";
 import NotFound from "pages/NotFound";
 import SignInSignUp from './pages/sign-in-sign-up';
+import ForgotPassword from "./pages/sign-in-sign-up/reset";
+import UpdatePassword from "./pages/sign-in-sign-up/updatePassword";
 import GymListing from './pages/gym-listing';
 import UserDashboard from './pages/user-dashboard';
 import HomeWelcome from './pages/home-welcome';
@@ -31,6 +33,8 @@ const Routes = () => {
         {/* Define your route here */}
         <Route path="/" element={<HomeWelcome />} />
         <Route path="/sign-in-sign-up" element={<SignInSignUp />} />
+        <Route path="/forgot-password" element={<ForgotPassword />} />
+        <Route path="/reset-password/:token" element={<UpdatePassword />} />
         <Route path="/gym-listing" element={<GymListing />} />
         <Route path="/user-dashboard" element={<UserDashboard />} />
         <Route path="/home-welcome" element={<HomeWelcome />} />

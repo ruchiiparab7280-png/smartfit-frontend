@@ -158,12 +158,24 @@ else {
         </button>
       </div>
 
-      <Checkbox
-        label="Remember me"
-        name="rememberMe"
-        checked={formData.rememberMe}
-        onChange={handleChange}
-      />
+    <div className="flex items-center justify-between">
+
+  <Checkbox
+    label="Remember me"
+    name="rememberMe"
+    checked={formData.rememberMe}
+    onChange={handleChange}
+  />
+
+  <button
+    type="button"
+    onClick={() => navigate("/forgot-password")}
+    className="text-sm text-primary hover:underline"
+  >
+    Forgot Password?
+  </button>
+
+</div>
 
       {errors.submit && (
         <p className="text-red-500 text-sm">{errors.submit}</p>
