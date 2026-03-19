@@ -15,12 +15,13 @@ const FeaturedGymCard = ({ gym }) => {
           alt={gym?.imageAlt}
           className="w-full h-full object-cover"
         />
-        {gym?.featured && (
-          <div className="absolute top-3 right-3 bg-accent text-accent-foreground px-3 py-1 rounded-full text-xs font-semibold">
-            Featured
-          </div>
-        )}
+        
       </div>
+      {gym?.distance && (
+  <div className="absolute top-3 left-3 bg-black/70 text-white px-2 py-1 rounded text-xs">
+    {gym.distance} km away
+  </div>
+)}
       <div className="p-5">
         <div className="flex items-start justify-between mb-3">
           <div>

@@ -1,53 +1,63 @@
-import React from "react";
+import React, { useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
 import GymCard from "pages/gym-listing/components/GymCard";
 import Button from "../../../components/ui/Button";
 
 const FeaturedGyms = () => {
   const navigate = useNavigate();
+  const [gyms, setGyms] = useState([]);
+  const [userLocation, setUserLocation] = useState(null);
+  const userCity = localStorage.getItem("userCity") || "Mumbai";
+  const getDistance = (lat1, lon1, lat2, lon2) => {
+  const R = 6371;
+  const dLat = (lat2 - lat1) * Math.PI / 180;
+  const dLon = (lon2 - lon1) * Math.PI / 180;
 
-  const featuredGyms = [
-    {
-      id: 1,
-      name: "PowerFit Elite",
-      address: "Andheri East, Mumbai - 400069",
-      distance: 0.5,
-      rating: 4.9,
-      reviews: 210,
-      members: "800+",
-      
-      openTime: "5 AM - 11 PM",
-      price:  "1400",
-      image: "https://images.unsplash.com/photo-1671970921963-7c265e8e3565",
-      imageAlt: "Modern gym interior",
-      featured: true,
-      amenities: [
-        { name: "24/7 Access", icon: "Clock" },
-        { name: "Personal Training", icon: "Users" },
-        { name: "Sauna", icon: "Flame" }
-      ]
+  const a =
+    Math.sin(dLat / 2) * Math.sin(dLat / 2) +
+    Math.cos(lat1 * Math.PI / 180) *
+    Math.cos(lat2 * Math.PI / 180) *
+    Math.sin(dLon / 2) *
+    Math.sin(dLon / 2);
+
+  const c = 2 * Math.atan2(Math.sqrt(a), Math.sqrt(1 - a));
+  return (R * c).toFixed(1);
+};
+  useEffect(() => {
+  navigator.geolocation.getCurrentPosition(
+    (position) => {
+      setUserLocation({
+        lat: position.coords.latitude,
+        lng: position.coords.longitude
+      });
     },
-    {
-      id: 2,
-      name: "Flex Zone Fitness",
-      address: "Malad West, Mumbai - 400095",
-      distance: 1.2,
-      rating: 4.7,
-      reviews: 180,
-      members: "200+",
-      openTime: "6 AM - 11 PM",
-      price: 1499,
-      image: "https://images.unsplash.com/photo-1721394750732-6efdd186cb12",
-      imageAlt: "Spacious fitness center",
-      featured: true,
-      amenities: [
-        { name: "Group Classes", icon: "Users" },
-        { name: "Pool", icon: "Droplet" },
-        { name: "Yoga Studio", icon: "Heart" }
-      ]
+    (err) => {
+      console.log("Location error", err);
     }
-  ];
+  );
+}, []);
 
+  useEffect(() => {
+  const fetchGyms = async () => {
+    try {
+      const res = await fetch(`${import.meta.env.VITE_API_URL}/api/gyms`);
+      const data = await res.json();
+
+      console.log("🔥 REAL GYMS:", data);
+
+      setGyms(data);
+    } catch (err) {
+      console.log("Error fetching gyms", err);
+    }
+  };
+
+  fetchGyms();
+}, []);
+const filteredGyms = gyms.filter(
+  (gym) =>
+    gym.city &&
+    gym.city.toLowerCase().includes(userCity.toLowerCase())
+);
   const handleViewDetails = () => {
   navigate("/gym-listing");
 };
@@ -62,11 +72,11 @@ const FeaturedGyms = () => {
         <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between mb-12">
           <div>
             <h2 className="text-3xl lg:text-4xl font-bold text-foreground mb-2">
-              Featured Gyms Near You
-            </h2>
+  Gyms Near You
+</h2>
             <p className="text-lg text-muted-foreground">
-              Top-rated fitness centers ready to welcome you
-            </p>
+  Discover gyms available in your area
+</p>
           </div>
 
           <Button
@@ -82,13 +92,36 @@ const FeaturedGyms = () => {
         </div>
 
       <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-  {featuredGyms.map((gym) => (
-    <GymCard
-      key={gym.id}
-      gym={gym}
-      onViewDetails={handleViewDetails}
-      onContact={handleContact}
-    />
+        {filteredGyms.length === 0 && (
+  <p className="text-muted-foreground">
+    No gyms found in your area 😕
+  </p>
+)}
+ {filteredGyms.map((gym) => (
+   <GymCard
+  key={gym.id}
+  gym={{
+    name: gym.gym_name,
+    location: `${gym.address}, ${gym.city}`,
+    price: gym.monthly_fee || 999,
+    rating: 4.5,
+    distance:
+      userLocation && gym.latitude && gym.longitude
+        ? getDistance(
+            userLocation.lat,
+            userLocation.lng,
+            gym.latitude,
+            gym.longitude
+          )
+        : null,
+    amenities: gym.amenities ? gym.amenities.split(",") : [],
+    image: gym.gym_images 
+      ? gym.gym_images.split(",")[0] 
+      : "https://images.unsplash.com/photo-1671970921963-7c265e8e3565"
+  }}
+  onViewDetails={handleViewDetails}
+  onContact={handleContact}
+/>
   ))}
 </div>
       </div>
