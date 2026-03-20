@@ -101,7 +101,18 @@ const handlePhotoChange = (e) => {
 
   if(file){
 
-    const url = URL.createObjectURL(file);
+    const handlePhotoChange = (e) => {
+  const file = e.target.files[0];
+
+  if (file) {
+    setForm(prev => ({
+      ...prev,
+      photo: file   // 🔥 FILE SAVE KAR (URL nahi)
+    }));
+
+    setPhotoPreview(URL.createObjectURL(file)); // preview ke liye ok
+  }
+};
 
     setPhotoPreview(url);
 
@@ -121,6 +132,19 @@ const handleSubmit = async (e) => {
   try{
 
     const email = localStorage.getItem("userEmail");
+    // 🔥 STEP 1: upload image
+const formData = new FormData();
+formData.append("image", form.photo);
+
+const uploadRes = await fetch(
+  `${import.meta.env.VITE_API_URL}/upload`,
+  {
+    method: "POST",
+    body: formData
+  }
+);
+
+const uploadData = await uploadRes.json();
 
     await fetch(`${import.meta.env.VITE_API_URL}/add-trainer`,{
       method:"POST",
@@ -132,8 +156,9 @@ const handleSubmit = async (e) => {
         name:form.name,
         specialization:form.specialization,
         price:Number(form.pricePerSession),
-        image:photoPreview
+        image: uploadData.image 
       })
+      
     });
 
     const res = await fetch(

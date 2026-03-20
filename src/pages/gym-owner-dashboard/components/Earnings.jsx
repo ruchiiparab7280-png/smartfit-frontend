@@ -104,11 +104,11 @@ return (
 {/* Header */}
 
 <div>
-<h2 className="text-2xl font-bold text-slate-800">
+<h2 className="text-2xl font-bold text-slate-200">
 Earnings Overview
 </h2>
 
-<p className="text-slate-500">
+<p className="text-slate-200">
 Track your gym revenue performance
 </p>
 </div>
@@ -126,7 +126,7 @@ className={`bg-gradient-to-r ${stat.color} text-white rounded-xl p-5 shadow-lg`}
 <div className="flex justify-between items-center">
 <span className="text-2xl">{stat.icon}</span>
 
-<span className="text-xs bg-white/20 px-2 py-1 rounded">
+<span className="text-xs bg-[#111827] px-2 py-1 rounded">
 {stat.growth}
 </span>
 </div>
@@ -146,7 +146,7 @@ className={`bg-gradient-to-r ${stat.color} text-white rounded-xl p-5 shadow-lg`}
 
 {/* Revenue Chart */}
 
-<div className="bg-white p-6 rounded-xl shadow-sm border">
+<div className="bg-[#111827] p-6 rounded-xl shadow-sm border">
 
 <h3 className="text-lg font-semibold mb-4">
 Monthly Revenue Chart
@@ -213,7 +213,7 @@ View All
 
 <table className="w-full text-sm">
 
-<thead className="bg-slate-50 text-slate-500 uppercase text-xs">
+<thead className="bg-[#111827] text-slate-200 uppercase text-xs">
 
 <tr>
 <th className="px-6 py-3 text-left">Transaction ID</th>
@@ -259,7 +259,7 @@ txn.status==="Success"
 
 </td>
 
-<td className="px-6 py-4 text-right text-slate-500">
+<td className="px-6 py-4 text-right text-slate-200">
 {txn.date}
 </td>
 
@@ -276,7 +276,7 @@ txn.status==="Success"
 
 {/* Monthly Revenue Table */}
 
-<div className="bg-white rounded-xl shadow-sm border">
+<div className="bg-[#111827] rounded-xl shadow-sm border">
 
 <div className="px-6 py-4 border-b">
 
@@ -290,7 +290,7 @@ Monthly Revenue Breakdown
 
 <table className="w-full text-sm">
 
-<thead className="bg-slate-50 text-slate-500 uppercase text-xs">
+<thead className="bg-[#111827] text-slate-200 uppercase text-xs">
 
 <tr>
 <th className="px-6 py-3 text-left">Month</th>
