@@ -1,4 +1,4 @@
-import React from "react";
+import { useEffect, useState } from "react";
 import {
   LineChart,
   Line,
@@ -15,87 +15,79 @@ import {
 const stats = [
 {
 title:"Total Monthly Earnings",
-value:"$10,400",
+value:`₹${statsData.total}`,
 growth:"+8.6%",
 color:"from-blue-500 to-blue-600",
 icon:"💰"
 },
 {
 title:"Trainer Earnings",
-value:"$2,900",
+value:`₹${statsData.trainer}`,
 growth:"+11.5%",
 color:"from-purple-500 to-purple-600",
 icon:"🏋️"
 },
 {
 title:"Membership Earnings",
-value:"$6,400",
+value:`₹${statsData.membership}`,
 growth:"+10.3%",
 color:"from-emerald-500 to-emerald-600",
 icon:"🎟️"
 },
 {
 title:"Supplement Earnings",
-value:"$1,100",
+value:`₹${statsData.supplement}`,
 growth:"+15.8%",
 color:"from-orange-500 to-orange-600",
 icon:"💊"
 }
 ];
 
-/* -------------------- Chart Data -------------------- */
 
-const revenueData = [
-{month:"Oct",membership:4200,trainer:1850,supplement:620},
-{month:"Nov",membership:4800,trainer:2100,supplement:740},
-{month:"Dec",membership:5200,trainer:2400,supplement:890},
-{month:"Jan",membership:6100,trainer:2750,supplement:1020},
-{month:"Feb",membership:5800,trainer:2600,supplement:950}
-];
 
-/* -------------------- Transactions -------------------- */
-
-const transactions = [
-{
-id:"TXN001",
-member:"Rahul Sharma",
-type:"Membership",
-amount:"$120",
-status:"Success",
-date:"12 Mar 2026"
-},
-{
-id:"TXN002",
-member:"Amit Patel",
-type:"Trainer Session",
-amount:"$80",
-status:"Success",
-date:"11 Mar 2026"
-},
-{
-id:"TXN003",
-member:"Riya Verma",
-type:"Supplement",
-amount:"$45",
-status:"Pending",
-date:"10 Mar 2026"
-},
-{
-id:"TXN004",
-member:"John Doe",
-type:"Membership",
-amount:"$150",
-status:"Success",
-date:"9 Mar 2026"
-}
-];
 
 const Earnings = () => {
+  const [statsData, setStatsData] = useState({
+  total: 0,
+  membership: 0,
+  trainer: 0,
+  supplement: 0
+});
+useEffect(() => {
 
+  const fetchEarnings = async () => {
+
+    try {
+
+      const email = localStorage.getItem("userEmail");
+
+      const res = await fetch(
+        `${import.meta.env.VITE_API_URL}/owner-earnings/${email}`
+      );
+
+      const data = await res.json();
+
+      setStatsData({
+        total: data.total,
+        membership: data.membershipTotal,
+        trainer: data.trainerTotal,
+        supplement: data.supplementTotal
+      });
+
+    } catch (err) {
+      console.log("Earnings fetch error:", err);
+    }
+
+  };
+
+  fetchEarnings();
+
+}, []);
 const tableData = revenueData.map(item => ({
 ...item,
 total: item.membership + item.trainer + item.supplement
 }));
+
 
 return (
 
