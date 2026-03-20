@@ -195,7 +195,7 @@ strokeWidth={3}
 
 {/* Payment Transactions */}
 
-<div className="bg-white rounded-xl shadow-sm border">
+<div className="bg-[#111827] rounded-xl shadow-sm border">
 
 <div className="flex justify-between items-center px-6 py-4 border-b">
 
@@ -229,7 +229,7 @@ View All
 <tbody className="divide-y">
 
 {transactions.map(txn=>(
-<tr key={txn.id} className="hover:bg-slate-50">
+<tr key={txn.id} className="hover:bg-orange-600">
 
 <td className="px-6 py-4 font-medium">
 {txn.id}
@@ -305,7 +305,7 @@ Monthly Revenue Breakdown
 <tbody className="divide-y">
 
 {tableData.map((row,i)=>(
-<tr key={i} className="hover:bg-slate-50">
+<tr key={i} className="hover:bg-orange-600">
 
 <td className="px-6 py-4 font-medium">
 {row.month}
