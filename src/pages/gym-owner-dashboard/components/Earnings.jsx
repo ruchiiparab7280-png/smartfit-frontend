@@ -20,6 +20,7 @@ const Earnings = () => {
   });
 
   const [chartData, setChartData] = useState([]);
+  const [transactions, setTransactions] = useState([]);
 
   useEffect(() => {
 
@@ -43,6 +44,7 @@ const Earnings = () => {
         });
 
         setChartData(data.monthlyData || []);
+        setTransactions(data.transactions || []);
 
       } catch (err) {
         console.log("Earnings fetch error:", err);
@@ -54,7 +56,7 @@ const Earnings = () => {
 
   }, []);
 
-  /* -------------------- Revenue Cards -------------------- */
+  /* -------------------- Stats -------------------- */
 
   const stats = [
     {
@@ -83,7 +85,7 @@ const Earnings = () => {
     }
   ];
 
-  /* -------------------- Table Data -------------------- */
+  /* -------------------- Monthly Table -------------------- */
 
   const tableData = chartData.map(item => ({
     ...item,
@@ -104,7 +106,7 @@ const Earnings = () => {
         </p>
       </div>
 
-      {/* Cards */}
+      {/* Stats Cards */}
       <div className="grid grid-cols-1 sm:grid-cols-2 xl:grid-cols-4 gap-6">
         {stats.map((stat, i) => (
           <div key={i} className={`bg-gradient-to-r ${stat.color} text-white rounded-xl p-5`}>
@@ -137,7 +139,7 @@ const Earnings = () => {
         </ResponsiveContainer>
       </div>
 
-      {/* Table */}
+      {/* Monthly Table */}
       <div className="bg-[#111827] rounded-xl">
 
         <div className="px-6 py-4 border-b border-slate-700">
@@ -166,6 +168,47 @@ const Earnings = () => {
                 <td className="px-6 py-3 text-right">₹{row.trainer}</td>
                 <td className="px-6 py-3 text-right">₹{row.supplement}</td>
                 <td className="px-6 py-3 text-right font-bold">₹{row.total}</td>
+              </tr>
+            ))}
+          </tbody>
+
+        </table>
+
+      </div>
+
+      {/* Transactions Table */}
+      <div className="bg-[#111827] rounded-xl">
+
+        <div className="px-6 py-4 border-b border-slate-700">
+          <h3 className="text-lg font-semibold text-white">
+            Recent Transactions
+          </h3>
+        </div>
+
+        <table className="w-full text-sm text-white">
+
+          <thead className="bg-[#1f2937]">
+            <tr>
+              <th className="px-6 py-3 text-left">ID</th>
+              <th className="px-6 py-3 text-left">User</th>
+              <th className="px-6 py-3 text-left">Type</th>
+              <th className="px-6 py-3 text-right">Amount</th>
+              <th className="px-6 py-3 text-center">Status</th>
+              <th className="px-6 py-3 text-right">Date</th>
+            </tr>
+          </thead>
+
+          <tbody>
+            {transactions.map((txn, i) => (
+              <tr key={i} className="border-b border-slate-800">
+                <td className="px-6 py-3">{txn.id}</td>
+                <td className="px-6 py-3">{txn.member}</td>
+                <td className="px-6 py-3">{txn.type}</td>
+                <td className="px-6 py-3 text-right">₹{txn.amount}</td>
+                <td className="px-6 py-3 text-center">{txn.status}</td>
+                <td className="px-6 py-3 text-right">
+                  {txn.date ? new Date(txn.date).toLocaleDateString() : "N/A"}
+                </td>
               </tr>
             ))}
           </tbody>
