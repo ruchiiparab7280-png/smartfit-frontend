@@ -75,37 +75,7 @@ console.log("Location permission denied");
 }
 
 }, []);
-useEffect(() => {
 
-  const fetchGyms = async () => {
-
-    try {
-
-      const res = await fetch(
-        `${import.meta.env.VITE_API_URL}/api/gyms`
-      );
-
-      if (!res.ok) {
-        console.log("Gym API error");
-        return;
-      }
-
-      const data = await res.json();
-
-      // tera mapping logic
-
-    } catch (error) {
-      console.log("Gym fetch error:", error);
-    }
-
-  };
-
-  // 🔥 IMPORTANT LINE
-  if (userLocation) {
-    fetchGyms();
-  }
-
-}, [userLocation]);
    useEffect(() => {
 
   const fetchGyms = async () => {
