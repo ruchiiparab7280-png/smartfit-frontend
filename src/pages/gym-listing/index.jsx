@@ -187,7 +187,7 @@ useEffect(() => {
     }
 
     result = result.filter(gym =>
-      (gym.distance === 0 || gym.distance <= filters.distance) &&
+     (isNaN(gym.distance) || gym.distance <= filters.distance) &&
       gym.price >= filters.priceRange.min &&
       gym.price <= filters.priceRange.max &&
       gym.rating >= filters.minRating
