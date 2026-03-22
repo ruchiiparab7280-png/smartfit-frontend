@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import GymDetails from './components/GymDetails';
 import FreeTrialRequests from "./components/FreeTrialRequests";
 import TrainerManagement from './components/TrainerManagement';
@@ -31,10 +31,38 @@ const menuItems = [
 
 
 const statCards = [
-  { label: 'Monthly Revenue', value: '$10,400', change: '+8.6%', positive: true, icon: '💰', color: 'border-l-blue-600' },
-  { label: 'Active Trainers', value: '4', change: '+1 this month', positive: true, icon: '🏋️', color: 'border-l-purple-600' },
-  { label: 'Active Members', value: '248', change: '+12 this week', positive: true, icon: '👥', color: 'border-l-emerald-600' },
-  { label: 'Supplement Sales', value: '$1,100', change: '+15.8%', positive: true, icon: '💊', color: 'border-l-amber-500' },
+  {
+    label: 'Monthly Revenue',
+    value: `₹${dashboardStats.revenue}`,
+    change: 'Live',
+    positive: true,
+    icon: '💰',
+    color: 'border-l-blue-600'
+  },
+  {
+    label: 'Active Trainers',
+    value: dashboardStats.trainers,
+    change: 'Live',
+    positive: true,
+    icon: '🏋️',
+    color: 'border-l-purple-600'
+  },
+  {
+    label: 'Active Members',
+    value: dashboardStats.members,
+    change: 'Live',
+    positive: true,
+    icon: '👥',
+    color: 'border-l-emerald-600'
+  },
+  {
+    label: 'Supplement Sales',
+    value: `₹${dashboardStats.supplements}`,
+    change: 'Live',
+    positive: true,
+    icon: '💊',
+    color: 'border-l-amber-500'
+  },
 ];
 
 const recentActivity = [
@@ -46,6 +74,42 @@ const recentActivity = [
 ];
 
 const GymOwnerDashboard = () => {
+  const [dashboardStats, setDashboardStats] = useState({
+  revenue: 0,
+  trainers: 0,
+  members: 0,
+  supplements: 0
+});
+useEffect(() => {
+
+  const fetchDashboard = async () => {
+
+    try {
+
+      const email = localStorage.getItem("userEmail");
+
+      const res = await fetch(
+        `${import.meta.env.VITE_API_URL}/owner-dashboard/${email}`
+      );
+
+      const data = await res.json();
+
+      setDashboardStats({
+        revenue: data.revenue || 0,
+        trainers: data.trainers || 0,
+        members: data.members || 0,
+        supplements: data.supplements || 0
+      });
+
+    } catch (err) {
+      console.log("Dashboard fetch error:", err);
+    }
+
+  };
+
+  fetchDashboard();
+
+}, []);
   const [activeSection, setActiveSection] = useState('dashboard');
   const [sidebarOpen, setSidebarOpen] = useState(false);
 
