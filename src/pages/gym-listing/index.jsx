@@ -75,8 +75,7 @@ console.log("Location permission denied");
 }
 
 }, []);
-
-   useEffect(() => {
+useEffect(() => {
 
   const fetchGyms = async () => {
 
@@ -85,68 +84,106 @@ console.log("Location permission denied");
       const res = await fetch(
         `${import.meta.env.VITE_API_URL}/api/gyms`
       );
-
       if (!res.ok) {
-        console.log("Gym API error");
-        return;
-      }
-
+  console.log("Gym API error");
+  return;
+}
       const data = await res.json();
+const formattedGyms = await Promise.all(
+data.map(async (gym, index) => {
 
-      const formattedGyms = data.map((gym, index) => ({
-        id: index + 1,
-        name: gym.gym_name,
-        address: gym.address,
-        phone: gym.phone,
-        email: gym.email,
-        latitude: gym.latitude,
-        longitude: gym.longitude,
-        price: gym.monthly_fee,
-        members: gym.capacity,
+  const trainerRes = await fetch(
+    `${import.meta.env.VITE_API_URL}/trainers/${gym.email}`
+  );
 
-  distance:
-  userLocation &&
-  gym.latitude != null &&
-  gym.longitude != null
-    ? parseFloat(
-        calculateDistance(
-          userLocation.lat,
-          userLocation.lng,
-          gym.latitude,
-          gym.longitude
-        ).toFixed(1)
-      )
-    : 0,  // 👈 IMPORTANT
+  const trainers = await trainerRes.json();
 
-        rating: 4,
-        openTime: `${gym.opening_time} - ${gym.closing_time}`,
-        description: gym.gym_description,
+  const supplementRes = await fetch(
+`${import.meta.env.VITE_API_URL}/supplements/${gym.email}`
+);
 
-        amenities: gym.amenities
-          ? gym.amenities.split(",").map(a => ({
-              name: a.trim(),
-              icon: "Star"
-            }))
-          : [],
+const supplements = await supplementRes.json();
 
-        trainers: gym.trainers,
-        supplements: gym.supplements,
-        memberships: gym.memberships
-      }));
+const membershipRes = await fetch(
+`${import.meta.env.VITE_API_URL}/memberships/${gym.email}`
+);
 
+const memberships = await membershipRes.json();
+
+ return {
+  id: index + 1,
+
+  name: gym.gym_name,
+  address: gym.address,
+  phone: gym.phone,
+  email: gym.email,
+  latitude: gym.latitude,
+  longitude: gym.longitude,
+  price: gym.monthly_fee,
+  members: gym.capacity,
+
+ distance: userLocation
+  ? parseFloat(
+      calculateDistance(
+        userLocation.lat,
+        userLocation.lng,
+        gym.latitude,
+        gym.longitude
+      ).toFixed(1)
+    )
+  : 0, // add this
+  rating: 4, // add this
+
+  openTime: `${gym.opening_time} - ${gym.closing_time}`,
+
+  description: gym.gym_description,
+
+    amenities: gym.amenities
+      ? gym.amenities.split(",").map(a => ({
+          name: a.trim(),
+          icon: "Check"
+        }))
+      : [],
+
+    trainers: trainers.map(t => ({
+      name: t.name,
+      price: t.price,
+      image: t.image
+    })),
+
+ supplements: supplements.map(s => ({
+id: s.id,
+name: s.name,
+price: s.price,
+image: s.image,
+description: s.description
+})),
+
+  
+ memberships: memberships.map(m => ({
+    name: m.name,
+    price: m.price,
+    duration: m.duration,
+    description: m.description
+  }))
+  };
+
+})
+);
       setGyms(formattedGyms);
 
     } catch (error) {
+
       console.log("Gym fetch error:", error);
+
     }
 
   };
 
-  if (userLocation) {
-    fetchGyms();
-  }
+  fetchGyms();
 
-}, [userLocation]);  
+}, []);
+
  
   const [filteredGyms, setFilteredGyms] = useState([]);
   useEffect(() => {
@@ -159,23 +196,12 @@ console.log("Location permission denied");
       );
     }
 
-   result = result.filter(gym => {
-
-  const distanceOk =
-  !gym.distance || gym.distance <= filters.distance;
-
-  const priceOk =
-    gym.price === undefined ||
-    (gym.price >= filters.priceRange.min &&
-     gym.price <= filters.priceRange.max);
-
-  const ratingOk =
-    gym.rating === undefined ||
-    gym.rating >= filters.minRating;
-
-  return distanceOk && priceOk && ratingOk;
-
-});
+    result = result.filter(gym =>
+      gym.distance <= filters.distance &&
+      gym.price >= filters.priceRange.min &&
+      gym.price <= filters.priceRange.max &&
+      gym.rating >= filters.minRating
+    );
 
     if (filters?.amenities?.length > 0) {
       result = result?.filter((gym) =>
