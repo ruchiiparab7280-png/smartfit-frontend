@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState } from 'react';
 import GymDetails from './components/GymDetails';
 import FreeTrialRequests from "./components/FreeTrialRequests";
 import TrainerManagement from './components/TrainerManagement';
@@ -31,90 +31,21 @@ const menuItems = [
 
 
 const statCards = [
-  {
-    label: 'Monthly Revenue',
-    value: `₹${dashboardStats.revenue}`,
-    change: 'Live',
-    positive: true,
-    icon: '💰',
-    color: 'border-l-blue-600'
-  },
-  {
-    label: 'Active Trainers',
-    value: dashboardStats.trainers,
-    change: 'Live',
-    positive: true,
-    icon: '🏋️',
-    color: 'border-l-purple-600'
-  },
-  {
-    label: 'Active Members',
-    value: dashboardStats.members,
-    change: 'Live',
-    positive: true,
-    icon: '👥',
-    color: 'border-l-emerald-600'
-  },
-  {
-    label: 'Supplement Sales',
-    value: `₹${dashboardStats.supplements}`,
-    change: 'Live',
-    positive: true,
-    icon: '💊',
-    color: 'border-l-amber-500'
-  },
+  { label: 'Monthly Revenue', value: '$10,400', change: '+8.6%', positive: true, icon: '💰', color: 'border-l-blue-600' },
+  { label: 'Active Trainers', value: '4', change: '+1 this month', positive: true, icon: '🏋️', color: 'border-l-purple-600' },
+  { label: 'Active Members', value: '248', change: '+12 this week', positive: true, icon: '👥', color: 'border-l-emerald-600' },
+  { label: 'Supplement Sales', value: '$1,100', change: '+15.8%', positive: true, icon: '💊', color: 'border-l-amber-500' },
 ];
 
+const recentActivity = [
+  { text: 'New trainer request from David Kim', time: '2 hours ago', type: 'request' },
+  { text: 'Marcus Johnson completed 3 sessions today', time: '4 hours ago', type: 'session' },
+  { text: 'New member John Doe joined Basic Monthly plan', time: '6 hours ago', type: 'member' },
+  { text: 'Whey Protein Gold stock running low (5 units)', time: '1 day ago', type: 'stock' },
+  { text: 'Monthly earnings report generated', time: '2 days ago', type: 'report' },
+];
 
 const GymOwnerDashboard = () => {
-  const [activities, setActivities] = useState([]);
-  
-  const [dashboardStats, setDashboardStats] = useState({
-    
-  revenue: 0,
-  trainers: 0,
-  members: 0,
-  supplements: 0
-});
-useEffect(() => {
-
-  const fetchDashboard = async () => {
-
-    try {
-
-      const email = localStorage.getItem("userEmail");
-
-      const res = await fetch(
-        `${import.meta.env.VITE_API_URL}/owner-dashboard/${email}`
-      );
-
-      const data = await res.json();
-
-      setDashboardStats({
-        revenue: data.revenue || 0,
-        trainers: data.trainers || 0,
-        members: data.members || 0,
-        supplements: data.supplements || 0
-      });
-
-      setActivities(data.activities || []);
-
-    } catch (err) {
-      console.log("Dashboard fetch error:", err);
-    }
-
-  };
-
-  fetchDashboard();
-
-  // 🔥 AUTO REFRESH every 10 sec
-  const interval = setInterval(() => {
-    fetchDashboard();
-  }, 10000);
-
-  return () => clearInterval(interval);
-
-}, []);
   const [activeSection, setActiveSection] = useState('dashboard');
   const [sidebarOpen, setSidebarOpen] = useState(false);
 
@@ -264,14 +195,12 @@ const DashboardHome = ({ setActiveSection }) => (
       <div className="lg:col-span-2 bg-[#111827] rounded-xl shadow-sm border border-slate-800 p-6">
         <h3 className="font-bold text-white mb-4">Recent Activity</h3>
         <div className="space-y-3">
-          {activities?.map((item, i) => (
+          {recentActivity?.map((item, i) => (
             <div key={i} className="flex items-start gap-3 py-2 border-b border-slate-800 last:border-0">
               <div className="w-2 h-2 rounded-full bg-blue-500 mt-2 flex-shrink-0"></div>
               <div className="flex-1 min-w-0">
                 <p className="text-sm text-slate-300">{item?.text}</p>
-                <p className="text-xs text-slate-400 mt-0.5">
-  {item.time ? new Date(item.time).toLocaleString() : "Now"}
-</p>
+                <p className="text-xs text-slate-400 mt-0.5">{item?.time}</p>
               </div>
             </div>
           ))}
