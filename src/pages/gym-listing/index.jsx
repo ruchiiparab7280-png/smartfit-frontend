@@ -135,15 +135,15 @@ useEffect(() => {
         members: gym.capacity,
 
         distance: userLocation
-          ? parseFloat(
-              calculateDistance(
-                userLocation.lat,
-                userLocation.lng,
-                gym.latitude,
-                gym.longitude
-              ).toFixed(1)
-            )
-          : 0,
+  ? parseFloat(
+      calculateDistance(
+        userLocation.lat,
+        userLocation.lng,
+        gym.latitude,
+        gym.longitude
+      ).toFixed(1)
+    )
+  : 9999,   // 👈 IMPORTANT
 
         rating: 4,
         openTime: `${gym.opening_time} - ${gym.closing_time}`,
@@ -152,7 +152,7 @@ useEffect(() => {
         amenities: gym.amenities
           ? gym.amenities.split(",").map(a => ({
               name: a.trim(),
-              icon: "Check"
+              icon: "Star"
             }))
           : [],
 
@@ -187,7 +187,7 @@ useEffect(() => {
     }
 
     result = result.filter(gym =>
-      gym.distance <= filters.distance &&
+      (!gym.distance || gym.distance <= filters.distance) &&
       gym.price >= filters.priceRange.min &&
       gym.price <= filters.priceRange.max &&
       gym.rating >= filters.minRating
