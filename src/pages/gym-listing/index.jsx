@@ -134,7 +134,7 @@ useEffect(() => {
         price: gym.monthly_fee,
         members: gym.capacity,
 
-        distance: userLocation
+   distance: userLocation && gym.latitude && gym.longitude
   ? parseFloat(
       calculateDistance(
         userLocation.lat,
@@ -143,7 +143,7 @@ useEffect(() => {
         gym.longitude
       ).toFixed(1)
     )
-  : 9999,   // 👈 IMPORTANT
+  : 0,  // 👈 IMPORTANT
 
         rating: 4,
         openTime: `${gym.opening_time} - ${gym.closing_time}`,
@@ -187,7 +187,7 @@ useEffect(() => {
     }
 
     result = result.filter(gym =>
-      (!gym.distance || gym.distance <= filters.distance) &&
+      (gym.distance === 0 || gym.distance <= filters.distance) &&
       gym.price >= filters.priceRange.min &&
       gym.price <= filters.priceRange.max &&
       gym.rating >= filters.minRating
