@@ -186,12 +186,23 @@ useEffect(() => {
       );
     }
 
-    result = result.filter(gym =>
-     (isNaN(gym.distance) || gym.distance <= filters.distance) &&
-      gym.price >= filters.priceRange.min &&
-      gym.price <= filters.priceRange.max &&
-      gym.rating >= filters.minRating
-    );
+   result = result.filter(gym => {
+
+  const distanceOk =
+    isNaN(gym.distance) || gym.distance <= filters.distance;
+
+  const priceOk =
+    gym.price === undefined ||
+    (gym.price >= filters.priceRange.min &&
+     gym.price <= filters.priceRange.max);
+
+  const ratingOk =
+    gym.rating === undefined ||
+    gym.rating >= filters.minRating;
+
+  return distanceOk && priceOk && ratingOk;
+
+});
 
     if (filters?.amenities?.length > 0) {
       result = result?.filter((gym) =>
