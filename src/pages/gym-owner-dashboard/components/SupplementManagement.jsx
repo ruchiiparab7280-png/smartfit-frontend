@@ -403,7 +403,7 @@ required
 type="text"
 value={form.name}
 onChange={e=>setForm({...form,name:e.target.value})}
-className="w-full px-4 py-2.5 rounded-lg border border-slate-200 focus:outline-none focus:ring-2 focus:ring-blue-500 text-slate-200"
+className="w-full px-4 py-2.5 rounded-lg border border-slate-200 focus:outline-none focus:ring-2 focus:ring-blue-500 text-slate-800"
 />
 
 </div>
@@ -440,7 +440,7 @@ Description
 rows={3}
 value={form.description}
 onChange={e=>setForm({...form,description:e.target.value})}
-className="w-full px-4 py-2.5 rounded-lg border border-slate-200 focus:outline-none focus:ring-2 focus:ring-blue-500"
+className="w-full px-4 py-2.5 rounded-lg border border-slate-200 focus:outline-none focus:ring-2 focus:ring-blue-500 text-slate-800"
 />
 
 </div>
