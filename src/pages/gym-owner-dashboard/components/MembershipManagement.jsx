@@ -183,7 +183,7 @@ Add Plan </button>
 
 <div
 key={plan?.id}
-className="bg-[#111827] rounded-xl shadow-sm border border-slate-200 p-6"
+className="bg-[#111827] rounded-xl shadow-sm border border-slate-800 p-6"
 >
 
 <div className="flex items-start justify-between mb-3">
@@ -333,11 +333,11 @@ Save
 Active Members
 </h3>
 
-<div className="bg-[#111827] rounded-xl border border-slate-200 overflow-hidden">
+<div className="bg-[#111827] rounded-xl border border-slate-800 overflow-hidden">
 
 <table className="w-full text-sm">
 
-<thead className="bg-slate-100 text-slate-600">
+<thead className="bg-slate-[#111827] text-slate-200">
 
 <tr>
 <th className="px-4 py-3 text-left">Member</th>
