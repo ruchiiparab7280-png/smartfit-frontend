@@ -167,7 +167,7 @@ Membership Management
 
 <button
 onClick={openAdd}
-className="flex items-center gap-2 px-5 py-2.5 bg-blue-600 text-white font-semibold rounded-lg hover:bg-blue-700"
+className="flex items-center gap-2 px-5 py-2.5 bg-orange-500 text-white font-semibold rounded-lg hover:bg-blue-700"
 
 >
 
@@ -183,13 +183,13 @@ Add Plan </button>
 
 <div
 key={plan?.id}
-className="bg-white rounded-xl shadow-sm border border-slate-200 p-6"
+className="bg-[#111827] rounded-xl shadow-sm border border-slate-200 p-6"
 >
 
 <div className="flex items-start justify-between mb-3">
 
 <div>
-<h3 className="font-bold text-slate-800 text-lg">
+<h3 className="font-bold text-slate-200 text-lg">
 {plan?.name}
 </h3>
 
@@ -202,12 +202,12 @@ className="bg-white rounded-xl shadow-sm border border-slate-200 p-6"
 <p className="text-2xl font-bold text-blue-600">
 ₹{plan?.price}
 </p>
-<p className="text-xs text-slate-400">per plan</p>
+<p className="text-xs text-slate-200">per plan</p>
 </div>
 
 </div>
 
-<p className="text-slate-500 text-sm mb-4">
+<p className="text-slate-200 text-sm mb-4">
 {plan?.description}
 </p>
 
@@ -243,7 +243,7 @@ Delete </button>
 
 <div className="fixed inset-0 bg-black/50 flex items-center justify-center z-50">
 
-<div className="bg-white rounded-2xl shadow-xl w-full max-w-md p-6">
+<div className="bg-[#111827] rounded-2xl shadow-xl w-full max-w-md p-6">
 
 <h3 className="text-lg font-bold mb-4">
 {editId ? 'Edit Plan' : 'Add Membership Plan'}
@@ -310,7 +310,7 @@ Cancel
 
 <button
 type="submit"
-className="flex-1 bg-blue-600 text-white py-2 rounded"
+className="flex-1 bg-orange-500 text-white py-2 rounded"
 >
 Save
 </button>
@@ -329,11 +329,11 @@ Save
 
 <div className="mt-10">
 
-<h3 className="text-xl font-bold text-slate-800 mb-4">
+<h3 className="text-xl font-bold text-slate-200 mb-4">
 Active Members
 </h3>
 
-<div className="bg-white rounded-xl border border-slate-200 overflow-hidden">
+<div className="bg-[#111827] rounded-xl border border-slate-200 overflow-hidden">
 
 <table className="w-full text-sm">
 
