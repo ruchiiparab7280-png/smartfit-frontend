@@ -157,10 +157,10 @@ return (
 
 <div className="flex items-center justify-between mb-6">
 <div>
-<h2 className="text-2xl font-bold text-slate-800">
+<h2 className="text-2xl font-bold text-slate-200">
 Membership Management
 </h2>
-<p className="text-slate-500 mt-1">
+<p className="text-slate-200 mt-1">
 {plans?.length} active membership plans
 </p>
 </div>
