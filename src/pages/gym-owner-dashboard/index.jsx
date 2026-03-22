@@ -68,6 +68,7 @@ const statCards = [
 
 const GymOwnerDashboard = () => {
   const [activities, setActivities] = useState([]);
+  
   const [dashboardStats, setDashboardStats] = useState({
     
   revenue: 0,
@@ -90,14 +91,13 @@ useEffect(() => {
       const data = await res.json();
 
       setDashboardStats({
-       
         revenue: data.revenue || 0,
         trainers: data.trainers || 0,
         members: data.members || 0,
         supplements: data.supplements || 0
       });
-         setActivities(data.activities || []);
-      
+
+      setActivities(data.activities || []);
 
     } catch (err) {
       console.log("Dashboard fetch error:", err);
@@ -106,6 +106,13 @@ useEffect(() => {
   };
 
   fetchDashboard();
+
+  // 🔥 AUTO REFRESH every 10 sec
+  const interval = setInterval(() => {
+    fetchDashboard();
+  }, 10000);
+
+  return () => clearInterval(interval);
 
 }, []);
   const [activeSection, setActiveSection] = useState('dashboard');
