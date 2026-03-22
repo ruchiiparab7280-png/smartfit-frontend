@@ -104,16 +104,19 @@ console.log("Location permission denied");
         price: gym.monthly_fee,
         members: gym.capacity,
 
-   distance: userLocation && gym.latitude && gym.longitude
-  ? parseFloat(
-      calculateDistance(
-        userLocation.lat,
-        userLocation.lng,
-        gym.latitude,
-        gym.longitude
-      ).toFixed(1)
-    )
-  : 0,  // 👈 IMPORTANT
+  distance:
+  userLocation &&
+  gym.latitude != null &&
+  gym.longitude != null
+    ? parseFloat(
+        calculateDistance(
+          userLocation.lat,
+          userLocation.lng,
+          gym.latitude,
+          gym.longitude
+        ).toFixed(1)
+      )
+    : 0,  // 👈 IMPORTANT
 
         rating: 4,
         openTime: `${gym.opening_time} - ${gym.closing_time}`,
@@ -159,7 +162,7 @@ console.log("Location permission denied");
    result = result.filter(gym => {
 
   const distanceOk =
-    isNaN(gym.distance) || gym.distance <= filters.distance;
+  !gym.distance || gym.distance <= filters.distance;
 
   const priceOk =
     gym.price === undefined ||
