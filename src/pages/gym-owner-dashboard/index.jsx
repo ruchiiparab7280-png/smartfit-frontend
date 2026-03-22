@@ -6,7 +6,6 @@ import TrainerRequests from './components/TrainerRequests';
 import SupplementManagement from './components/SupplementManagement';
 import MembershipManagement from './components/MembershipManagement';
 import Earnings from './components/Earnings';
-
 import {
   LayoutDashboard,
   Building2,
@@ -30,7 +29,6 @@ const menuItems = [
 ];
 
 const GymOwnerDashboard = () => {
-
   const [dashboardStats, setDashboardStats] = useState({
     revenue: 0,
     trainers: 0,
@@ -40,18 +38,13 @@ const GymOwnerDashboard = () => {
 
   const [activities, setActivities] = useState([]);
   const [loading, setLoading] = useState(true);
-
   const [activeSection, setActiveSection] = useState('dashboard');
   const [sidebarOpen, setSidebarOpen] = useState(false);
 
-  /* ================= FETCH ================= */
-
   useEffect(() => {
-
     const fetchDashboard = async () => {
       try {
         setLoading(true);
-
         const email = localStorage.getItem("userEmail");
 
         const res = await fetch(
@@ -70,17 +63,54 @@ const GymOwnerDashboard = () => {
         setActivities(data.activities || []);
 
       } catch (err) {
-        console.log("Dashboard error:", err);
+        console.log("Dashboard fetch error:", err);
       } finally {
         setLoading(false);
       }
     };
 
     fetchDashboard();
+
     const interval = setInterval(fetchDashboard, 10000);
     return () => clearInterval(interval);
 
   }, []);
+
+  // ✅ moved statCards here (inside component)
+  const statCards = [
+    {
+      label: 'Monthly Revenue',
+      value: `₹${dashboardStats.revenue}`,
+      change: 'Live',
+      positive: true,
+      icon: '💰',
+      color: 'border-l-blue-600'
+    },
+    {
+      label: 'Active Trainers',
+      value: dashboardStats.trainers,
+      change: 'Live',
+      positive: true,
+      icon: '🏋️',
+      color: 'border-l-purple-600'
+    },
+    {
+      label: 'Active Members',
+      value: dashboardStats.members,
+      change: 'Live',
+      positive: true,
+      icon: '👥',
+      color: 'border-l-emerald-600'
+    },
+    {
+      label: 'Supplement Sales',
+      value: `₹${dashboardStats.supplements}`,
+      change: 'Live',
+      positive: true,
+      icon: '💊',
+      color: 'border-l-amber-500'
+    },
+  ];
 
   const renderContent = () => {
     switch (activeSection) {
@@ -97,109 +127,93 @@ const GymOwnerDashboard = () => {
             setActiveSection={setActiveSection}
             loading={loading}
             activities={activities}
-            dashboardStats={dashboardStats}
+            statCards={statCards}
           />
         );
     }
   };
 
   return (
-    <div className="flex h-screen bg-[#0b1220] overflow-hidden text-white">
-      <aside className="w-64 bg-slate-900 flex flex-col">
-        <div className="p-5 border-b border-slate-700 font-bold">
-          SmartFit Owner Dashboard
-        </div>
+    <div className="flex h-screen bg-[#0b1220] text-white">
 
-        <nav className="flex-1 p-3">
+      {/* Sidebar */}
+      <aside className="w-64 bg-slate-900 hidden lg:block">
+        <div className="p-5 font-bold">SmartFit</div>
+        <nav className="p-3">
           {menuItems.map(item => (
             <button
               key={item.id}
               onClick={() => setActiveSection(item.id)}
-              className={`w-full flex items-center gap-2 p-2 rounded ${
+              className={`w-full text-left px-3 py-2 mb-2 rounded ${
                 activeSection === item.id
-                  ? "bg-orange-500"
-                  : "hover:bg-slate-800"
+                  ? 'bg-orange-500'
+                  : 'hover:bg-slate-800'
               }`}
             >
-              {item.icon}
               {item.label}
             </button>
           ))}
         </nav>
       </aside>
 
-      <main className="flex-1 p-6 overflow-y-auto">
+      {/* Main */}
+      <div className="flex-1 p-6 overflow-y-auto">
         {renderContent()}
-      </main>
+      </div>
     </div>
   );
 };
 
-/* ================= DASHBOARD HOME ================= */
-
-const DashboardHome = ({ loading, activities, dashboardStats, setActiveSection }) => {
+const DashboardHome = ({ setActiveSection, loading, activities, statCards }) => {
 
   if (loading) {
     return (
-      <div className="text-white text-center mt-20 text-xl">
+      <div className="text-center mt-20 text-xl">
         Loading dashboard...
       </div>
     );
   }
 
-  const statCards = [
-    {
-      label: 'Monthly Revenue',
-      value: `₹${dashboardStats.revenue}`,
-      icon: '💰'
-    },
-    {
-      label: 'Active Trainers',
-      value: dashboardStats.trainers,
-      icon: '🏋️'
-    },
-    {
-      label: 'Active Members',
-      value: dashboardStats.members,
-      icon: '👥'
-    },
-    {
-      label: 'Supplement Sales',
-      value: `₹${dashboardStats.supplements}`,
-      icon: '💊'
-    },
-  ];
-
   return (
     <div>
 
+      <h2 className="text-2xl font-bold mb-6">
+        Welcome back, Gym Owner 👋
+      </h2>
+
       {/* Stats */}
       <div className="grid grid-cols-1 sm:grid-cols-2 xl:grid-cols-4 gap-5 mb-8">
-        {statCards.map((card, i) => (
-          <div key={i} className="bg-[#111827] p-5 rounded-xl border border-slate-800">
-            <div className="text-2xl">{card.icon}</div>
-            <p className="text-2xl font-bold mt-2">{card.value}</p>
-            <p className="text-slate-400">{card.label}</p>
+        {statCards.map(card => (
+          <div key={card.label} className="bg-[#111827] p-5 rounded-lg">
+            <p className="text-2xl">{card.icon}</p>
+            <p className="text-xl font-bold">{card.value}</p>
+            <p className="text-sm text-slate-400">{card.label}</p>
           </div>
         ))}
       </div>
 
       {/* Activity */}
-      <div className="bg-[#111827] p-6 rounded-xl border border-slate-800">
-        <h3 className="font-bold mb-4">Recent Activity</h3>
+      <div className="bg-[#111827] p-5 rounded-lg mb-6">
+        <h3 className="mb-3 font-bold">Recent Activity</h3>
 
-        {activities.length === 0 && (
-          <p className="text-slate-400">No recent activity</p>
-        )}
+        {activities.length === 0 && <p>No activity</p>}
 
-        {activities.map((item, i) => (
-          <div key={i} className="border-b border-slate-800 py-2">
-            <p>{item.text}</p>
-            <p className="text-xs text-slate-400">
-              {item.time ? new Date(item.time).toLocaleString() : "Now"}
-            </p>
-          </div>
+        {activities.map((a, i) => (
+          <p key={i} className="text-sm mb-2">
+            {a.text}
+          </p>
         ))}
+      </div>
+
+      {/* Quick Actions */}
+      <div className="space-y-2">
+        <button onClick={() => setActiveSection('trainers')} className="bg-orange-500 px-4 py-2 rounded w-full">
+          Add Trainer
+        </button>
+
+        <button onClick={() => setActiveSection('trainer-requests')} className="bg-orange-500 px-4 py-2 rounded w-full">
+          Review Requests
+        </button>
       </div>
 
     </div>
