@@ -65,16 +65,11 @@ const statCards = [
   },
 ];
 
-const recentActivity = [
-  { text: 'New trainer request from David Kim', time: '2 hours ago', type: 'request' },
-  { text: 'Marcus Johnson completed 3 sessions today', time: '4 hours ago', type: 'session' },
-  { text: 'New member John Doe joined Basic Monthly plan', time: '6 hours ago', type: 'member' },
-  { text: 'Whey Protein Gold stock running low (5 units)', time: '1 day ago', type: 'stock' },
-  { text: 'Monthly earnings report generated', time: '2 days ago', type: 'report' },
-];
 
 const GymOwnerDashboard = () => {
+  const [activities, setActivities] = useState([]);
   const [dashboardStats, setDashboardStats] = useState({
+    
   revenue: 0,
   trainers: 0,
   members: 0,
@@ -95,11 +90,14 @@ useEffect(() => {
       const data = await res.json();
 
       setDashboardStats({
+       
         revenue: data.revenue || 0,
         trainers: data.trainers || 0,
         members: data.members || 0,
         supplements: data.supplements || 0
       });
+         setActivities(data.activities || []);
+      
 
     } catch (err) {
       console.log("Dashboard fetch error:", err);
@@ -259,12 +257,14 @@ const DashboardHome = ({ setActiveSection }) => (
       <div className="lg:col-span-2 bg-[#111827] rounded-xl shadow-sm border border-slate-800 p-6">
         <h3 className="font-bold text-white mb-4">Recent Activity</h3>
         <div className="space-y-3">
-          {recentActivity?.map((item, i) => (
+          {activities?.map((item, i) => (
             <div key={i} className="flex items-start gap-3 py-2 border-b border-slate-800 last:border-0">
               <div className="w-2 h-2 rounded-full bg-blue-500 mt-2 flex-shrink-0"></div>
               <div className="flex-1 min-w-0">
                 <p className="text-sm text-slate-300">{item?.text}</p>
-                <p className="text-xs text-slate-400 mt-0.5">{item?.time}</p>
+                <p className="text-xs text-slate-400 mt-0.5">
+  {item.time ? new Date(item.time).toLocaleString() : "Now"}
+</p>
               </div>
             </div>
           ))}
