@@ -37,8 +37,8 @@ const GymCard = ({ gym, onViewDetails, onContact }) => {
     <div className="bg-card rounded-lg overflow-hidden card-elevation-md hover-lift transition-smooth border border-border">
       <div className="relative h-48 overflow-hidden">
         <Image
-          src={gym?.image}
-          alt={gym?.imageAlt}
+  src={gym?.image || "https://via.placeholder.com/400"}
+ alt={gym?.imageAlt}
           className="w-full h-full object-cover"
         />
         {gym?.featured && (
