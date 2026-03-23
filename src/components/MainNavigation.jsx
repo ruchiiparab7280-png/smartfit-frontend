@@ -77,7 +77,7 @@ const authenticatedItems = showDashboard
               onClick={handleNavClick}
             >
              <img
-                src="/public/assets/smartfit-logo.png"
+                src="/build/smartfit-logo.png"
 
                   alt="SmartFit Logo"
                    className="h-20 w-20 object-contain"
