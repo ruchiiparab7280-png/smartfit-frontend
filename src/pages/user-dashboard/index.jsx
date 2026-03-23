@@ -16,7 +16,7 @@ import SupplementOrders from "./components/SupplementOrders";
 
 const UserDashboard = () => {
 const [workouts,setWorkouts] = useState([])
-const [profile,setProfile] = useState(null)  
+
 const updateProfile = (newData) => {
 setProfile(newData)
 }
@@ -65,7 +65,7 @@ gymImage:"https://images.unsplash.com/photo-1571902943202-507ec2618e8f"
 }
 }
 
-fetchProfile()
+fetchMembership()
 
 },[])
 
