@@ -16,7 +16,7 @@ import SupplementOrders from "./components/SupplementOrders";
 
 const UserDashboard = () => {
 const [workouts,setWorkouts] = useState([])
-
+const [profile,setProfile] = useState(null)  
 const updateProfile = (newData) => {
 setProfile(newData)
 }
@@ -35,7 +35,15 @@ console.log("membership data:", data)
 if(data.length > 0){
 
 const start = new Date(data[0].start_date)
-const expiry = new Date(data[0].expiry_date)
+
+let months = 1
+
+if(data[0].duration?.includes("3")) months = 3
+if(data[0].duration?.includes("6")) months = 6
+if(data[0].duration?.includes("12")) months = 12
+
+const expiry = new Date(start)
+expiry.setMonth(expiry.getMonth() + months)
 
 const today = new Date()
 const diff = Math.ceil((expiry - today) / (1000 * 60 * 60 * 24))
@@ -51,21 +59,67 @@ status = "Expired"
 }
 
 setMembership({
-gymName: data[0].gym_name || "N/A",
-location: data[0].gym_city ? data[0].gym_city.toUpperCase() : "N/A",
-gymEmail: data[0].gym_email,
-planType: data[0].plan_name,
-startDate: start.toLocaleDateString("en-IN"),
-expiryDate: expiry.toLocaleDateString("en-IN"),
-daysRemaining: diff,
-status: status,
+gymName:data[0].gym_name,
+location:data[0].gym_city?.toUpperCase(),
+gymEmail:data[0].gym_email,
+planType:data[0].plan_name,
+startDate:start.toLocaleDateString(),
+expiryDate:expiry.toLocaleDateString(),
+daysRemaining:diff,
+status:status,
 gymImage:"https://images.unsplash.com/photo-1571902943202-507ec2618e8f"
 })
 
 }
+
 }
 
 fetchMembership()
+
+},[])
+
+useEffect(()=>{
+
+const fetchWorkouts = async ()=>{
+
+const email = localStorage.getItem("userEmail")
+
+const res = await fetch(
+`${import.meta.env.VITE_API_URL}/user-workouts/${email}`
+)
+
+const data = await res.json()
+
+setWorkouts(data)
+
+}
+
+fetchWorkouts()
+
+},[])
+useEffect(()=>{
+
+const fetchProfile = async ()=>{
+
+const email = localStorage.getItem("userEmail")
+
+try{
+
+const res = await fetch(`${import.meta.env.VITE_API_URL}/user-profile/${email}`)
+
+const data = await res.json()
+
+setProfile(data)
+
+}catch(err){
+
+console.log("Profile fetch error",err)
+
+}
+
+}
+
+fetchProfile()
 
 },[])
 
