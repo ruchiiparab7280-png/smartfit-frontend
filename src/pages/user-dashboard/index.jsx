@@ -1,4 +1,5 @@
 import React, { useState, useEffect } from "react";
+import { useNavigate } from "react-router-dom";
 import MainNavigation from "../../components/MainNavigation";
 import Icon from "../../components/AppIcon";
 
@@ -8,13 +9,14 @@ import MembershipCard from "./components/MembershipCard";
 import WorkoutPlanCard from "./components/WorkoutPlanCard";
 import ProgressChart from "./components/ProgressChart";
 import BMICalculator from "./components/BMICalculator";
-import RecommendedGymCard from "./components/RecommendedGymCard";
+
 
 import FreeTrialRequests from "./components/FreeTrialRequests";
 import TrainerRequests from "./components/TrainerRequests";
 import SupplementOrders from "./components/SupplementOrders";
 
 const UserDashboard = () => {
+const navigate = useNavigate()
 const [workouts,setWorkouts] = useState([])
 const [profile,setProfile] = useState(null)  
 const updateProfile = (newData) => {
@@ -195,7 +197,7 @@ return membership ? (
 membership={membership} 
 goToGyms={(gymEmail)=>{
 localStorage.setItem("renewGym",gymEmail)
-setActiveTab("gyms")
+navigate("/find-gyms")
 }}
 />
 ) : (
@@ -206,7 +208,7 @@ setActiveTab("gyms")
     </p>
 
     <button
-      onClick={()=>setActiveTab("gyms")}
+      onClick={()=>navigate("/find-gyms")}
       className="bg-orange-500 text-white px-5 py-2 rounded"
     >
       Explore Gyms
@@ -233,8 +235,7 @@ return (
 case "bmi":
 return <BMICalculator/>
 
-case "gyms":
-return <RecommendedGymCard/>
+
 
 default:
 return <StatsOverview/>
@@ -293,9 +294,7 @@ return(
 <Icon name="Activity"/> BMI Calculator
 </button>
 
-<button onClick={()=>setActiveTab("gyms")} className="flex gap-3 items-center hover:text-primary">
-<Icon name="MapPin"/> Recommended Gyms
-</button>
+
 
 </div>
 
