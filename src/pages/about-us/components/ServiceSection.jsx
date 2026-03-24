@@ -8,7 +8,7 @@ const ServicesSection = () => {
     icon: "MapPin",
     title: "Gym Discovery & Search",
     description: "Find gyms near you with our intelligent location-based search. Filter by distance, amenities, price range, and user ratings to discover the perfect fitness facility.",
-    image:"image1.png",
+    image: "/assets/images/image1.png",
     imageAlt: "Person using smartphone to search for nearby gyms on interactive map interface with location pins and gym details displayed on screen",
     features: ["Location-based search", "Advanced filtering", "Real-time availability", "Virtual tours"]
   },
@@ -16,7 +16,7 @@ const ServicesSection = () => {
     icon: "CreditCard",
     title: "Membership Management",
     description: "Manage all your gym memberships from one convenient dashboard. Track payments, view membership details, and handle renewals with ease.",
-    image: "image2.png",
+    image: "/assets/images/image2.png",
     imageAlt: "Clean dashboard interface showing membership cards, payment history, and subscription details with modern blue and white design elements",
     features: ["Centralized dashboard", "Payment tracking", "Auto-renewal options", "Membership history"]
   },
@@ -24,7 +24,7 @@ const ServicesSection = () => {
     icon: "Activity",
     title: "Fitness Tracking & Planning",
     description: "Set goals, track workouts, and monitor your progress with our comprehensive fitness tools. Get personalized workout recommendations and nutrition tips.",
-    image: "image3.png",
+    image: "/assets/images/image3.png",
     imageAlt: "Fitness tracking dashboard displaying workout statistics, progress charts, goal achievements, and personalized exercise recommendations on tablet device",
     features: ["Workout logging", "Progress analytics", "Goal setting", "BMI calculator"]
   },
@@ -32,7 +32,7 @@ const ServicesSection = () => {
     icon: "Star",
     title: "Reviews & Ratings",
     description: "Read authentic reviews from real gym members. Share your own experiences to help others make informed decisions about their fitness journey.",
-    image: "image4.png",
+    image: "/assets/images/image4.png",
     imageAlt: "User interface showing detailed gym reviews with star ratings, member testimonials, facility photos, and verified user badges on mobile device",
     features: ["Verified reviews", "Photo uploads", "Rating system", "Response from gyms"]
   },
@@ -40,7 +40,7 @@ const ServicesSection = () => {
     icon: "Bell",
     title: "Smart Notifications",
     description: "Stay updated with personalized notifications about membership renewals, special offers, class schedules, and fitness milestones.",
-    image: "image5.png",
+    image: "/assets/images/image5.png",
     imageAlt: "Smartphone screen displaying push notifications for gym class reminders, membership alerts, and special promotional offers with colorful notification badges",
     features: ["Renewal reminders", "Class alerts", "Special offers", "Achievement badges"]
   },
@@ -48,7 +48,7 @@ const ServicesSection = () => {
     icon: "Handshake",
     title: "Gym Partner Program",
     description: "Gym owners can join our platform to increase visibility, attract new members, and manage their facility's online presence effectively.",
-    image: "image6.png",
+    image: "/assets/images/image6.png",
     imageAlt: "Professional gym owner shaking hands with business partner in modern fitness facility with exercise equipment visible in background",
     features: ["Business dashboard", "Member analytics", "Marketing tools", "Revenue tracking"]
   }];
