@@ -532,21 +532,21 @@ Product Image
 <div className="flex items-center gap-3">
 
 {imagePreview && (
+  <div className="flex flex-col items-center gap-1">
+    <img
+      src={imagePreview}
+      alt="preview"
+      className="w-16 h-16 rounded-lg object-cover"
+    />
 
-<img
-src={imagePreview}
-alt="preview"
-className="w-16 h-16 rounded-lg object-cover"
-/>
-
-<button
-  type="button"
-  onClick={handleRemoveImage}
-  className="text-xs text-red-500 hover:underline"
->
-  Remove
-</button>
-
+    <button
+      type="button"
+      onClick={handleRemoveImage}
+      className="text-xs text-red-500 hover:underline"
+    >
+      Remove
+    </button>
+  </div>
 )}
 
 <label className="flex-1 text-center py-2 border-2 border-dashed border-slate-200 rounded-lg text-sm text-blue-600 font-medium cursor-pointer">
