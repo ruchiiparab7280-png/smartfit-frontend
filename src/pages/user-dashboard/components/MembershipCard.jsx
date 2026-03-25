@@ -20,20 +20,40 @@ return 'bg-muted text-muted-foreground border-border';
 };
 
 const getDaysRemaining = (expiryDate) => {
+const toUTCDateMidnight = (value) => {
+  const dateStr =
+    typeof value === "string" && /^\d{4}-\d{2}-\d{2}$/.test(value)
+      ? value
+      : null;
+
+  if (dateStr) {
+    const [y, m, d] = dateStr.split("-").map(Number);
+    return new Date(Date.UTC(y, m - 1, d));
+  }
+
+  const d = new Date(value);
+  if (Number.isNaN(d.getTime())) return null;
+  return new Date(Date.UTC(d.getUTCFullYear(), d.getUTCMonth(), d.getUTCDate()));
+};
+
+const expiryUTC = toUTCDateMidnight(expiryDate);
+if (!expiryUTC) return 0;
+
 const today = new Date();
-const expiry = new Date(expiryDate);
-today.setHours(0, 0, 0, 0);
-expiry.setHours(0, 0, 0, 0);
-const diffTime = expiry - today;
-const diffDays = Math.ceil(diffTime / (1000 * 60 * 60 * 24));
-return diffDays;
+const todayUTC = new Date(
+  Date.UTC(today.getUTCFullYear(), today.getUTCMonth(), today.getUTCDate())
+);
+
+const diffTime = expiryUTC - todayUTC;
+return Math.ceil(diffTime / (1000 * 60 * 60 * 24));
 };
 
 const formatDate = (value) => {
 if (!value) return "-";
 const date = new Date(value);
 if (Number.isNaN(date.getTime())) return "-";
-return date.toLocaleDateString();
+// Use UTC to avoid timezone-induced "previous/next day" display issues.
+return date.toLocaleDateString(undefined, { timeZone: "UTC" });
 };
 
 const daysRemaining = getDaysRemaining(membership?.expiry_date);

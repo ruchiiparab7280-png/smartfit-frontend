@@ -295,7 +295,7 @@ console.log("SENDING MEMBERSHIP:",{
 gym_name: gym.gym_name || gym.name,
 gym_city: gym.city || gym.address,
 start_date: startDate,
-expiry_date: calculatedExpiryDate ? calculatedExpiryDate.toISOString() : null
+expiry_date: calculatedExpiryDate
 });
 
     // save membership
@@ -318,7 +318,7 @@ price: selectedPlan.price,
 
 // 🔥 user selected date
 start_date: startDate,
-expiry_date: calculatedExpiryDate ? calculatedExpiryDate.toISOString() : null,
+expiry_date: calculatedExpiryDate,
 
 payment_id: response.razorpay_payment_id
 })
@@ -338,29 +338,68 @@ payment_id: response.razorpay_payment_id
 const [selectedPlan, setSelectedPlan] = useState(null);
 const [startDate,setStartDate] = useState("")
 
+const formatUTCDate = (dateLike) => {
+  if (!dateLike) return null;
+  const d = dateLike instanceof Date ? dateLike : new Date(dateLike);
+  if (Number.isNaN(d.getTime())) return null;
+
+  const y = d.getUTCFullYear();
+  const m = String(d.getUTCMonth() + 1).padStart(2, "0");
+  const day = String(d.getUTCDate()).padStart(2, "0");
+  return `${y}-${m}-${day}`;
+};
+
 const parseDurationMonths = (duration) => {
-  if (!duration) return 1;
-  const match = String(duration).match(/\d+/);
-  if (!match) return 1;
-  const months = Number(match[0]);
+  if (duration === null || duration === undefined) return 1;
+  const str = String(duration).toLowerCase();
+
+  // Examples: "1 year", "2 years"
+  const yearMatch = str.match(/(\d+)\s*year/);
+  if (yearMatch) {
+    const years = Number(yearMatch[1]);
+    return Number.isNaN(years) ? 1 : years * 12;
+  }
+
+  // Examples: "year" (no number provided)
+  if (str.includes("year")) return 12;
+
+  // Examples: "3 Months", "12 months"
+  const monthMatch = str.match(/(\d+)\s*month/);
+  if (monthMatch) {
+    const months = Number(monthMatch[1]);
+    return Number.isNaN(months) ? 1 : months;
+  }
+
+  const digits = str.match(/\d+/);
+  const months = digits ? Number(digits[0]) : 1;
   return Number.isNaN(months) ? 1 : months;
 };
 
 const calculateMembershipExpiry = (startDateValue, durationValue) => {
-  const start = new Date(startDateValue);
-  if (Number.isNaN(start.getTime())) return null;
+  const startDateStr = formatUTCDate(startDateValue);
+  if (!startDateStr) return null;
+
+  const [yStr, mStr, dStr] = startDateStr.split("-");
+  const y = Number(yStr);
+  const m = Number(mStr);
+  const d = Number(dStr);
+  if ([y, m, d].some((n) => Number.isNaN(n))) return null;
 
   const monthsToAdd = parseDurationMonths(durationValue);
-  const expiry = new Date(start);
 
-  // Protect against invalid end-of-month rollover (e.g. Jan 31 + 1 month).
-  const originalDay = expiry.getDate();
-  expiry.setDate(1);
-  expiry.setMonth(expiry.getMonth() + monthsToAdd);
-  const lastDay = new Date(expiry.getFullYear(), expiry.getMonth() + 1, 0).getDate();
-  expiry.setDate(Math.min(originalDay, lastDay));
+  // Date arithmetic in UTC to avoid timezone "off by one day" errors.
+  const expiry = new Date(Date.UTC(y, m - 1, d));
+  const originalDay = expiry.getUTCDate();
 
-  return expiry;
+  expiry.setUTCDate(1);
+  expiry.setUTCMonth(expiry.getUTCMonth() + monthsToAdd);
+
+  const lastDay = new Date(
+    Date.UTC(expiry.getUTCFullYear(), expiry.getUTCMonth() + 1, 0)
+  ).getUTCDate();
+  expiry.setUTCDate(Math.min(originalDay, lastDay));
+
+  return formatUTCDate(expiry);
 };
 
 const scrollLeft = () => {
