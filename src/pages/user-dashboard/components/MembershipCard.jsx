@@ -4,6 +4,7 @@ import Image from '../../../components/AppImage';
 import Button from '../../../components/ui/Button';
 
 const MembershipCard = ({ membership, goToGyms }) => {
+console.log("MembershipCard received membership:", membership);
 
 const getStatusColor = (status) => {
 switch (status) {
@@ -21,12 +22,21 @@ return 'bg-muted text-muted-foreground border-border';
 const getDaysRemaining = (expiryDate) => {
 const today = new Date();
 const expiry = new Date(expiryDate);
+today.setHours(0, 0, 0, 0);
+expiry.setHours(0, 0, 0, 0);
 const diffTime = expiry - today;
 const diffDays = Math.ceil(diffTime / (1000 * 60 * 60 * 24));
 return diffDays;
 };
 
-const daysRemaining = getDaysRemaining(membership?.expiryDate);
+const formatDate = (value) => {
+if (!value) return "-";
+const date = new Date(value);
+if (Number.isNaN(date.getTime())) return "-";
+return date.toLocaleDateString();
+};
+
+const daysRemaining = getDaysRemaining(membership?.expiry_date);
 
 return (
 
@@ -56,14 +66,14 @@ className="w-full h-full object-cover"
 
 <div className="flex items-center gap-2 mb-2">
 <Icon name="Building" size={16}/>
-<span className="font-semibold text-lg">{membership?.gymName}</span>
+<span className="font-semibold text-lg">{membership?.gym_name || "-"}</span>
 </div>
 
 {/* Location */}
 
 <div className="flex items-center gap-2 text-muted-foreground mb-4">
 <Icon name="MapPin" size={16}/>
-<span>{membership?.location}</span>
+<span>{membership?.gym_city || "-"}</span>
 </div>
 
 {/* Membership Details */}
@@ -75,7 +85,7 @@ className="w-full h-full object-cover"
 <Icon name="CreditCard" size={14}/>
 Plan Type
 </span>
-<span className="font-semibold">{membership?.planType}</span>
+<span className="font-semibold">{membership?.plan_name}</span>
 </div>
 
 <div className="flex justify-between">
@@ -83,7 +93,7 @@ Plan Type
 <Icon name="Calendar" size={14}/>
 Start Date
 </span>
-<span className="font-semibold">{membership?.startDate}</span>
+<span className="font-semibold">{formatDate(membership?.start_date)}</span>
 </div>
 
 <div className="flex justify-between">
@@ -91,7 +101,7 @@ Start Date
 <Icon name="CalendarCheck" size={14}/>
 Expiry Date
 </span>
-<span className="font-semibold">{membership?.expiryDate}</span>
+<span className="font-semibold">{formatDate(membership?.expiry_date)}</span>
 </div>
 
 {daysRemaining > 0 && (
@@ -116,7 +126,7 @@ Days Remaining
 
 {(membership?.status === 'Active' || membership?.status === 'Expiring Soon') ? (
 <> <Button
-onClick={()=>goToGyms(membership?.gymEmail)}>
+onClick={()=>goToGyms(membership?.gym_email)}>
 Renew
 </Button>
 <Button

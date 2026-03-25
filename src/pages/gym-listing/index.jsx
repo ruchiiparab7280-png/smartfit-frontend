@@ -110,63 +110,76 @@ const membershipRes = await fetch(
 
 const memberships = await membershipRes.json();
 
- return {
-  id: index + 1,
+ // Parse gym_images JSON
+  let gymImages = [];
+  try {
+    if (gym.gym_images) {
+      const parsed = JSON.parse(gym.gym_images);
+      if (Array.isArray(parsed)) gymImages = parsed;
+    }
+  } catch {}
 
-  name: gym.gym_name,
-  address: gym.address,
-  phone: gym.phone,
-  email: gym.email,
-  latitude: gym.latitude,
-  longitude: gym.longitude,
-  price: gym.monthly_fee,
-  members: gym.capacity,
+  return {
+    id: index + 1,
 
- distance: userLocation
-  ? parseFloat(
-      calculateDistance(
-        userLocation.lat,
-        userLocation.lng,
-        gym.latitude,
-        gym.longitude
-      ).toFixed(1)
-    )
-  : 0, // add this
-  rating: 4, // add this
+    name: gym.gym_name,
+    address: gym.address,
+    phone: gym.phone,
+    email: gym.email,
+    latitude: gym.latitude,
+    longitude: gym.longitude,
+    price: gym.monthly_fee,
+    members: gym.capacity,
 
-  openTime: `${gym.opening_time} - ${gym.closing_time}`,
+   distance: userLocation
+    ? parseFloat(
+        calculateDistance(
+          userLocation.lat,
+          userLocation.lng,
+          gym.latitude,
+          gym.longitude
+        ).toFixed(1)
+      )
+    : 0, // add this
+    rating: 4, // add this
 
-  description: gym.gym_description,
+    openTime: `${gym.opening_time} - ${gym.closing_time}`,
 
-    amenities: gym.amenities
-      ? gym.amenities.split(",").map(a => ({
-          name: a.trim(),
-          icon: "Check"
-        }))
-      : [],
+    description: gym.gym_description,
 
-    trainers: trainers.map(t => ({
-      name: t.name,
-      price: t.price,
-      image: t.image
-    })),
+    // Gym images
+    image: gymImages.length > 0 ? gymImages[0] : null,
+    images: gymImages,
 
- supplements: supplements.map(s => ({
-id: s.id,
-name: s.name,
-price: s.price,
-image: s.image,
-description: s.description
-})),
+      amenities: gym.amenities
+        ? gym.amenities.split(",").map(a => ({
+            name: a.trim(),
+            icon: "Check"
+          }))
+        : [],
 
-  
- memberships: memberships.map(m => ({
-    name: m.name,
-    price: m.price,
-    duration: m.duration,
-    description: m.description
-  }))
-  };
+      trainers: trainers.map(t => ({
+        name: t.name,
+        price: t.price,
+        image: t.image
+      })),
+
+   supplements: supplements.map(s => ({
+  id: s.id,
+  name: s.name,
+  price: s.price,
+  image: s.image,
+  description: s.description
+  })),
+
+    
+   memberships: memberships.map(m => ({
+      name: m.name,
+      price: m.price,
+      duration: m.duration,
+      description: m.description
+    }))
+    };
 
 })
 );

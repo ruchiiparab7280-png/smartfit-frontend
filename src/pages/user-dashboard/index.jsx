@@ -1,5 +1,4 @@
 import React, { useState, useEffect } from "react";
-import { useNavigate } from "react-router-dom";
 import MainNavigation from "../../components/MainNavigation";
 import Icon from "../../components/AppIcon";
 
@@ -9,14 +8,13 @@ import MembershipCard from "./components/MembershipCard";
 import WorkoutPlanCard from "./components/WorkoutPlanCard";
 import ProgressChart from "./components/ProgressChart";
 import BMICalculator from "./components/BMICalculator";
-
+import RecommendedGymCard from "./components/RecommendedGymCard";
 
 import FreeTrialRequests from "./components/FreeTrialRequests";
 import TrainerRequests from "./components/TrainerRequests";
 import SupplementOrders from "./components/SupplementOrders";
 
 const UserDashboard = () => {
-const navigate = useNavigate()
 const [workouts,setWorkouts] = useState([])
 const [profile,setProfile] = useState(null)  
 const updateProfile = (newData) => {
@@ -25,6 +23,46 @@ setProfile(newData)
 const [membership,setMembership] = useState(null)
 useEffect(()=>{
 
+const parseDurationMonths = (duration) => {
+if (!duration) return 1;
+const match = String(duration).match(/\d+/);
+if (!match) return 1;
+const months = Number(match[0]);
+return Number.isNaN(months) ? 1 : months;
+};
+
+const calculateExpiryDate = (startDateValue, durationValue) => {
+const start = new Date(startDateValue);
+if (Number.isNaN(start.getTime())) return null;
+
+const months = parseDurationMonths(durationValue);
+const expiry = new Date(start);
+
+// Handle end-of-month dates safely when adding months.
+const originalDay = expiry.getDate();
+expiry.setDate(1);
+expiry.setMonth(expiry.getMonth() + months);
+const lastDayOfTargetMonth = new Date(expiry.getFullYear(), expiry.getMonth() + 1, 0).getDate();
+expiry.setDate(Math.min(originalDay, lastDayOfTargetMonth));
+
+return expiry;
+};
+
+const getMembershipStatus = (expiryDateValue) => {
+if (!expiryDateValue) return "Active";
+const expiry = new Date(expiryDateValue);
+if (Number.isNaN(expiry.getTime())) return "Active";
+
+const today = new Date();
+today.setHours(0, 0, 0, 0);
+expiry.setHours(0, 0, 0, 0);
+
+const diff = Math.ceil((expiry - today) / (1000 * 60 * 60 * 24));
+if (diff <= 0) return "Expired";
+if (diff <= 7) return "Expiring Soon";
+return "Active";
+};
+
 const fetchMembership = async ()=>{
 
 const email = localStorage.getItem("userEmail")
@@ -32,43 +70,17 @@ const email = localStorage.getItem("userEmail")
 const res = await fetch(`${import.meta.env.VITE_API_URL}/user-memberships/${email}`)
 
 const data = await res.json()
-console.log("membership data:", data)
+console.log("user-memberships API response:", data)
 
 if(data.length > 0){
-
-const start = new Date(data[0].start_date)
-
-let months = 1
-
-if(data[0].duration?.includes("3")) months = 3
-if(data[0].duration?.includes("6")) months = 6
-if(data[0].duration?.includes("12")) months = 12
-
-const expiry = new Date(start)
-expiry.setMonth(expiry.getMonth() + months)
-
-const today = new Date()
-const diff = Math.ceil((expiry - today) / (1000 * 60 * 60 * 24))
-
-let status = "Active"
-
-if(diff <= 7 && diff > 0){
-status = "Expiring Soon"
-}
-
-if(diff <= 0){
-status = "Expired"
-}
+const firstMembership = data[0];
+const computedExpiry = calculateExpiryDate(firstMembership.start_date, firstMembership.duration);
+const resolvedExpiryDate = firstMembership.expiry_date || (computedExpiry ? computedExpiry.toISOString() : null);
 
 setMembership({
-gymName:data[0].gym_name,
-location:data[0].gym_city?.toUpperCase(),
-gymEmail:data[0].gym_email,
-planType:data[0].plan_name,
-startDate:start.toLocaleDateString(),
-expiryDate:expiry.toLocaleDateString(),
-daysRemaining:diff,
-status:status,
+...firstMembership,
+expiry_date: resolvedExpiryDate,
+status:getMembershipStatus(resolvedExpiryDate),
 gymImage:"https://images.unsplash.com/photo-1571902943202-507ec2618e8f"
 })
 
@@ -197,7 +209,7 @@ return membership ? (
 membership={membership} 
 goToGyms={(gymEmail)=>{
 localStorage.setItem("renewGym",gymEmail)
-navigate("/find-gyms")
+setActiveTab("gyms")
 }}
 />
 ) : (
@@ -208,7 +220,7 @@ navigate("/find-gyms")
     </p>
 
     <button
-      onClick={()=>navigate("/find-gyms")}
+      onClick={()=>setActiveTab("gyms")}
       className="bg-orange-500 text-white px-5 py-2 rounded"
     >
       Explore Gyms
@@ -235,7 +247,8 @@ return (
 case "bmi":
 return <BMICalculator/>
 
-
+case "gyms":
+return <RecommendedGymCard/>
 
 default:
 return <StatsOverview/>
@@ -294,7 +307,9 @@ return(
 <Icon name="Activity"/> BMI Calculator
 </button>
 
-
+<button onClick={()=>setActiveTab("gyms")} className="flex gap-3 items-center hover:text-primary">
+<Icon name="MapPin"/> Recommended Gyms
+</button>
 
 </div>
 
