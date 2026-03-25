@@ -9,6 +9,7 @@ import MapView from "./components/MapView";
 import SearchBar from './components/SearchBar';
 import SortControls from './components/SortControls';
 import GymDetailsModal from './components/GymDetailsModal';
+import { normalizeGymImages } from '../../utils/gymImageUtils';
 
 const GymListing = () => {
   const calculateDistance = (lat1, lon1, lat2, lon2) => {
@@ -137,21 +138,12 @@ const memberships = await membershipRes.json();
   openTime: `${gym.opening_time} - ${gym.closing_time}`,
 
   description: gym.gym_description,
-
-  image: gym.image,
-  images: (() => {
-    if (Array.isArray(gym.images)) return gym.images;
-    if (typeof gym.images === "string") {
-      // Handle JSON-stringified arrays from older rows.
-      try {
-        const parsed = JSON.parse(gym.images);
-        if (Array.isArray(parsed)) return parsed;
-      } catch (_) {}
-      return [gym.images];
-    }
-    if (gym.images) return [gym.images];
-    if (gym.image) return [gym.image];
-    return [];
+  ...(function buildImages() {
+    const normalizedImages = normalizeGymImages(gym.images ?? gym.image);
+    return {
+      image: normalizedImages[0],
+      images: normalizedImages
+    };
   })(),
 
     amenities: gym.amenities

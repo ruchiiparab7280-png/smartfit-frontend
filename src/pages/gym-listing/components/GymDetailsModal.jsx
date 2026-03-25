@@ -2,11 +2,51 @@ import React, { useRef, useState,useEffect } from 'react';
 import Image from '../../../components/AppImage';
 import Icon from '../../../components/AppIcon';
 import Button from '../../../components/ui/Button';
+import { normalizeGymImages } from '../../../utils/gymImageUtils';
 
 const GymDetailsModal = ({ gym, isOpen, onClose }) => {
   if (!isOpen || !gym) return null;
 
  const scrollRef = useRef(null);
+
+  const galleryImages = normalizeGymImages(gym?.images ?? gym?.image);
+  const galleryToShow = galleryImages.length ? galleryImages : ["/assets/images/no_image.png"];
+
+  const [lightboxOpen, setLightboxOpen] = useState(false);
+  const [lightboxIndex, setLightboxIndex] = useState(0);
+
+  const openLightbox = (index) => {
+    setLightboxIndex(index);
+    setLightboxOpen(true);
+  };
+
+  const closeLightbox = () => setLightboxOpen(false);
+
+  const goPrevLightbox = () => {
+    setLightboxIndex((i) => (i - 1 + galleryToShow.length) % galleryToShow.length);
+  };
+
+  const goNextLightbox = () => {
+    setLightboxIndex((i) => (i + 1) % galleryToShow.length);
+  };
+
+  useEffect(() => {
+    if (!lightboxOpen) return;
+
+    const onKeyDown = (e) => {
+      if (e.key === "Escape") closeLightbox();
+      if (e.key === "ArrowLeft") goPrevLightbox();
+      if (e.key === "ArrowRight") goNextLightbox();
+    };
+
+    window.addEventListener("keydown", onKeyDown);
+    return () => window.removeEventListener("keydown", onKeyDown);
+  }, [lightboxOpen, galleryToShow.length]);
+
+  useEffect(() => {
+    setLightboxOpen(false);
+    setLightboxIndex(0);
+  }, [gym?.email]);
 
 const [showTrainerModal,setShowTrainerModal] = useState(false);
 const [selectedTrainer,setSelectedTrainer] = useState(null);
@@ -403,6 +443,7 @@ const calculateMembershipExpiry = (startDateValue, durationValue) => {
 };
 
 const scrollLeft = () => {
+  if (!scrollRef.current) return;
   scrollRef.current.scrollBy({
     left: -600,
     behavior: "smooth"
@@ -410,6 +451,7 @@ const scrollLeft = () => {
 };
 
 const scrollRight = () => {
+  if (!scrollRef.current) return;
   scrollRef.current.scrollBy({
     left: 600,
     behavior: "smooth"
@@ -460,13 +502,20 @@ const scrollRight = () => {
   ref={scrollRef}
   className="flex overflow-x-auto h-full scroll-smooth no-scrollbar"
 >
-  {gym?.images?.map((img, index) => (
-    <Image
+  {galleryToShow.map((img, index) => (
+    <button
       key={index}
-      src={img}
-      alt="gym"
-      className="min-w-full h-full object-cover flex-shrink-0"
-    />
+      type="button"
+      onClick={() => openLightbox(index)}
+      className="min-w-full h-full flex-shrink-0"
+      aria-label={`View image ${index + 1}`}
+    >
+      <Image
+        src={img}
+        alt={`Gym image ${index + 1}`}
+        className="min-w-full h-full object-cover flex-shrink-0"
+      />
+    </button>
   ))}
 </div>
 
@@ -796,6 +845,55 @@ reviews.map((review,index)=>(
           </div>
         </div>
       </div>
+      {lightboxOpen && (
+        <div
+          className="fixed inset-0 z-[1000] bg-background/80 backdrop-blur-sm flex items-center justify-center p-4"
+          onClick={closeLightbox}
+          role="dialog"
+          aria-modal="true"
+          aria-label="Image viewer"
+        >
+          <div
+            className="relative w-full h-full max-w-5xl max-h-[90vh]"
+            onClick={(e) => e.stopPropagation()}
+          >
+            <button
+              type="button"
+              onClick={closeLightbox}
+              className="absolute top-3 right-3 z-10 bg-background/90 backdrop-blur-sm p-2 rounded-full hover:bg-background transition-base focus-ring"
+              aria-label="Close image viewer"
+            >
+              <Icon name="X" size={24} />
+            </button>
+
+            <button
+              type="button"
+              onClick={goPrevLightbox}
+              className="absolute left-3 top-1/2 -translate-y-1/2 z-10 bg-black/60 text-white p-2 rounded-full hover:bg-black/70 transition-base"
+              aria-label="Previous image"
+            >
+              <Icon name="ChevronLeft" size={22} />
+            </button>
+
+            <button
+              type="button"
+              onClick={goNextLightbox}
+              className="absolute right-3 top-1/2 -translate-y-1/2 z-10 bg-black/60 text-white p-2 rounded-full hover:bg-black/70 transition-base"
+              aria-label="Next image"
+            >
+              <Icon name="ChevronRight" size={22} />
+            </button>
+
+            <div className="w-full h-full flex items-center justify-center">
+              <Image
+                src={galleryToShow[lightboxIndex] || "/assets/images/no_image.png"}
+                alt="Gym image"
+                className="max-h-[85vh] w-auto object-contain"
+              />
+            </div>
+          </div>
+        </div>
+      )}
     {showTrainerModal && (
 
 <div className="fixed inset-0 flex items-center justify-center bg-black/60 z-50">

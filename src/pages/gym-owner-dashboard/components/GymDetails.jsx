@@ -1,4 +1,5 @@
 import React, { useState, useEffect } from "react";
+import { normalizeGymImages } from "../../../utils/gymImageUtils";
 
 const amenitiesList = [
   "Cardio Equipment",
@@ -64,19 +65,8 @@ setFormData({
 });
 
 const rawImages = data?.images ?? data?.image;
-let existingImages = [];
-if (Array.isArray(rawImages)) {
-  existingImages = rawImages;
-} else if (typeof rawImages === "string") {
-  // Supabase may return JSON-stringified arrays.
-  try {
-    const parsed = JSON.parse(rawImages);
-    existingImages = Array.isArray(parsed) ? parsed : [rawImages];
-  } catch {
-    existingImages = [rawImages];
-  }
-}
-setImageItems(existingImages.filter(Boolean).map((src) => ({ src })));
+const existingImages = normalizeGymImages(rawImages);
+setImageItems(existingImages.map((src) => ({ src })));
       } catch (error) {
         console.log("Fetch error:", error);
       }
@@ -157,7 +147,7 @@ setImageItems(existingImages.filter(Boolean).map((src) => ({ src })));
     setErrorMessage("");
 
     if (imageItems.length < 6) {
-      setErrorMessage("Please upload at least 6 images");
+      setErrorMessage("Please upload at least 6 images of the gym");
       return;
     }
 
