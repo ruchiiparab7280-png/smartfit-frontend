@@ -138,6 +138,22 @@ const memberships = await membershipRes.json();
 
   description: gym.gym_description,
 
+  image: gym.image,
+  images: (() => {
+    if (Array.isArray(gym.images)) return gym.images;
+    if (typeof gym.images === "string") {
+      // Handle JSON-stringified arrays from older rows.
+      try {
+        const parsed = JSON.parse(gym.images);
+        if (Array.isArray(parsed)) return parsed;
+      } catch (_) {}
+      return [gym.images];
+    }
+    if (gym.images) return [gym.images];
+    if (gym.image) return [gym.image];
+    return [];
+  })(),
+
     amenities: gym.amenities
       ? gym.amenities.split(",").map(a => ({
           name: a.trim(),

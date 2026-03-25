@@ -158,20 +158,45 @@ const handleImageChange = (e) => {
 const file = e.target.files[0];
 
 if(file){
+const allowedExts = new Set([".jpg", ".jpeg", ".png", ".webp"]);
+const allowedMimes = new Set(["image/jpeg", "image/png", "image/webp"]);
+
+const ext = file?.name?.toLowerCase().match(/\.[a-z0-9]+$/)?.[0];
+const isAllowed = ext && allowedExts.has(ext) && allowedMimes.has(file.type);
+
+if(!isAllowed){
+  alert("Invalid image type. Allowed: jpg, jpeg, png, webp");
+  return;
+}
+
+if (imagePreview?.startsWith("blob:")) {
+  URL.revokeObjectURL(imagePreview);
+}
 
 const url = URL.createObjectURL(file);
+console.log("Supplement selected image file:", { name: file.name, type: file.type });
 
 setImagePreview(url);
-
-setForm(prev => ({
+setForm((prev) => ({
 ...prev,
-image:url
+image:file
 }));
+
+// Allow selecting the same file again.
+e.target.value = "";
 
 }
 
 };
 
+const handleRemoveImage = () => {
+  if (imagePreview?.startsWith("blob:")) {
+    URL.revokeObjectURL(imagePreview);
+  }
+  setImagePreview("");
+  setForm((prev) => ({ ...prev, image: "" }));
+  console.log("Supplement image selection cleared");
+};
 
 // add supplement
 const handleSubmit = async (e) => {
@@ -183,44 +208,76 @@ try{
 if(editId){
 
 // UPDATE API
-await fetch(
-`${import.meta.env.VITE_API_URL}/update-supplement/${editId}`,
-{
-method:"PUT",
-headers:{
-"Content-Type":"application/json"
-},
-body:JSON.stringify({
-name:form.name,
-price:form.price,
-description:form.description,
-stock_status:form.stock_status
-})
+let imageUrl = form.image;
+
+// If user selected a new File, upload it; otherwise keep existing URL.
+if (form.image instanceof File) {
+  const fd = new FormData();
+  fd.append("image", form.image);
+  const uploadRes = await fetch(`${import.meta.env.VITE_API_URL}/upload`, {
+    method: "POST",
+    body: fd,
+  });
+  const uploadData = await uploadRes.json();
+  console.log("✅ Supplement upload response:", uploadData);
+  imageUrl = uploadData.image;
 }
-);
+
+await fetch(`${import.meta.env.VITE_API_URL}/update-supplement/${editId}`,{
+  method:"PUT",
+  headers:{
+    "Content-Type":"application/json"
+  },
+  body:JSON.stringify({
+    gym_email:ownerEmail,
+    name:form.name,
+    price:form.price,
+    description:form.description,
+    stock_status:form.stock_status,
+    image:imageUrl,
+  })
+});
 
 alert("Supplement updated ✅");
 
 }else{
 
 // ADD API
-await fetch(
-`${import.meta.env.VITE_API_URL}/add-supplement`,
-{
-method:"POST",
-headers:{
-"Content-Type":"application/json"
-},
-body:JSON.stringify({
-gym_email:ownerEmail,
-name:form.name,
-price:form.price,
-image:imagePreview,
-description:form.description,
-stock_status:form.stock_status
-})
+let imageUrl = form.image || imagePreview;
+if (!imageUrl) {
+  alert("Please upload a supplement image");
+  return;
 }
-);
+
+// If user selected a new File, upload it.
+if (form.image instanceof File) {
+  const fd = new FormData();
+  fd.append("image", form.image);
+  const uploadRes = await fetch(`${import.meta.env.VITE_API_URL}/upload`, {
+    method: "POST",
+    body: fd,
+  });
+  const uploadData = await uploadRes.json();
+  console.log("✅ Supplement upload response:", uploadData);
+  imageUrl = uploadData.image;
+}
+
+console.log("📌 Supplement image URL to save:", imageUrl);
+
+await fetch(`${import.meta.env.VITE_API_URL}/add-supplement`,{
+  method:"POST",
+  headers:{
+    "Content-Type":"application/json"
+  },
+  body:JSON.stringify({
+    gym_email:ownerEmail,
+    name:form.name,
+    price:form.price,
+    image:imageUrl,
+    description:form.description,
+    stock_status:form.stock_status
+  })
+});
 
 alert("Supplement added ✅");
 
@@ -482,6 +539,14 @@ alt="preview"
 className="w-16 h-16 rounded-lg object-cover"
 />
 
+<button
+  type="button"
+  onClick={handleRemoveImage}
+  className="text-xs text-red-500 hover:underline"
+>
+  Remove
+</button>
+
 )}
 
 <label className="flex-1 text-center py-2 border-2 border-dashed border-slate-200 rounded-lg text-sm text-blue-600 font-medium cursor-pointer">
@@ -490,7 +555,7 @@ Upload Image
 
 <input
 type="file"
-accept="image/*"
+accept="image/png,image/jpeg,image/jpg,image/webp"
 onChange={handleImageChange}
 className="hidden"
 />

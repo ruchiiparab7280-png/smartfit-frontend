@@ -96,95 +96,113 @@ const handleDelete = async (id) => {
 };
 
 const handlePhotoChange = (e) => {
+  const file = e.target.files?.[0];
+  if (!file) return;
 
-  const file = e.target.files[0];
+  const allowedExts = new Set([".jpg", ".jpeg", ".png", ".webp"]);
+  const allowedMimes = new Set(["image/jpeg", "image/png", "image/webp"]);
 
-  if(file){
+  const ext = file?.name?.toLowerCase().match(/\.[a-z0-9]+$/)?.[0];
+  const isAllowed = ext && allowedExts.has(ext) && allowedMimes.has(file.type);
 
-    const handlePhotoChange = (e) => {
-  const file = e.target.files[0];
-
-  if (file) {
-    setForm(prev => ({
-      ...prev,
-      photo: file   // 🔥 FILE SAVE KAR (URL nahi)
-    }));
-
-    setPhotoPreview(URL.createObjectURL(file)); // preview ke liye ok
-  }
-};
-
-    setPhotoPreview(url);
-
-    setForm(prev => ({
-      ...prev,
-      photo:url
-    }));
-
+  if (!isAllowed) {
+    alert("Invalid image type. Allowed: jpg, jpeg, png, webp");
+    return;
   }
 
+  if (photoPreview?.startsWith("blob:")) {
+    URL.revokeObjectURL(photoPreview);
+  }
+
+  setForm((prev) => ({ ...prev, photo: file }));
+  const previewUrl = URL.createObjectURL(file);
+  setPhotoPreview(previewUrl);
+  console.log("Trainer selected image file:", { name: file.name, type: file.type });
+
+  // Allow selecting the same file again.
+  e.target.value = "";
 };
 
 const handleSubmit = async (e) => {
 
   e.preventDefault();
 
-  try{
-
+  try {
     const email = localStorage.getItem("userEmail");
-    // 🔥 STEP 1: upload image
-const formData = new FormData();
-formData.append("image", form.photo);
+    let imageUrl = form.photo;
 
-const uploadRes = await fetch(
-  `${import.meta.env.VITE_API_URL}/upload`,
-  {
-    method: "POST",
-    body: formData
-  }
-);
+    // If user picked a new File, upload it; otherwise keep existing URL.
+    if (form.photo instanceof File) {
+      const fd = new FormData();
+      fd.append("image", form.photo);
 
-const uploadData = await uploadRes.json();
+      const uploadRes = await fetch(`${import.meta.env.VITE_API_URL}/upload`, {
+        method: "POST",
+        body: fd,
+      });
+      const uploadData = await uploadRes.json();
+      console.log("✅ Trainer upload response:", uploadData);
+      imageUrl = uploadData.image;
+    }
 
-    await fetch(`${import.meta.env.VITE_API_URL}/add-trainer`,{
-      method:"POST",
-      headers:{
-        "Content-Type":"application/json"
-      },
-      body:JSON.stringify({
-        gym_email:email,
-        name:form.name,
-        specialization:form.specialization,
-        price:Number(form.pricePerSession),
-        image: uploadData.image 
-      })
-      
-    });
+    if (!imageUrl) {
+      alert("Please upload a trainer image");
+      return;
+    }
 
-    const res = await fetch(
-      `${import.meta.env.VITE_API_URL}/trainers/${email}`
-    );
+    if (editId) {
+      await fetch(`${import.meta.env.VITE_API_URL}/update-trainer/${editId}`, {
+        method: "PUT",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          gym_email: email,
+          name: form.name,
+          specialization: form.specialization,
+          price: Number(form.pricePerSession),
+          image: imageUrl,
+        }),
+      });
+    } else {
+      await fetch(`${import.meta.env.VITE_API_URL}/add-trainer`, {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          gym_email: email,
+          name: form.name,
+          specialization: form.specialization,
+          price: Number(form.pricePerSession),
+          image: imageUrl,
+        }),
+      });
+    }
 
+    const res = await fetch(`${import.meta.env.VITE_API_URL}/trainers/${email}`);
     const data = await res.json();
 
     setTrainers(
-      data.map((t)=>({
-        id:t.id,
-        name:t.name,
-        photo:t.image,
-        specialization:t.specialization,
-        pricePerSession:t.price
+      data.map((t) => ({
+        id: t.id,
+        name: t.name,
+        photo: t.image,
+        specialization: t.specialization,
+        pricePerSession: t.price,
       }))
     );
 
     setShowModal(false);
-
-  }catch(error){
-
-    console.log("Trainer save error:",error);
-
+  } catch (error) {
+    console.log("Trainer save error:", error);
   }
 
+};
+
+const handleRemovePhoto = () => {
+  if (photoPreview?.startsWith("blob:")) {
+    URL.revokeObjectURL(photoPreview);
+  }
+  setPhotoPreview("");
+  setForm((prev) => ({ ...prev, photo: "" }));
+  console.log("Trainer image selection cleared");
 };
 
 return (
@@ -300,7 +318,16 @@ className="text-slate-900 hover:text-slate-600"
 <div className="w-20 h-20 rounded-full bg-slate-100 overflow-hidden border-2 border-slate-200">
 
 {photoPreview ? (
-<img src={photoPreview} className="w-full h-full object-cover"/>
+<>
+  <img src={photoPreview} className="w-full h-full object-cover" />
+  <button
+    type="button"
+    onClick={handleRemovePhoto}
+    className="mt-2 w-full text-xs text-red-500 hover:underline"
+  >
+    Remove
+  </button>
+</>
 ):null}
 
 </div>
@@ -311,7 +338,7 @@ Upload Photo
 
 <input
 type="file"
-accept="image/*"
+accept="image/png,image/jpeg,image/jpg,image/webp"
 onChange={handlePhotoChange}
 className="hidden"
 />

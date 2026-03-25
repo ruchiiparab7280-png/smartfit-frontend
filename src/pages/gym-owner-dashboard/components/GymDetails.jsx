@@ -30,8 +30,11 @@ const GymDetails = () => {
     upiId: ""
   });
 
-  const [images, setImages] = useState([]);
+  // Holds preview URLs + optional File objects for newly selected images.
+  // Existing images loaded from DB have no `file`.
+  const [imageItems, setImageItems] = useState([]);
   const [saved, setSaved] = useState(false);
+  const [errorMessage, setErrorMessage] = useState("");
 
   /* ================= FETCH DATA ================= */
 
@@ -59,6 +62,21 @@ setFormData({
     ? data.amenities.split(",").map((a) => a.trim())
     : [],
 });
+
+const rawImages = data?.images ?? data?.image;
+let existingImages = [];
+if (Array.isArray(rawImages)) {
+  existingImages = rawImages;
+} else if (typeof rawImages === "string") {
+  // Supabase may return JSON-stringified arrays.
+  try {
+    const parsed = JSON.parse(rawImages);
+    existingImages = Array.isArray(parsed) ? parsed : [rawImages];
+  } catch {
+    existingImages = [rawImages];
+  }
+}
+setImageItems(existingImages.filter(Boolean).map((src) => ({ src })));
       } catch (error) {
         console.log("Fetch error:", error);
       }
@@ -92,15 +110,42 @@ setFormData({
   /* ================= IMAGE UPLOAD ================= */
 
   const handleImageUpload = (e) => {
-    const files = Array.from(e.target.files);
+    const files = Array.from(e.target.files || []);
+    if (!files.length) return;
 
-    if (images.length + files.length > 6) {
-      alert("Maximum 6 images allowed");
-      return;
-    }
+    const allowedExts = new Set([".jpg", ".jpeg", ".png", ".webp"]);
+    const allowedMimes = new Set(["image/jpeg", "image/png", "image/webp"]);
 
-    const previews = files.map((file) => URL.createObjectURL(file));
-    setImages((prev) => [...prev, ...previews]);
+    const validItems = [];
+    files.forEach((file) => {
+      const ext = file?.name?.toLowerCase().match(/\.[a-z0-9]+$/)?.[0];
+      const isAllowed =
+        (ext && allowedExts.has(ext)) && allowedMimes.has(file.type);
+
+      if (!isAllowed) {
+        alert("Invalid image type. Allowed: jpg, jpeg, png, webp");
+        return;
+      }
+
+      validItems.push({
+        src: URL.createObjectURL(file),
+        file,
+      });
+    });
+
+    setImageItems((prev) => [...prev, ...validItems]);
+    // Allow selecting the same file again.
+    e.target.value = "";
+  };
+
+  const handleRemoveImage = (index) => {
+    setImageItems((prev) => {
+      const item = prev[index];
+      if (item?.file && item?.src?.startsWith("blob:")) {
+        URL.revokeObjectURL(item.src);
+      }
+      return prev.filter((_, i) => i !== index);
+    });
   };
 
   /* ================= SAVE ================= */
@@ -109,14 +154,37 @@ setFormData({
 
     e.preventDefault();
 
-   // if (images.length < 6) {
-      //alert("Please upload at least 6 gym images");
-      //return;
-    //}
+    setErrorMessage("");
+
+    if (imageItems.length < 6) {
+      setErrorMessage("Please upload at least 6 images");
+      return;
+    }
 
     try {
 
       const email = localStorage.getItem("userEmail");
+
+      // Upload only newly selected files; keep existing URLs as-is.
+      const imagesToSave = await Promise.all(
+        imageItems.map(async (item) => {
+          if (!item?.file) return item?.src;
+
+          const fd = new FormData();
+          fd.append("image", item.file);
+
+          const uploadRes = await fetch(
+            `${import.meta.env.VITE_API_URL}/upload`,
+            { method: "POST", body: fd }
+          );
+          const uploadData = await uploadRes.json();
+          console.log("✅ Gym image upload response:", uploadData);
+
+          return uploadData.image;
+        })
+      );
+
+      console.log("📌 Gym images URLs to save:", imagesToSave);
 
       const res = await fetch(
         `${import.meta.env.VITE_API_URL}/update-gym/${email}`,
@@ -133,7 +201,8 @@ setFormData({
             amenities: formData.amenities.join(", "),
             opening_time: formData.openingTime,
             closing_time: formData.closingTime,
-            upi_id: formData.upiId
+            upi_id: formData.upiId,
+            images: imagesToSave,
           })
         }
       );
@@ -320,28 +389,35 @@ setFormData({
           {/* Images */}
           <div className="md:col-span-2">
 
-            <p className="text-xs text-red-500 mb-2">
-              Minimum 6 gym images required
-            </p>
+            {errorMessage && (
+              <p className="text-sm text-red-500 mb-2">{errorMessage}</p>
+            )}
 
             <input
               type="file"
               multiple
-              accept="image/*"
+              accept="image/png,image/jpeg,image/jpg,image/webp"
               onChange={handleImageUpload}
             />
 
-            {images.length > 0 && (
-              <div className="flex gap-3 mt-4">
-
-                {images.map((img, i) => (
-                  <img
-                    key={i}
-                    src={img}
-                    className="w-20 h-20 object-cover rounded"
-                  />
+            {imageItems.length > 0 && (
+              <div className="flex flex-wrap gap-3 mt-4">
+                {imageItems.map((item, i) => (
+                  <div key={i} className="relative">
+                    <img
+                      src={item.src}
+                      className="w-20 h-20 object-cover rounded"
+                      alt={`Gym image ${i + 1}`}
+                    />
+                    <button
+                      type="button"
+                      onClick={() => handleRemoveImage(i)}
+                      className="absolute -top-2 -right-2 bg-red-600 text-white text-xs px-2 py-1 rounded-full"
+                    >
+                      Remove
+                    </button>
+                  </div>
                 ))}
-
               </div>
             )}
 
