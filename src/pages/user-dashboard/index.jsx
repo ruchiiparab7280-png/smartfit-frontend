@@ -8,7 +8,7 @@ import MembershipCard from "./components/MembershipCard";
 import WorkoutPlanCard from "./components/WorkoutPlanCard";
 import ProgressChart from "./components/ProgressChart";
 import BMICalculator from "./components/BMICalculator";
-import RecommendedGymCard from "./components/RecommendedGymCard";
+
 
 import FreeTrialRequests from "./components/FreeTrialRequests";
 import TrainerRequests from "./components/TrainerRequests";
@@ -247,8 +247,7 @@ return (
 case "bmi":
 return <BMICalculator/>
 
-case "gyms":
-return <RecommendedGymCard/>
+
 
 default:
 return <StatsOverview/>
@@ -307,9 +306,7 @@ return(
 <Icon name="Activity"/> BMI Calculator
 </button>
 
-<button onClick={()=>setActiveTab("gyms")} className="flex gap-3 items-center hover:text-primary">
-<Icon name="MapPin"/> Recommended Gyms
-</button>
+
 
 </div>
 
