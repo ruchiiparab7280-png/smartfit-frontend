@@ -65,8 +65,10 @@ setFormData({
     : [],
 });
 
-const rawImages = data?.images ?? data?.image;
-const existingImages = normalizeGymImages(rawImages);
+const rawImages = data?.gym_images;
+const existingImages = normalizeGymImages(rawImages).filter(
+  (src) => typeof src === "string" && !src.startsWith("blob:")
+);
 setImageItems(existingImages.map((src) => ({ src })));
       } catch (error) {
         console.log("Fetch error:", error);

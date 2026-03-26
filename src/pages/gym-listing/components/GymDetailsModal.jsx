@@ -9,7 +9,9 @@ const GymDetailsModal = ({ gym, isOpen, onClose }) => {
 
  const scrollRef = useRef(null);
 
-  const galleryImages = normalizeGymImages(gym?.images ?? gym?.image);
+  const galleryImages = normalizeGymImages(
+    gym?.gym_images ?? gym?.images ?? gym?.image
+  ).filter((src) => typeof src === "string" && !src.startsWith("blob:"));
   const galleryToShow = galleryImages.length ? galleryImages : ["/assets/images/no_image.png"];
 
   const [lightboxOpen, setLightboxOpen] = useState(false);
