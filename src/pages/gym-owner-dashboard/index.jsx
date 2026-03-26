@@ -21,7 +21,7 @@ const menuItems = [
   { id: "dashboard", label: "Dashboard", icon: <LayoutDashboard size={18} /> },
   { id: "gym-details", label: "Edit Gym Details", icon: <Building2 size={18} /> },
   { id: "trial-requests", label: "Free Trial Requests", icon: <Gift size={18} /> },
-  
+
   { id: "trainers", label: "Trainer Management", icon: <Users size={18} /> },
   { id: "trainer-requests", label: "Trainer Requests", icon: <UserPlus size={18} /> },
   { id: "supplements", label: "Supplement Management", icon: <Pill size={18} /> },
@@ -84,9 +84,8 @@ const GymOwnerDashboard = () => {
         />
       )}
       {/* Sidebar */}
-      <aside className={`fixed lg:static inset-y-0 left-0 z-30 w-64 bg-slate-900 flex flex-col transition-transform duration-300 ${
-        sidebarOpen ? 'translate-x-0' : '-translate-x-full lg:translate-x-0'
-      }`}>
+      <aside className={`fixed lg:static inset-y-0 left-0 z-30 w-64 bg-slate-900 flex flex-col transition-transform duration-300 ${sidebarOpen ? 'translate-x-0' : '-translate-x-full lg:translate-x-0'
+        }`}>
         {/* Logo */}
         <div className="flex items-center gap-3 px-6 py-5 border-b border-slate-700">
           <div className="w-9 h-9 bg-blue-600 rounded-lg flex items-center justify-center flex-shrink-0">
@@ -106,11 +105,10 @@ const GymOwnerDashboard = () => {
             <button
               key={item?.id}
               onClick={() => { setActiveSection(item?.id); setSidebarOpen(false); }}
-              className={`w-full flex items-center gap-3 px-3 py-2.5 rounded-lg mb-1 text-sm font-medium transition-colors ${
-                activeSection === item.id
-                ? 'bg-orange-500 text-white'
-                : 'text-slate-400 hover:text-white hover:bg-slate-800'
-              }`}
+              className={`w-full flex items-center gap-3 px-3 py-2.5 rounded-lg mb-1 text-sm font-medium transition-colors ${activeSection === item.id
+                  ? 'bg-orange-500 text-white'
+                  : 'text-slate-400 hover:text-white hover:bg-slate-800'
+                }`}
             >
               {item?.icon}
               <span>{item?.label}</span>
@@ -142,7 +140,7 @@ const GymOwnerDashboard = () => {
               </svg>
             </button>
             <div>
-             <h1 className="text-lg font-bold text-white">
+              <h1 className="text-lg font-bold text-white">
                 {menuItems?.find(m => m?.id === activeSection)?.label || 'Dashboard'}
               </h1>
               <p className="text-xs text-slate-400 hidden sm:block">SmartFit Multi Gym Management</p>
@@ -318,8 +316,8 @@ const DashboardHome = ({ setActiveSection }) => {
         const supplementChangePct =
           supplementSalesPrevMonth > 0
             ? ((supplementSalesThisMonth - supplementSalesPrevMonth) /
-                supplementSalesPrevMonth) *
-              100
+              supplementSalesPrevMonth) *
+            100
             : 0;
         const supplementPositive = supplementChangePct >= 0;
         const supplementChangeText = `${supplementChangePct >= 0 ? "+" : ""}${supplementChangePct.toFixed(
@@ -335,9 +333,8 @@ const DashboardHome = ({ setActiveSection }) => {
           .slice(0, 3)
           .forEach((r) => {
             activities.push({
-              text: `New trainer request from ${
-                r?.full_name || r?.user_email || r?.trainer_name || "Unknown"
-              }`,
+              text: `New trainer request from ${r?.full_name || r?.user_email || r?.trainer_name || "Unknown"
+                }`,
               time: formatRelativeTime(r?.date || r?.created_at || r?.requested_at),
               _sortTime: r?.date || r?.created_at || r?.requested_at || null,
               type: "request",
@@ -397,7 +394,7 @@ const DashboardHome = ({ setActiveSection }) => {
 
         setStatCards([
           {
-            label: "Monthly Revenue",
+            label: "This Month Revenue",
             value: `₹${formatINR(monthlyRevenue)}`,
             change: monthlyChangeText,
             positive: monthlyPositive,
@@ -460,11 +457,10 @@ const DashboardHome = ({ setActiveSection }) => {
             <div className="flex items-center justify-between mb-3">
               <span className="text-2xl">{card?.icon}</span>
               <span
-                className={`text-xs font-semibold px-2 py-0.5 rounded-full ${
-                  card?.positive
+                className={`text-xs font-semibold px-2 py-0.5 rounded-full ${card?.positive
                     ? "bg-green-100 text-green-700"
                     : "bg-red-100 text-red-600"
-                }`}
+                  }`}
               >
                 {card?.change}
               </span>
