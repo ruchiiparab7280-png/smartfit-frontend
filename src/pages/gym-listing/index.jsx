@@ -9,7 +9,7 @@ import MapView from "./components/MapView";
 import SearchBar from './components/SearchBar';
 import SortControls from './components/SortControls';
 import GymDetailsModal from './components/GymDetailsModal';
-import { normalizeGymImages } from '../../utils/gymImageUtils';
+import { normalizeGymImages, normalizeImageUrl } from '../../utils/gymImageUtils';
 
 const GymListing = () => {
   const calculateDistance = (lat1, lon1, lat2, lon2) => {
@@ -156,7 +156,7 @@ const memberships = await membershipRes.json();
     trainers: trainers.map(t => ({
       name: t.name,
       price: t.price,
-      image: t.image
+      image: normalizeImageUrl(t.image) || ''
     })),
 
  supplements: supplements.map(s => ({

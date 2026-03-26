@@ -1,4 +1,5 @@
 import React, { useState, useEffect } from 'react';
+import { normalizeImageUrl } from '../../../utils/gymImageUtils';
 
 const emptyForm = { name: '', photo: '', specialization: '', pricePerSession: '' };
 
@@ -28,7 +29,7 @@ useEffect(() => {
         data.map((t)=>({
           id:t.id,
           name:t.name,
-          photo:t.image,
+          photo:normalizeImageUrl(t.image) || '',
           specialization:t.specialization,
           pricePerSession:t.price
         }))
@@ -83,7 +84,7 @@ const handleDelete = async (id) => {
       data.map((t)=>({
         id:t.id,
         name:t.name,
-        photo:t.image,
+        photo:normalizeImageUrl(t.image) || '',
         specialization:t.specialization,
         pricePerSession:t.price
       }))
@@ -142,7 +143,7 @@ const handleSubmit = async (e) => {
       });
       const uploadData = await uploadRes.json();
       console.log("✅ Trainer upload response:", uploadData);
-      imageUrl = uploadData.image;
+      imageUrl = normalizeImageUrl(uploadData.image) || uploadData.image;
     }
 
     if (!imageUrl) {
@@ -183,7 +184,7 @@ const handleSubmit = async (e) => {
       data.map((t) => ({
         id: t.id,
         name: t.name,
-        photo: t.image,
+        photo: normalizeImageUrl(t.image) || '',
         specialization: t.specialization,
         pricePerSession: t.price,
       }))
@@ -247,7 +248,9 @@ className="bg-[#111827] rounded-xl shadow-lg shadow-blue-900/40 border border-sl
 >
 
 <img
-src={trainer?.photo}
+src={trainer?.photo || '/assets/images/no_image.png'}
+alt={trainer?.name || 'Trainer'}
+onError={(e) => { e.target.onerror = null; e.target.src = '/assets/images/no_image.png'; }}
 className="w-20 h-20 rounded-full object-cover border-4 border-blue-100 mb-3"
 />
 

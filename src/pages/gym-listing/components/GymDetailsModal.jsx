@@ -684,8 +684,9 @@ Book Free Trial
       >
 
         <img
-          src={trainer.image}
-          alt="trainer"
+          src={trainer.image || '/assets/images/no_image.png'}
+          alt={trainer.name || 'Trainer'}
+          onError={(e) => { e.target.onerror = null; e.target.src = '/assets/images/no_image.png'; }}
           className="w-20 h-20 mx-auto rounded-full object-cover mb-2"
         />
 
