@@ -1,5 +1,6 @@
 import React, { useState, useEffect } from "react";
 import { normalizeGymImages } from "../../../utils/gymImageUtils";
+import { supabase } from "../../../lib/supabase";
 
 const amenitiesList = [
   "Cardio Equipment",
@@ -141,7 +142,7 @@ setImageItems(existingImages.map((src) => ({ src })));
   /* ================= SAVE ================= */
 
   const handleSave = async (e) => {
-
+    console.log("IMAGE ITEMS:", imageItems); // 👈 YAHAN LAGANA HAI
     e.preventDefault();
 
     setErrorMessage("");
@@ -155,22 +156,43 @@ setImageItems(existingImages.map((src) => ({ src })));
 
       const email = localStorage.getItem("userEmail");
 
+      const bucketName = "gym-images";
+
       // Upload only newly selected files; keep existing URLs as-is.
+      // Result: store an array of public URLs in the gym table.
       const imagesToSave = await Promise.all(
         imageItems.map(async (item) => {
           if (!item?.file) return item?.src;
 
-          const fd = new FormData();
-          fd.append("image", item.file);
+          const extFromName =
+            item.file?.name?.split(".")?.pop()?.toLowerCase() || "jpg";
+          const allowedExts = new Set(["jpg", "jpeg", "png", "webp"]);
+          const ext = allowedExts.has(extFromName) ? extFromName : "jpg";
 
-          const uploadRes = await fetch(
-            `${import.meta.env.VITE_API_URL}/upload`,
-            { method: "POST", body: fd }
-          );
-          const uploadData = await uploadRes.json();
-          console.log("✅ Gym image upload response:", uploadData);
+          const rand =
+            typeof globalThis.crypto?.randomUUID === "function"
+              ? globalThis.crypto.randomUUID()
+              : `${Math.random().toString(16).slice(2)}${Date.now()}`;
 
-          return uploadData.image;
+          const filePath = `${email}/${Date.now()}-${rand}.${ext}`;
+
+          const { error: uploadError } = await supabase.storage
+            .from(bucketName)
+            .upload(filePath, item.file, {
+              upsert: false,
+              contentType: item.file.type,
+            });
+
+          if (uploadError) {
+            console.error("Supabase upload error:", uploadError);
+            throw new Error("Failed to upload gym images");
+          }
+
+          const { data: publicData } = supabase.storage
+            .from(bucketName)
+            .getPublicUrl(filePath);
+
+          return publicData.publicUrl;
         })
       );
 
