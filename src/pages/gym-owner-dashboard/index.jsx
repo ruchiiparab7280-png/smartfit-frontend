@@ -6,6 +6,7 @@ import TrainerRequests from './components/TrainerRequests';
 import SupplementManagement from './components/SupplementManagement';
 import MembershipManagement from './components/MembershipManagement';
 import Earnings from './components/Earnings';
+import Reviews from './components/Reviews';
 import {
   LayoutDashboard,
   Building2,
@@ -14,7 +15,8 @@ import {
   Gift,
   Pill,
   CreditCard,
-  DollarSign
+  DollarSign,
+  Star
 } from "lucide-react";
 
 const menuItems = [
@@ -26,6 +28,7 @@ const menuItems = [
   { id: "trainer-requests", label: "Trainer Requests", icon: <UserPlus size={18} /> },
   { id: "supplements", label: "Supplement Management", icon: <Pill size={18} /> },
   { id: "memberships", label: "Membership Management", icon: <CreditCard size={18} /> },
+  { id: "reviews", label: "Reviews", icon: <Star size={18} /> },
   { id: "earnings", label: "Earnings", icon: <DollarSign size={18} /> },
 ];
 
@@ -69,6 +72,7 @@ const GymOwnerDashboard = () => {
       case 'trainer-requests': return <TrainerRequests />;
       case 'supplements': return <SupplementManagement />;
       case 'memberships': return <MembershipManagement />;
+      case 'reviews': return <Reviews />;
       case 'earnings': return <Earnings />;
       default: return <DashboardHome setActiveSection={setActiveSection} />;
     }
