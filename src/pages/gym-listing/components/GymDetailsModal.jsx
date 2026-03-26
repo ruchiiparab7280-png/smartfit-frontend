@@ -11,8 +11,10 @@ const GymDetailsModal = ({ gym, isOpen, onClose }) => {
 
   const galleryImages = normalizeGymImages(
     gym?.gym_images ?? gym?.images ?? gym?.image
-  ).filter((src) => typeof src === "string" && !src.startsWith("blob:"));
-  const galleryToShow = galleryImages.length ? galleryImages : ["/assets/images/no_image.png"];
+  );
+  const galleryToShow = galleryImages.length
+    ? galleryImages
+    : ["/assets/images/no_image.png"];
 
   const [lightboxOpen, setLightboxOpen] = useState(false);
   const [lightboxIndex, setLightboxIndex] = useState(0);
@@ -447,7 +449,7 @@ const calculateMembershipExpiry = (startDateValue, durationValue) => {
 const scrollLeft = () => {
   if (!scrollRef.current) return;
   scrollRef.current.scrollBy({
-    left: -600,
+    left: -scrollRef.current.clientWidth,
     behavior: "smooth"
   });
 };
@@ -455,7 +457,7 @@ const scrollLeft = () => {
 const scrollRight = () => {
   if (!scrollRef.current) return;
   scrollRef.current.scrollBy({
-    left: 600,
+    left: scrollRef.current.clientWidth,
     behavior: "smooth"
   });
 };
@@ -502,20 +504,20 @@ const scrollRight = () => {
 
 <div
   ref={scrollRef}
-  className="flex overflow-x-auto h-full scroll-smooth no-scrollbar"
+  className="flex overflow-x-auto h-full scroll-smooth no-scrollbar snap-x snap-mandatory"
 >
   {galleryToShow.map((img, index) => (
     <button
       key={index}
       type="button"
       onClick={() => openLightbox(index)}
-      className="min-w-full h-full flex-shrink-0"
+      className="min-w-full h-full flex-shrink-0 snap-center"
       aria-label={`View image ${index + 1}`}
     >
       <Image
         src={img}
         alt={`Gym image ${index + 1}`}
-        className="min-w-full h-full object-cover flex-shrink-0"
+        className="w-full h-full object-cover flex-shrink-0"
       />
     </button>
   ))}

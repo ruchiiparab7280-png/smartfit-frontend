@@ -61,21 +61,38 @@ export function normalizeGymImages(imagesField) {
   if (!imagesField) return [];
 
   if (Array.isArray(imagesField)) {
-    return imagesField.map(normalizeImageUrl).filter(Boolean);
+    return imagesField
+      .map(normalizeImageUrl)
+      .filter(
+        (url) => typeof url === "string" && url.startsWith("http") && !url.startsWith("blob:")
+      );
   }
 
   if (typeof imagesField === "string") {
     if (isProbablyJsonArrayString(imagesField)) {
       try {
         const parsed = JSON.parse(imagesField);
-        if (Array.isArray(parsed)) return parsed.map(normalizeImageUrl).filter(Boolean);
+        if (Array.isArray(parsed)) {
+          return parsed
+            .map(normalizeImageUrl)
+            .filter(
+              (url) =>
+                typeof url === "string" &&
+                url.startsWith("http") &&
+                !url.startsWith("blob:")
+            );
+        }
       } catch {
         // fallthrough to treating it as a single url
       }
     }
 
     const normalized = normalizeImageUrl(imagesField);
-    return normalized ? [normalized] : [];
+    if (!normalized) return [];
+    if (typeof normalized !== "string") return [];
+    if (!normalized.startsWith("http")) return [];
+    if (normalized.startsWith("blob:")) return [];
+    return [normalized];
   }
 
   // Unknown type.

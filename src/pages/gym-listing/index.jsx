@@ -139,9 +139,7 @@ const memberships = await membershipRes.json();
 
   description: gym.gym_description,
   ...(function buildImages() {
-    const normalizedImages = normalizeGymImages(gym.gym_images).filter(
-      (src) => typeof src === "string" && !src.startsWith("blob:")
-    );
+    const normalizedImages = normalizeGymImages(gym.gym_images);
     return {
       image: normalizedImages[0],
       images: normalizedImages
