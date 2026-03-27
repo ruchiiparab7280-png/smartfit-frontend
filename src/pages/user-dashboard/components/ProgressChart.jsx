@@ -19,41 +19,34 @@ const ProgressChart = ({ workouts }) => {
 
 const [chartType,setChartType] = useState("workouts")
 
-/* WORKOUT SESSIONS DATA */
+/* WORKOUT SESSIONS DATA – group by day */
 
-const workoutData = workouts.map((day,index)=>({
-month:`Day ${index+1}`,
-sessions: day.exercises.length
-}))
+const DAYS = ["Monday", "Tuesday", "Wednesday", "Thursday", "Friday", "Saturday", "Sunday"];
+
+const workoutData = DAYS.map(d => ({
+  month: d.slice(0, 3),
+  sessions: (workouts || []).filter(w => w.day === d).length
+}));
 
 
-/* CALORIES AUTO CALCULATION */
+/* CALORIES AUTO CALCULATION – estimate 8 cal per set */
 
-const caloriesData = workouts.map((day,index)=>{
-
-let calories = 0
-
-day.exercises.forEach(ex=>{
-if(ex.completed){
-calories += 8
-}
-})
-
-return{
-month:`Day ${index+1}`,
-burned: calories
-}
-
-})
+const caloriesData = DAYS.map(d => {
+  let calories = 0;
+  (workouts || []).filter(w => w.day === d).forEach(w => {
+    calories += (w.sets || 1) * 8;
+  });
+  return { month: d.slice(0, 3), burned: calories };
+});
 
 
 /* WEIGHT DATA (placeholder until weight tracking added) */
 
-const weightData = workouts.map((day,index)=>({
-month:`Day ${index+1}`,
-weight:180 - index,
-target:170
-}))
+const weightData = DAYS.map((d, index) => ({
+  month: d.slice(0, 3),
+  weight: 180 - index,
+  target: 170
+}));
 
 
 const chartOptions = [

@@ -156,13 +156,18 @@ const fetchWorkouts = async ()=>{
 
 const email = localStorage.getItem("userEmail")
 
+try {
 const res = await fetch(
-`${import.meta.env.VITE_API_URL}/user-workouts/${email}`
+`${import.meta.env.VITE_API_URL}/workouts/${email}`
 )
 
 const data = await res.json()
 
-setWorkouts(data)
+setWorkouts(Array.isArray(data) ? data : [])
+} catch(err) {
+console.log("Workout fetch error", err)
+setWorkouts([])
+}
 
 }
 
@@ -196,40 +201,17 @@ fetchProfile()
 },[])
 
 const calculateStreak = (workouts) => {
-
-let streak = 0
-
-for(let i = 0; i < workouts.length; i++){
-
-const allCompleted = workouts[i].exercises?.every(ex => ex.completed)
-
-if(allCompleted){
-streak++
-}else{
-break
-}
-
-}
-
-return streak
-
+// With flat rows, streak = number of distinct days that have workouts
+const days = new Set((workouts || []).map(w => w.day));
+return days.size;
 }
 const calculateCalories = (workouts) => {
-
-let total = 0
-
-workouts.forEach(day=>{
-if(day.exercises){
-day.exercises.forEach(ex=>{
-if(ex.completed){
-total += 8
-}
-})
-}
-})
-
-return total
-
+// Estimate: each exercise burns ~8 calories per set
+let total = 0;
+(workouts || []).forEach(w => {
+total += (w.sets || 1) * 8;
+});
+return total;
 }
 
 const [activeTab,setActiveTab] = useState("dashboard")
