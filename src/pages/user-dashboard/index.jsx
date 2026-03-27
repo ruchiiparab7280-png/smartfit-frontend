@@ -1,6 +1,7 @@
 import React, { useState, useEffect } from "react";
 import MainNavigation from "../../components/MainNavigation";
 import Icon from "../../components/AppIcon";
+import { supabase } from "../../lib/supabase";
 
 import StatsOverview from "./components/StatsOverview";
 import ProfileCard from "./components/ProfileCard";
@@ -157,12 +158,15 @@ const fetchWorkouts = async ()=>{
 const email = localStorage.getItem("userEmail")
 
 try {
-const res = await fetch(
-`${import.meta.env.VITE_API_URL}/workouts/${email}`
-)
+const { data, error } = await supabase
+  .from("workouts")
+  .select("*")
+  .eq("user_id", email)
+  .order("created_at", { ascending: true });
 
-const data = await res.json()
+if (error) throw error;
 
+console.log("✅ Fetched workouts:", data);
 setWorkouts(Array.isArray(data) ? data : [])
 } catch(err) {
 console.log("Workout fetch error", err)

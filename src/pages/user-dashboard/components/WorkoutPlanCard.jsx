@@ -2,8 +2,8 @@ import React, { useState, useEffect, useCallback } from "react";
 import { motion, AnimatePresence } from "framer-motion";
 import Icon from "../../../components/AppIcon";
 import Button from "../../../components/ui/Button";
+import { supabase } from "../../../lib/supabase";
 
-const API = import.meta.env.VITE_API_URL;
 const DAYS = ["Monday", "Tuesday", "Wednesday", "Thursday", "Friday", "Saturday", "Sunday"];
 
 /* ───────────── Toast Component ───────────── */
@@ -75,30 +75,69 @@ const WorkoutPlanCard = ({ workouts, setWorkouts }) => {
     return Object.keys(errors).length === 0;
   };
 
-  /* ─── CRUD ─── */
-  const addWorkout = async () => {
-    if (!validate()) return;
-    setLoading(true);
-    try {
-      const res = await fetch(`${API}/workouts`, {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({
-          user_id: userEmail,
-          day: activeDay,
-          exercise: exercise.trim(),
-          sets: Number(sets),
-          reps: Number(reps),
-          duration: duration.trim(),
-        }),
-      });
-      const data = await res.json();
-      if (!res.ok) throw new Error(data.message);
+  /* ─── CRUD via Supabase client directly ─── */
 
-      setWorkouts((prev) => [...prev, data.workout]);
-      showToast("Workout added successfully!");
+  const addWorkout = async () => {
+    console.log("🟡 addWorkout triggered");
+    if (!validate()) {
+      console.log("❌ Validation failed", formErrors);
+      return;
+    }
+
+    if (!userEmail) {
+      showToast("Please log in first to add workouts", "error");
+      console.error("❌ user_id is null — not logged in");
+      return;
+    }
+
+    setLoading(true);
+
+    // Build payload – try with duration first, fallback without it
+    const baseCols = {
+      user_id: userEmail,
+      day: activeDay,
+      exercise: exercise.trim(),
+      sets: Number(sets),
+      reps: Number(reps),
+    };
+
+    const payloadWithDuration = { ...baseCols, duration: duration.trim() || "" };
+
+    console.log("📤 Sending to Supabase:", payloadWithDuration);
+
+    try {
+      // Attempt with duration column
+      let { data, error } = await supabase
+        .from("workouts")
+        .insert([payloadWithDuration])
+        .select();
+
+      // If duration column doesn't exist, retry without it
+      if (error && error.code === "PGRST204" && error.message?.includes("duration")) {
+        console.log("⚠️ 'duration' column missing, retrying without it...");
+        const result = await supabase
+          .from("workouts")
+          .insert([baseCols])
+          .select();
+        data = result.data;
+        error = result.error;
+      }
+
+      console.log("📥 Supabase response:", { data, error });
+
+      if (error) throw error;
+
+      if (data && data[0]) {
+        setWorkouts((prev) => [...(prev || []), data[0]]);
+        console.log("✅ Workout added to state:", data[0]);
+        showToast("Workout added successfully!");
+      } else {
+        throw new Error("No data returned from insert");
+      }
+
       resetForm();
     } catch (err) {
+      console.error("❌ Add workout error:", err);
       showToast(err.message || "Failed to add workout", "error");
     } finally {
       setLoading(false);
@@ -106,33 +145,54 @@ const WorkoutPlanCard = ({ workouts, setWorkouts }) => {
   };
 
   const updateWorkout = async () => {
+    console.log("🟡 updateWorkout triggered, id:", editingId);
     if (!validate()) return;
-    setLoading(true);
-    try {
-      const res = await fetch(`${API}/workouts/${editingId}`, {
-        method: "PUT",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({
-          exercise: exercise.trim(),
-          sets: Number(sets),
-          reps: Number(reps),
-          duration: duration.trim(),
-        }),
-      });
-      const data = await res.json();
-      if (!res.ok) throw new Error(data.message);
 
-      // Optimistic update
+    setLoading(true);
+
+    try {
+      const payload = {
+        exercise: exercise.trim(),
+        sets: Number(sets),
+        reps: Number(reps),
+      };
+
+      // Try adding duration; ignore if column missing
+      const durVal = duration.trim() || "";
+
+      console.log("📤 Updating workout:", editingId, payload);
+
+      let { data, error } = await supabase
+        .from("workouts")
+        .update({ ...payload, duration: durVal })
+        .eq("id", editingId)
+        .select();
+
+      if (error && error.code === "PGRST204" && error.message?.includes("duration")) {
+        console.log("⚠️ 'duration' column missing, retrying without it...");
+        const result = await supabase
+          .from("workouts")
+          .update(payload)
+          .eq("id", editingId)
+          .select();
+        data = result.data;
+        error = result.error;
+      }
+
+      console.log("📥 Update response:", { data, error });
+
+      if (error) throw error;
+
       setWorkouts((prev) =>
-        prev.map((w) =>
-          w.id === editingId
-            ? { ...w, exercise: exercise.trim(), sets: Number(sets), reps: Number(reps), duration: duration.trim() }
-            : w
+        (prev || []).map((w) =>
+          w.id === editingId ? { ...w, ...payload, duration: durVal } : w
         )
       );
+
       showToast("Workout updated successfully!");
       resetForm();
     } catch (err) {
+      console.error("❌ Update workout error:", err);
       showToast(err.message || "Failed to update workout", "error");
     } finally {
       setLoading(false);
@@ -140,15 +200,24 @@ const WorkoutPlanCard = ({ workouts, setWorkouts }) => {
   };
 
   const deleteWorkout = async (id) => {
+    console.log("🟡 deleteWorkout triggered, id:", id);
+
     // Optimistic remove
-    const prev = [...workouts];
-    setWorkouts((p) => p.filter((w) => w.id !== id));
+    const prev = [...(workouts || [])];
+    setWorkouts((p) => (p || []).filter((w) => w.id !== id));
 
     try {
-      const res = await fetch(`${API}/workouts/${id}`, { method: "DELETE" });
-      if (!res.ok) throw new Error();
+      const { error } = await supabase
+        .from("workouts")
+        .delete()
+        .eq("id", id);
+
+      console.log("📥 Delete response:", { error });
+
+      if (error) throw error;
       showToast("Workout deleted!");
-    } catch {
+    } catch (err) {
+      console.error("❌ Delete workout error:", err);
       setWorkouts(prev); // rollback
       showToast("Failed to delete workout", "error");
     }
@@ -305,7 +374,12 @@ const WorkoutPlanCard = ({ workouts, setWorkouts }) => {
 
                 <div className="flex gap-2 pt-1">
                   <Button
-                    onClick={editingId ? updateWorkout : addWorkout}
+                    onClick={(e) => {
+                      e.preventDefault();
+                      e.stopPropagation();
+                      if (editingId) updateWorkout();
+                      else addWorkout();
+                    }}
                     loading={loading}
                     className="bg-gradient-to-r from-orange-500 to-rose-500 hover:from-orange-600 hover:to-rose-600 text-white rounded-xl"
                   >
