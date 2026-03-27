@@ -951,7 +951,7 @@ Confirm Booking
 
 <button
 onClick={()=>setShowTrainerModal(false)}
-className="mt-2 text-sm text-gray-900"
+className="mt-2 text-sm text-gray-200"
 >
 Cancel
 </button>
@@ -1014,7 +1014,7 @@ Confirm Booking
 
 <button
 onClick={()=>setShowTrialModal(false)}
-className="mt-2 text-sm text-gray-900"
+className="mt-2 text-sm text-gray-200"
 >
 Cancel
 </button>
