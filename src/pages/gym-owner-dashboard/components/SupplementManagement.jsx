@@ -1,4 +1,5 @@
 import React, { useState, useEffect } from "react";
+import { normalizeImageUrl } from '../../../utils/gymImageUtils';
 
 const emptyForm = {
   name: "",
@@ -35,7 +36,10 @@ const res = await fetch(
 
 const data = await res.json();
 
-setSupplements(data);
+setSupplements(data.map(s => ({
+  ...s,
+  image: normalizeImageUrl(s.image) || '/assets/images/no_image.png'
+})));
 
 }catch(err){
 
@@ -358,8 +362,9 @@ className="relative z-10 bg-[#111827] rounded-xl shadow-sm border border-slate-8
 <div className="h-44 bg-[#111827] overflow-hidden">
 
 <img
-src={s.image}
+src={s.image || '/assets/images/no_image.png'}
 alt="supplement"
+onError={(e) => { e.target.onerror = null; e.target.src = '/assets/images/no_image.png'; }}
 className="w-full h-full object-cover"
 />
 

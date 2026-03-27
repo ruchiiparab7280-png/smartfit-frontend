@@ -733,8 +733,9 @@ Book Free Trial
       >
 
         <img
-          src={item.image}
+          src={item.image || '/assets/images/no_image.png'}
           alt="supplement"
+          onError={(e) => { e.target.onerror = null; e.target.src = '/assets/images/no_image.png'; }}
           className="w-20 h-20 mx-auto rounded object-cover mb-2"
         />
 
