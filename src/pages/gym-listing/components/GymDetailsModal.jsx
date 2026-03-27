@@ -1083,7 +1083,7 @@ Confirm Order </button>
 
 <button
 onClick={()=>setShowSupplementModal(false)}
-className="mt-2 text-sm text-gray-900"
+className="mt-2 text-sm text-gray-200"
 
 >
 
@@ -1136,7 +1136,7 @@ Submit Review
 
 <button
 onClick={()=>setShowReviewModal(false)}
-className="mt-2 text-sm text-gray-900"
+className="mt-2 text-sm text-gray-200"
 >
 Cancel
 </button>
@@ -1192,7 +1192,7 @@ className="w-full mb-3 p-2 border rounded"
 
       <button
         onClick={() => setShowBookingModal(false)}
-        className="mt-2 text-sm text-gray-900"
+        className="mt-2 text-sm text-gray-200"
       >
         Cancel
       </button>
