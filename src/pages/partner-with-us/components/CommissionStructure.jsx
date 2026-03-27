@@ -16,13 +16,10 @@ const CommissionStructure = () => {
       </div>
 
       {/* CENTERED GRID LIKE BENEFITS */}
-      <div className="grid grid-cols-1 md:grid-cols-3 gap-6 justify-items-center">
-
-        {/* Empty for spacing */}
-        <div className="hidden md:block"></div>
+      <div className="flex justify-center">
 
         {/* MAIN CARD */}
-        <div className="w-full max-w-md border-2 border-primary rounded-lg p-6 text-center relative">
+        <div className="w-full max-w-xl border-2 border-primary rounded-lg p-6 text-center relative">
 
           {/* Recommended Badge */}
           <div className="absolute -top-4 left-1/2 -translate-x-1/2 bg-primary text-white px-4 py-1 rounded-full text-sm font-semibold">
@@ -78,9 +75,6 @@ const CommissionStructure = () => {
   </li>
 </ul>
 </div>
-
-        {/* Empty for spacing */}
-        <div className="hidden md:block"></div>
 
       </div>
 
