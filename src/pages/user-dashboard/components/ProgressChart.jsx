@@ -1,15 +1,15 @@
 import React, { useState } from "react";
 import {
-LineChart,
-Line,
-BarChart,
-Bar,
-XAxis,
-YAxis,
-CartesianGrid,
-Tooltip,
-Legend,
-ResponsiveContainer
+  LineChart,
+  Line,
+  BarChart,
+  Bar,
+  XAxis,
+  YAxis,
+  CartesianGrid,
+  Tooltip,
+  Legend,
+  ResponsiveContainer
 } from "recharts";
 
 import Icon from "../../../components/AppIcon";
@@ -17,212 +17,219 @@ import Button from "../../../components/ui/Button";
 
 const ProgressChart = ({ workouts }) => {
 
-const [chartType,setChartType] = useState("workouts")
+  const [chartType, setChartType] = useState("workouts")
 
-/* WORKOUT SESSIONS DATA – group by day */
+  /* WORKOUT SESSIONS DATA */
 
-const DAYS = ["Monday", "Tuesday", "Wednesday", "Thursday", "Friday", "Saturday", "Sunday"];
+  const workoutData = workouts.map((day, index) => ({
+    month: `Day ${index + 1}`,
+    sessions: day.exercises.length
+  }))
 
-const workoutData = DAYS.map(d => ({
-  month: d.slice(0, 3),
-  sessions: (workouts || []).filter(w => w.day === d).length
-}));
 
+  /* CALORIES AUTO CALCULATION */
 
-/* CALORIES AUTO CALCULATION – estimate 8 cal per set */
+  const caloriesData = workouts.map((day, index) => {
 
-const caloriesData = DAYS.map(d => {
-  let calories = 0;
-  (workouts || []).filter(w => w.day === d).forEach(w => {
-    calories += (w.sets || 1) * 8;
-  });
-  return { month: d.slice(0, 3), burned: calories };
-});
+    let calories = 0
 
+    day.exercises.forEach(ex => {
+      if (ex.completed) {
+        calories += 8
+      }
+    })
 
-/* WEIGHT DATA (placeholder until weight tracking added) */
+    return {
+      month: `Day ${index + 1}`,
+      burned: calories
+    }
 
-const weightData = DAYS.map((d, index) => ({
-  month: d.slice(0, 3),
-  weight: 180 - index,
-  target: 170
-}));
+  })
 
 
-const chartOptions = [
-{ id:"weight",label:"Weight Progress",icon:"TrendingDown" },
-{ id:"workouts",label:"Workout Sessions",icon:"Activity" },
-{ id:"calories",label:"Calorie Tracking",icon:"Flame" }
-]
+  /* WEIGHT DATA (placeholder until weight tracking added) */
 
+  const weightData = workouts.map((day, index) => ({
+    month: `Day ${index + 1}`,
+    weight: 180 - index,
+    target: 170
+  }))
 
-return(
 
-<div className="bg-card rounded-lg p-6 w-full overflow-hidden">
+  const chartOptions = [
+    { id: "weight", label: "Weight Progress", icon: "TrendingDown" },
+    { id: "workouts", label: "Workout Sessions", icon: "Activity" },
+    { id: "calories", label: "Calorie Tracking", icon: "Flame" }
+  ]
 
-{/* HEADER */}
 
-<div className="flex flex-col lg:flex-row lg:items-center justify-between gap-4 mb-6">
+  return (
 
-<h2 className="text-2xl font-bold text-foreground">
-Progress Tracking
-</h2>
+    <div className="bg-card rounded-lg p-6 w-full overflow-hidden">
 
-<div className="flex flex-wrap gap-2">
+      {/* HEADER */}
 
-{chartOptions.map(option=>(
-<Button
-key={option.id}
-variant={chartType === option.id ? "default" : "outline"}
-size="sm"
-iconName={option.icon}
-iconPosition="left"
-onClick={()=>setChartType(option.id)}
->
-{option.label}
-</Button>
-))}
+      <div className="flex flex-col lg:flex-row lg:items-center justify-between gap-4 mb-6">
 
-</div>
+        <h2 className="text-2xl font-bold text-foreground">
+          Progress Tracking
+        </h2>
 
-</div>
+        <div className="flex flex-wrap gap-2">
 
+          {chartOptions.map(option => (
+            <Button
+              key={option.id}
+              variant={chartType === option.id ? "default" : "outline"}
+              size="sm"
+              iconName={option.icon}
+              iconPosition="left"
+              onClick={() => setChartType(option.id)}
+            >
+              {option.label}
+            </Button>
+          ))}
 
-{/* CHART */}
+        </div>
 
-<div className="w-full h-[320px]">
+      </div>
 
 
-{/* WEIGHT CHART */}
+      {/* CHART */}
 
-{chartType === "weight" && (
+      <div className="w-full h-[320px]">
 
-<ResponsiveContainer width="100%" height="100%">
 
-<LineChart data={weightData}>
+        {/* WEIGHT CHART */}
 
-<CartesianGrid strokeDasharray="3 3" stroke="var(--color-border)" />
+        {chartType === "weight" && (
 
-<XAxis dataKey="month" stroke="var(--color-muted-foreground)" />
+          <ResponsiveContainer width="100%" height="100%">
 
-<YAxis stroke="var(--color-muted-foreground)" />
+            <LineChart data={weightData}>
 
-<Tooltip
-contentStyle={{
-backgroundColor:"var(--color-card)",
-border:"1px solid var(--color-border)",
-borderRadius:"8px"
-}}
-/>
+              <CartesianGrid strokeDasharray="3 3" stroke="var(--color-border)" />
 
-<Legend/>
+              <XAxis dataKey="month" stroke="var(--color-muted-foreground)" />
 
-<Line
-type="monotone"
-dataKey="weight"
-stroke="var(--color-primary)"
-strokeWidth={3}
-name="Current Weight"
-/>
+              <YAxis stroke="var(--color-muted-foreground)" />
 
-<Line
-type="monotone"
-dataKey="target"
-stroke="var(--color-success)"
-strokeWidth={2}
-strokeDasharray="5 5"
-name="Target Weight"
-/>
+              <Tooltip
+                contentStyle={{
+                  backgroundColor: "var(--color-card)",
+                  border: "1px solid var(--color-border)",
+                  borderRadius: "8px"
+                }}
+              />
 
-</LineChart>
+              <Legend />
 
-</ResponsiveContainer>
+              <Line
+                type="monotone"
+                dataKey="weight"
+                stroke="var(--color-primary)"
+                strokeWidth={3}
+                name="Current Weight"
+              />
 
-)}
+              <Line
+                type="monotone"
+                dataKey="target"
+                stroke="var(--color-success)"
+                strokeWidth={2}
+                strokeDasharray="5 5"
+                name="Target Weight"
+              />
 
+            </LineChart>
 
-{/* WORKOUT SESSIONS */}
+          </ResponsiveContainer>
 
-{chartType === "workouts" && (
+        )}
 
-<ResponsiveContainer width="100%" height="100%">
 
-<BarChart data={workoutData}>
+        {/* WORKOUT SESSIONS */}
 
-<CartesianGrid strokeDasharray="3 3" stroke="var(--color-border)" />
+        {chartType === "workouts" && (
 
-<XAxis dataKey="month" stroke="var(--color-muted-foreground)" />
+          <ResponsiveContainer width="100%" height="100%">
 
-<YAxis stroke="var(--color-muted-foreground)" />
+            <BarChart data={workoutData}>
 
-<Tooltip
-contentStyle={{
-backgroundColor:"var(--color-card)",
-border:"1px solid var(--color-border)",
-borderRadius:"8px"
-}}
-/>
+              <CartesianGrid strokeDasharray="3 3" stroke="var(--color-border)" />
 
-<Legend/>
+              <XAxis dataKey="month" stroke="var(--color-muted-foreground)" />
 
-<Bar
-dataKey="sessions"
-fill="var(--color-accent)"
-radius={[6,6,0,0]}
-name="Workout Sessions"
-/>
+              <YAxis stroke="var(--color-muted-foreground)" />
 
-</BarChart>
+              <Tooltip
+                contentStyle={{
+                  backgroundColor: "var(--color-card)",
+                  border: "1px solid var(--color-border)",
+                  borderRadius: "8px"
+                }}
+              />
 
-</ResponsiveContainer>
+              <Legend />
 
-)}
+              <Bar
+                dataKey="sessions"
+                fill="var(--color-accent)"
+                radius={[6, 6, 0, 0]}
+                name="Workout Sessions"
+              />
 
+            </BarChart>
 
-{/* CALORIES */}
+          </ResponsiveContainer>
 
-{chartType === "calories" && (
+        )}
 
-<ResponsiveContainer width="100%" height="100%">
 
-<LineChart data={caloriesData}>
+        {/* CALORIES */}
 
-<CartesianGrid strokeDasharray="3 3" stroke="var(--color-border)" />
+        {chartType === "calories" && (
 
-<XAxis dataKey="month" stroke="var(--color-muted-foreground)" />
+          <ResponsiveContainer width="100%" height="100%">
 
-<YAxis stroke="var(--color-muted-foreground)" />
+            <LineChart data={caloriesData}>
 
-<Tooltip
-contentStyle={{
-backgroundColor:"var(--color-card)",
-border:"1px solid var(--color-border)",
-borderRadius:"8px"
-}}
-/>
+              <CartesianGrid strokeDasharray="3 3" stroke="var(--color-border)" />
 
-<Legend/>
+              <XAxis dataKey="month" stroke="var(--color-muted-foreground)" />
 
-<Line
-type="monotone"
-dataKey="burned"
-stroke="var(--color-error)"
-strokeWidth={3}
-name="Calories Burned"
-/>
+              <YAxis stroke="var(--color-muted-foreground)" />
 
-</LineChart>
+              <Tooltip
+                contentStyle={{
+                  backgroundColor: "var(--color-card)",
+                  border: "1px solid var(--color-border)",
+                  borderRadius: "8px"
+                }}
+              />
 
-</ResponsiveContainer>
+              <Legend />
 
-)}
+              <Line
+                type="monotone"
+                dataKey="burned"
+                stroke="var(--color-error)"
+                strokeWidth={3}
+                name="Calories Burned"
+              />
 
-</div>
+            </LineChart>
 
-</div>
+          </ResponsiveContainer>
 
-)
+        )}
+
+      </div>
+
+    </div>
+
+  )
 
 }
 
-export default ProgressChart
+export default ProgressChart;
