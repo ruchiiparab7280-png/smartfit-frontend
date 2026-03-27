@@ -9,7 +9,8 @@ import MembershipCard from "./components/MembershipCard";
 import WorkoutPlanCard from "./components/WorkoutPlanCard";
 import ProgressChart from "./components/ProgressChart";
 import BMICalculator from "./components/BMICalculator";
-
+import GymDetailsModal from "../gym-listing/components/GymDetailsModal";
+import { normalizeGymImages, normalizeImageUrl } from "../../utils/gymImageUtils";
 
 import FreeTrialRequests from "./components/FreeTrialRequests";
 import TrainerRequests from "./components/TrainerRequests";
@@ -22,6 +23,8 @@ const UserDashboard = () => {
     setProfile(newData)
   }
   const [membership, setMembership] = useState(null)
+  const [membershipGym, setMembershipGym] = useState(null)
+  const [showGymModal, setShowGymModal] = useState(false)
   useEffect(() => {
 
     const parseDurationMonths = (duration) => {
@@ -128,12 +131,43 @@ const UserDashboard = () => {
         const computedExpiry = calculateExpiryDate(firstMembership.start_date, firstMembership.duration);
         const resolvedExpiryDate = firstMembership.expiry_date || computedExpiry;
 
+        // Dynamic gym image from database
+        const gymImages = normalizeGymImages(firstMembership.gym_images);
+        const gymImage = gymImages[0] || "/assets/images/no_image.png";
+
         setMembership({
           ...firstMembership,
           expiry_date: resolvedExpiryDate,
           status: getMembershipStatus(resolvedExpiryDate),
-          gymImage: "https://images.unsplash.com/photo-1571902943202-507ec2618e8f"
+          gymImage
         })
+
+        // Fetch full gym data for the modal (trainers, supplements, plans, images)
+        try {
+          const gymEmail = firstMembership.gym_email;
+          const [trainerRes, supplementRes, membershipRes] = await Promise.all([
+            fetch(`${import.meta.env.VITE_API_URL}/trainers/${gymEmail}`),
+            fetch(`${import.meta.env.VITE_API_URL}/supplements/${gymEmail}`),
+            fetch(`${import.meta.env.VITE_API_URL}/memberships/${gymEmail}`),
+          ]);
+          const [trainers, supplements, memberships] = await Promise.all([
+            trainerRes.json(), supplementRes.json(), membershipRes.json()
+          ]);
+
+          setMembershipGym({
+            name: firstMembership.gym_name,
+            email: gymEmail,
+            address: firstMembership.gym_city,
+            image: gymImage,
+            images: gymImages,
+            gym_images: gymImages,
+            trainers: trainers.map(t => ({ name: t.name, price: t.price, image: normalizeImageUrl(t.image) || '' })),
+            supplements: supplements.map(s => ({ id: s.id, name: s.name, price: s.price, image: s.image, description: s.description })),
+            memberships: memberships.map(m => ({ name: m.name, price: m.price, duration: m.duration, description: m.description })),
+          });
+        } catch (err) {
+          console.log("Gym details fetch error", err);
+        }
 
         console.log("Normalized membership (dashboard):", {
           gym_name: firstMembership?.gym_name,
@@ -270,6 +304,7 @@ const UserDashboard = () => {
               localStorage.setItem("renewGym", gymEmail)
               setActiveTab("gyms")
             }}
+            onViewGym={() => setShowGymModal(true)}
           />
         ) : (
           <div className="bg-card p-10 rounded-lg text-center">
@@ -379,6 +414,12 @@ const UserDashboard = () => {
         </div>
 
       </div>
+
+      <GymDetailsModal
+        gym={membershipGym}
+        isOpen={showGymModal}
+        onClose={() => setShowGymModal(false)}
+      />
 
     </div>
 

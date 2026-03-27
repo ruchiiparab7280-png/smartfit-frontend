@@ -3,7 +3,7 @@ import Icon from '../../../components/AppIcon';
 import Image from '../../../components/AppImage';
 import Button from '../../../components/ui/Button';
 
-const MembershipCard = ({ membership, goToGyms }) => {
+const MembershipCard = ({ membership, goToGyms, onViewGym }) => {
 console.log("MembershipCard received membership:", membership);
 
 const getStatusColor = (status) => {
@@ -146,14 +146,14 @@ Days Remaining
 
 {(membership?.status === 'Active' || membership?.status === 'Expiring Soon') ? (
 <> <Button
-onClick={()=>goToGyms(membership?.gym_email)}>
+onClick={onViewGym}>
 Renew
 </Button>
 <Button
 variant="outline"
 iconName="Eye"
 iconPosition="left"
-
+onClick={onViewGym}
 >
 
 View </Button>
