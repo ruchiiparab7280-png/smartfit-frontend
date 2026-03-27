@@ -1162,7 +1162,7 @@ Cancel
 type="date"
 value={startDate}
 onChange={(e)=>setStartDate(e.target.value)}
-className="w-full mb-3 p-2 border rounded"
+className="w-full mb-3 p-2 border rounded text-black bg-white"
 />
 
       <select className="w-full mb-3 p-2 border rounded text-black">
@@ -1192,7 +1192,7 @@ className="w-full mb-3 p-2 border rounded"
 
       <button
         onClick={() => setShowBookingModal(false)}
-        className="mt-2 text-sm text-gray-900"
+        className="mt-2 text-sm text-gray-200"
       >
         Cancel
       </button>
