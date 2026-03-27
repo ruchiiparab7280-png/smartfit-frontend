@@ -196,15 +196,17 @@ const WorkoutPlanCard = ({ workouts, setWorkouts }) => {
 
   };
 
-  const deleteWorkout = async (workoutId) => {
+  const handleDeleteDay = async (dayName) => {
     try {
-      const res = await fetch(`${import.meta.env.VITE_API_URL}/delete-workout/${workoutId}`, {
-        method: "DELETE",
-      });
+      const user_email = localStorage.getItem("userEmail");
+      const res = await fetch(
+        `${import.meta.env.VITE_API_URL}/delete-day/${encodeURIComponent(dayName)}?user_email=${encodeURIComponent(user_email)}`,
+        { method: "DELETE" }
+      );
       if (!res.ok) throw new Error("Delete failed");
-      setWorkouts(prev => prev.filter(w => w.id !== workoutId));
+      setWorkouts(prev => prev.filter(w => w.day !== dayName));
     } catch (err) {
-      console.log("Workout delete error", err);
+      console.log("Delete day error", err);
     }
   };
 
@@ -321,7 +323,7 @@ const WorkoutPlanCard = ({ workouts, setWorkouts }) => {
                 </button>
 
                 <button
-                  onClick={(e) => { e.stopPropagation(); deleteWorkout(workout.id); }}
+                  onClick={(e) => { e.stopPropagation(); handleDeleteDay(workout.day); }}
                   className="ml-3 text-red-500 hover:text-red-700 transition-colors"
                   title="Delete workout"
                 >
