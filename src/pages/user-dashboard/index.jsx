@@ -142,28 +142,23 @@ const UserDashboard = () => {
           gymImage
         })
 
-        // Fetch full gym data for the modal (trainers, supplements, plans, images)
+        // Fetch full gym data for the modal via single API call
         try {
           const gymEmail = firstMembership.gym_email;
-          const [trainerRes, supplementRes, membershipRes] = await Promise.all([
-            fetch(`${import.meta.env.VITE_API_URL}/trainers/${gymEmail}`),
-            fetch(`${import.meta.env.VITE_API_URL}/supplements/${gymEmail}`),
-            fetch(`${import.meta.env.VITE_API_URL}/memberships/${gymEmail}`),
-          ]);
-          const [trainers, supplements, memberships] = await Promise.all([
-            trainerRes.json(), supplementRes.json(), membershipRes.json()
-          ]);
+          const gymRes = await fetch(`${import.meta.env.VITE_API_URL}/gym-details/${gymEmail}`);
+          const gymData = await gymRes.json();
+
+          const fullGymImages = normalizeGymImages(gymData.gym_images);
 
           setMembershipGym({
-            name: firstMembership.gym_name,
-            email: gymEmail,
-            address: firstMembership.gym_city,
-            image: gymImage,
-            images: gymImages,
-            gym_images: gymImages,
-            trainers: trainers.map(t => ({ name: t.name, price: t.price, image: normalizeImageUrl(t.image) || '' })),
-            supplements: supplements.map(s => ({ id: s.id, name: s.name, price: s.price, image: s.image, description: s.description })),
-            memberships: memberships.map(m => ({ name: m.name, price: m.price, duration: m.duration, description: m.description })),
+            ...gymData,
+            image: fullGymImages[0] || gymImage,
+            images: fullGymImages,
+            gym_images: fullGymImages,
+            trainers: (gymData.trainers || []).map(t => ({
+              ...t,
+              image: normalizeImageUrl(t.image) || ''
+            })),
           });
         } catch (err) {
           console.log("Gym details fetch error", err);
