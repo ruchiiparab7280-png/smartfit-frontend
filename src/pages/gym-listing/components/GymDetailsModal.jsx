@@ -913,7 +913,7 @@ Book Training Session
 type="date"
 value={trainerDate}
 onChange={(e)=>setTrainerDate(e.target.value)}
-className="w-full mb-3 p-2 border rounded"
+className="w-full mb-3 p-2 border rounded text-black bg-white"
 />
 
 <select
@@ -976,7 +976,7 @@ Book Free Trial
 type="date"
 value={trialDate}
 onChange={(e)=>setTrialDate(e.target.value)}
-className="w-full mb-3 p-2 border rounded"
+className="w-full mb-3 p-2 border rounded text-black bg-white"
 />
 
 <select
@@ -1044,7 +1044,7 @@ Buy Supplement
 type="number"
 value={supplementQty}
 onChange={(e)=>setSupplementQty(e.target.value)}
-className="w-full mb-3 p-2 border rounded"
+className="w-full mb-3 p-2 border rounded text-black bg-white"
 />
 
 <label className="text-sm">Payment Method</label>
@@ -1067,7 +1067,7 @@ className="w-full mb-3 p-2 border rounded text-black"
 type="date"
 value={pickupDate}
 onChange={(e)=>setPickupDate(e.target.value)}
-className="w-full mb-3 p-2 border rounded"
+className="w-full mb-3 p-2 border rounded text-black bg-white"
 />
 </>
 
