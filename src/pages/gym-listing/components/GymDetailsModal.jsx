@@ -837,6 +837,15 @@ reviews.map((review,index)=>(
               fullWidth
               iconName="Phone"
               iconPosition="left"
+              onClick={() => {
+                if (gym?.phone) {
+                  window.open(`tel:${gym.phone}`, '_self');
+                } else {
+                  alert('Phone number not available for this gym.');
+                }
+              }}
+              disabled={!gym?.phone}
+              style={!gym?.phone ? { opacity: 0.5, cursor: 'not-allowed' } : {}}
             >
               Call Now
             </Button>
@@ -845,6 +854,18 @@ reviews.map((review,index)=>(
               fullWidth
               iconName="Mail"
               iconPosition="left"
+              onClick={() => {
+                if (gym?.phone) {
+                  const rawPhone = String(gym.phone).replace(/[\s\-\+\(\)]/g, '');
+                  const whatsappNumber = rawPhone.startsWith('91') ? rawPhone : `91${rawPhone}`;
+                  const message = encodeURIComponent('Hi, I am interested in your gym services.');
+                  window.open(`https://wa.me/${whatsappNumber}?text=${message}`, '_blank');
+                } else {
+                  alert('Phone number not available for this gym.');
+                }
+              }}
+              disabled={!gym?.phone}
+              style={!gym?.phone ? { opacity: 0.5, cursor: 'not-allowed' } : {}}
             >
               Send Message
             </Button>
