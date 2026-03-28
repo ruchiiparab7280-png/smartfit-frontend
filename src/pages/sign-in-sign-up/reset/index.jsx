@@ -24,7 +24,8 @@ const ForgotPassword = () => {
     setMessage("");
 
     try {
-      console.log("📧 Sending forgot-password request for:", email);
+      console.log("📧 Sending forgot-password request to:", `${import.meta.env.VITE_API_URL}/forgot-password`);
+      console.log("📧 Email:", email);
       const res = await fetch(`${import.meta.env.VITE_API_URL}/forgot-password`, {
         method: "POST",
         headers: {
@@ -46,7 +47,11 @@ const ForgotPassword = () => {
       }
     } catch (err) {
       console.error("📧 Forgot password error:", err);
-      setMessage("Server error. Please try again later.");
+      if (err.name === "TypeError" && err.message.includes("fetch")) {
+        setMessage("Cannot reach the server. It may be starting up — please wait 30 seconds and try again.");
+      } else {
+        setMessage("Server error: " + (err.message || "Please try again later."));
+      }
       setIsError(true);
     }
 
