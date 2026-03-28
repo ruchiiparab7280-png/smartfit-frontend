@@ -7,6 +7,10 @@ import { normalizeGymImages } from '../../../utils/gymImageUtils';
 const GymDetailsModal = ({ gym, isOpen, onClose }) => {
   if (!isOpen || !gym) return null;
 
+  // 🔍 Debug: log trainers and supplements data structure
+  console.log('🏋️ gym.trainers:', gym.trainers);
+  console.log('💊 gym.supplements:', gym.supplements);
+
  const scrollRef = useRef(null);
 
   const galleryImages = normalizeGymImages(
@@ -694,6 +698,10 @@ Book Free Trial
           {trainer.name}
         </p>
 
+        <p className="text-xs text-primary italic mb-1">
+          {trainer.specialization || trainer.speciality || 'No speciality provided'}
+        </p>
+
         <p className="text-sm text-muted-foreground">
           ₹{trainer.price}/session
         </p>
@@ -743,7 +751,11 @@ Book Free Trial
           {item.name}
         </p>
 
-        <p className="text-sm text-muted-foreground">
+        <p className="text-xs text-muted-foreground mt-1 line-clamp-2">
+          {item.description || item.desc || item.details || 'No description available'}
+        </p>
+
+        <p className="text-sm text-primary font-semibold mt-1">
           ₹{item.price}
         </p>
 
