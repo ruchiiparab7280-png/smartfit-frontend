@@ -7,7 +7,8 @@ import { normalizeGymImages } from '../../../utils/gymImageUtils';
 const GymDetailsModal = ({ gym, isOpen, onClose }) => {
   if (!isOpen || !gym) return null;
 
-  // 🔍 Debug: log trainers and supplements data structure
+  // 🔍 Debug: log full gym data and nested arrays
+  console.log('📦 Gym Data:', gym);
   console.log('🏋️ gym.trainers:', gym.trainers);
   console.log('💊 gym.supplements:', gym.supplements);
 

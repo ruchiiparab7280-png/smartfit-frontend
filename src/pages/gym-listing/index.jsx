@@ -155,6 +155,7 @@ const memberships = await membershipRes.json();
 
     trainers: trainers.map(t => ({
       name: t.name,
+      specialization: t.specialization || "",
       price: t.price,
       image: normalizeImageUrl(t.image) || ''
     })),
