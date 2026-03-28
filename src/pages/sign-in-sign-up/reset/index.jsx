@@ -24,13 +24,20 @@ const ForgotPassword = () => {
     setMessage("");
 
     try {
+      // 30-second timeout to prevent hanging on cold-start / slow SMTP
+      const controller = new AbortController();
+      const timeoutId = setTimeout(() => controller.abort(), 30000);
+
       const res = await fetch(`${import.meta.env.VITE_API_URL}/forgot-password`, {
         method: "POST",
         headers: {
           "Content-Type": "application/json"
         },
-        body: JSON.stringify({ email })
+        body: JSON.stringify({ email }),
+        signal: controller.signal
       });
+
+      clearTimeout(timeoutId);
 
       const data = await res.json();
 
@@ -43,15 +50,17 @@ const ForgotPassword = () => {
         setIsError(true);
       }
     } catch (err) {
-      if (err.name === "TypeError" && err.message.includes("fetch")) {
+      if (err.name === "AbortError") {
+        setMessage("Request timed out. The server may be starting up — please wait 30 seconds and try again.");
+      } else if (err.name === "TypeError" && err.message.includes("fetch")) {
         setMessage("Cannot reach the server. It may be starting up — please wait 30 seconds and try again.");
       } else {
         setMessage("Something went wrong. Please try again later.");
       }
       setIsError(true);
+    } finally {
+      setIsLoading(false);
     }
-
-    setIsLoading(false);
   };
 
   return (
