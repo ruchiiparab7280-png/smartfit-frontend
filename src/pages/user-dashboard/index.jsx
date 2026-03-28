@@ -1,6 +1,7 @@
 import React, { useState, useEffect } from "react";
 import MainNavigation from "../../components/MainNavigation";
 import Icon from "../../components/AppIcon";
+import { useNavigate } from "react-router-dom";
 import { supabase } from "../../lib/supabase";
 
 import StatsOverview from "./components/StatsOverview";
@@ -308,14 +309,19 @@ const UserDashboard = () => {
               You haven't purchased any membership yet.
             </p>
 
+            const navigate = useNavigate();
+
             <button
-              onClick={() => setActiveTab("gyms")}
+              onClick={() => navigate("/gym-listing")}
               className="bg-orange-500 text-white px-5 py-2 rounded"
             >
               Explore Gyms
             </button>
           </div>
         )
+
+      case "gyms":
+        return <GymListing />
 
       case "trial":
         return <FreeTrialRequests />
