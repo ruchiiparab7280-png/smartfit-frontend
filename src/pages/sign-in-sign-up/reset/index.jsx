@@ -24,6 +24,7 @@ const ForgotPassword = () => {
     setMessage("");
 
     try {
+      console.log("📧 Sending forgot-password request for:", email);
       const res = await fetch(`${import.meta.env.VITE_API_URL}/forgot-password`, {
         method: "POST",
         headers: {
@@ -33,17 +34,18 @@ const ForgotPassword = () => {
       });
 
       const data = await res.json();
+      console.log("📧 Forgot password response:", { status: res.status, data });
 
       if (res.ok) {
         setMessage("Reset link sent to your email! Check your inbox.");
         setIsError(false);
         setIsSent(true);
       } else {
-        setMessage(data.message);
+        setMessage(data.message || "Failed to send reset email.");
         setIsError(true);
       }
     } catch (err) {
-      console.log(err);
+      console.error("📧 Forgot password error:", err);
       setMessage("Server error. Please try again later.");
       setIsError(true);
     }
