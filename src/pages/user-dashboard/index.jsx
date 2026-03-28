@@ -18,6 +18,7 @@ import TrainerRequests from "./components/TrainerRequests";
 import SupplementOrders from "./components/SupplementOrders";
 
 const UserDashboard = () => {
+  const navigate = useNavigate();
   const [workouts, setWorkouts] = useState([])
   const [profile, setProfile] = useState(null)
   const updateProfile = (newData) => {
@@ -309,7 +310,7 @@ const UserDashboard = () => {
               You haven't purchased any membership yet.
             </p>
 
-            const navigate = useNavigate();
+
 
             <button
               onClick={() => navigate("/gym-listing")}
