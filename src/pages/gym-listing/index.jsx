@@ -378,13 +378,13 @@ description: s.description
             <p className="text-sm text-muted-foreground">
                 © {new Date()?.getFullYear()} SmartFit. All rights reserved.              </p>
             <div className="flex items-center space-x-4">
-              <a href="#" className="text-muted-foreground hover:text-primary transition-base">
+              <a href="https://www.facebook.com/share/1Cuz1fQh3i/" target="_blank" rel="noopener noreferrer" className="text-muted-foreground hover:text-primary transition-base">
                 <Icon name="Facebook" size={20} />
               </a>
-              <a href="#" className="text-muted-foreground hover:text-primary transition-base">
+              <a href="https://x.com/SmartFit7971" target="_blank" rel="noopener noreferrer" className="text-muted-foreground hover:text-primary transition-base">
                 <Icon name="Twitter" size={20} />
               </a>
-              <a href="#" className="text-muted-foreground hover:text-primary transition-base">
+              <a href="https://www.instagram.com/smartfit7971?igsh=MXdmZDZ4Yzc1cnMz" target="_blank" rel="noopener noreferrer" className="text-muted-foreground hover:text-primary transition-base">
                 <Icon name="Instagram" size={20} />
               </a>
             </div>

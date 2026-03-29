@@ -205,10 +205,10 @@ const handleSubmit = async () => {
             <p>We usually respond within 24 hours.</p>
 
             <div className="contact-info">
-              <div className="info-item"><span>📧</span><p>support@smartfit.com</p></div>
-              <div className="info-item"><span>📞</span><p>+91 XXXXX XXXXX</p></div>
+              <div className="info-item"><span>📧</span><p>smartfit7971@gmail.com </p></div>
+              <div className="info-item"><span>📞</span><p>+91 8468835484</p></div>
               <div className="info-item"><span>📍</span><p>Mumbai, India</p></div>
-              <div className="info-item"><span>🕒</span><p>Mon - Sat : 8AM - 8PM</p></div>
+              <div className="info-item"><span>🕒</span><p>Mon - Sat : 11AM - 6PM</p></div>
             </div>
           </div>
 

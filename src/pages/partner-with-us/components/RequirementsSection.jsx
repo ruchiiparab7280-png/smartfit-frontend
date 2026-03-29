@@ -17,7 +17,7 @@ const RequirementsSection = () => {
       id: 2,
       category: "Facility Standards",
       items: [
-        "Minimum 500 sq ft of workout space",
+       
         "Well-maintained equipment",
         "Clean and hygienic environment",
         "Adequate ventilation and lighting"
@@ -27,7 +27,7 @@ const RequirementsSection = () => {
       id: 3,
       category: "Operational Requirements",
       items: [
-        "Minimum 6 months of operation",
+        
         "Qualified and certified trainers",
         "Clear membership terms and pricing",
         "Customer service standards"

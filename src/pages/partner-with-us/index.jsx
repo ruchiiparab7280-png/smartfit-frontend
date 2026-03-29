@@ -1,5 +1,5 @@
 import React from "react";
-
+import { Link } from "react-router-dom";
 import MainNavigation from '../../components/MainNavigation';
 import BenefitsSection from './components/BenefitsSection';
 import CommissionStructure from './components/CommissionStructure';
@@ -64,17 +64,17 @@ const PartnerWithUs = () => {
                 <div className="bg-card rounded-lg p-6 card-elevation-sm">
                   <Icon name="Mail" size={32} color="var(--color-primary)" className="mx-auto mb-3" />
                   <h3 className="font-semibold text-foreground mb-2">Email Us</h3>
-                  <p className="text-sm text-muted-foreground">partners@smartfit.com</p>
+                  <p className="text-sm text-muted-foreground">smartfit7971@gmail.com</p>
                 </div>
                 <div className="bg-card rounded-lg p-6 card-elevation-sm">
                   <Icon name="Phone" size={32} color="var(--color-primary)" className="mx-auto mb-3" />
                   <h3 className="font-semibold text-foreground mb-2">Call Us</h3>
-                  <p className="text-sm text-muted-foreground">1-800-GYM-PARTNER</p>
+                  <p className="text-sm text-muted-foreground">91 8468835484</p>
                 </div>
                 <div className="bg-card rounded-lg p-6 card-elevation-sm">
                   <Icon name="MessageCircle" size={32} color="var(--color-primary)" className="mx-auto mb-3" />
                   <h3 className="font-semibold text-foreground mb-2">Live Chat</h3>
-                  <p className="text-sm text-muted-foreground">Available 9 AM - 6 PM EST</p>
+                  <p className="text-sm text-muted-foreground">Available 11 AM - 6 PM </p>
                 </div>
               </div>
             </div>
@@ -88,15 +88,9 @@ const PartnerWithUs = () => {
               © {new Date()?.getFullYear()} SmartFit. All rights reserved.
             </p>
             <div className="flex items-center gap-6">
-              <a href="#" className="text-sm text-muted-foreground hover:text-primary transition-base">
-                Privacy Policy
-              </a>
-              <a href="#" className="text-sm text-muted-foreground hover:text-primary transition-base">
-                Terms of Service
-              </a>
-              <a href="#" className="text-sm text-muted-foreground hover:text-primary transition-base">
-                Partnership Agreement
-              </a>
+              <Link to="/privacy-policy">Privacy Policy</Link>
+              <Link to="/terms">Terms of Service</Link>
+              <Link to="/partnership">Partnership Agreement</Link>
             </div>
           </div>
         </div>
