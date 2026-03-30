@@ -579,7 +579,7 @@ const GymDetailsModal = ({ gym, isOpen, onClose }) => {
             <div className="text-center">
               <Icon name="MapPin" size={24} className="mx-auto mb-2 text-primary" />
               <p className="text-sm text-muted-foreground">Distance</p>
-              <p className="font-semibold text-foreground">{gym?.distance} km</p>
+              <p className="font-semibold text-foreground">{gym?.distance !== null && gym?.distance !== undefined ? `${gym.distance} km` : 'Unavailable'}</p>
             </div>
             <div className="text-center">
               <Icon name="Star" size={24} className="mx-auto mb-2 text-primary" />

@@ -48,7 +48,9 @@ const GymCard = ({ gym, onViewDetails, onContact }) => {
           </div>
         )}
         <div className="absolute bottom-3 left-3 bg-background/90 backdrop-blur-sm px-3 py-1 rounded-md text-sm font-medium">
-          {gym?.distance} km away
+          {gym?.distance !== null && gym?.distance !== undefined
+            ? `${gym.distance} km away`
+            : 'Distance unavailable'}
         </div>
       </div>
 

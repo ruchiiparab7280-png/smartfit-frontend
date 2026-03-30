@@ -12,24 +12,27 @@ import GymDetailsModal from './components/GymDetailsModal';
 import SkeletonCard from '../../components/ui/SkeletonCard';
 import { normalizeGymImages, normalizeImageUrl } from '../../utils/gymImageUtils';
 
+// Haversine formula — returns distance in km between two lat/lng points
+const getDistance = (lat1, lon1, lat2, lon2) => {
+  if (lat1 == null || lon1 == null || lat2 == null || lon2 == null) return null;
+  const R = 6371;
+  const dLat = (lat2 - lat1) * Math.PI / 180;
+  const dLon = (lon2 - lon1) * Math.PI / 180;
+  const a =
+    Math.sin(dLat / 2) * Math.sin(dLat / 2) +
+    Math.cos(lat1 * Math.PI / 180) *
+    Math.cos(lat2 * Math.PI / 180) *
+    Math.sin(dLon / 2) *
+    Math.sin(dLon / 2);
+  const c = 2 * Math.atan2(Math.sqrt(a), Math.sqrt(1 - a));
+  return R * c;
+};
+
 const GymListing = () => {
-  const calculateDistance = useCallback((lat1, lon1, lat2, lon2) => {
-    const R = 6371;
-    const dLat = (lat2 - lat1) * Math.PI / 180;
-    const dLon = (lon2 - lon1) * Math.PI / 180;
-    const a =
-      Math.sin(dLat/2) * Math.sin(dLat/2) +
-      Math.cos(lat1 * Math.PI/180) *
-      Math.cos(lat2 * Math.PI/180) *
-      Math.sin(dLon/2) *
-      Math.sin(dLon/2);
-    const c = 2 * Math.atan2(Math.sqrt(a), Math.sqrt(1-a));
-    return R * c;
-  }, []);
 
   const [filters, setFilters] = useState({
     distance: 10,
-    priceRange: { min: 0, max: 5000 }, 
+    priceRange: { min: 0, max: 5000 },
     minRating: 1,
     amenities: []
   });
@@ -40,10 +43,11 @@ const GymListing = () => {
   const [searchQuery, setSearchQuery] = useState('');
   const [selectedGym, setSelectedGym] = useState(null);
   const [showDetailsModal, setShowDetailsModal] = useState(false);
-  const [gyms, setGyms] = useState([]);
+  const [rawGyms, setRawGyms] = useState([]);
   const [isLoading, setIsLoading] = useState(true);
   const [userLocation, setUserLocation] = useState(null);
 
+  // 1) Get user location once
   useEffect(() => {
     if (navigator.geolocation) {
       navigator.geolocation.getCurrentPosition(
@@ -53,14 +57,15 @@ const GymListing = () => {
             lng: position.coords.longitude
           });
         },
-        (error) => {
-          console.log("Location permission denied");
-        }
+        () => {
+          console.log("Location permission denied — distances unavailable");
+        },
+        { enableHighAccuracy: true, timeout: 10000, maximumAge: 60000 }
       );
     }
   }, []);
 
-  // 🚀 PERFORMANCE: Single API call replaces 31+ calls (N+1 fix)
+  // 2) Fetch gyms once (no location dependency — avoids re-fetch)
   useEffect(() => {
     const fetchGyms = async () => {
       setIsLoading(true);
@@ -80,20 +85,10 @@ const GymListing = () => {
           address: gym.address,
           phone: gym.phone,
           email: gym.email,
-          latitude: gym.latitude,
-          longitude: gym.longitude,
+          latitude: parseFloat(gym.latitude) || null,
+          longitude: parseFloat(gym.longitude) || null,
           price: gym.monthly_fee,
           members: gym.capacity,
-          distance: userLocation
-            ? parseFloat(
-                calculateDistance(
-                  userLocation.lat,
-                  userLocation.lng,
-                  gym.latitude,
-                  gym.longitude
-                ).toFixed(1)
-              )
-            : 0,
           rating: 4,
           openTime: `${gym.opening_time} - ${gym.closing_time}`,
           description: gym.gym_description,
@@ -110,7 +105,6 @@ const GymListing = () => {
                 icon: "Check"
               }))
             : [],
-          // 🚀 Data already included from /api/gyms-full — no extra fetches needed
           trainers: (gym.trainers || []).map(t => ({
             name: t.name,
             specialization: t.specialization || "",
@@ -132,7 +126,7 @@ const GymListing = () => {
           }))
         }));
 
-        setGyms(formattedGyms);
+        setRawGyms(formattedGyms);
       } catch (error) {
         console.log("Gym fetch error:", error);
       } finally {
@@ -141,7 +135,20 @@ const GymListing = () => {
     };
 
     fetchGyms();
-  }, [userLocation, calculateDistance]);
+  }, []);
+
+  // 3) Recalculate distances reactively when location or raw data changes
+  const gyms = useMemo(() => {
+    return rawGyms.map(gym => {
+      const dist = userLocation
+        ? getDistance(userLocation.lat, userLocation.lng, gym.latitude, gym.longitude)
+        : null;
+      return {
+        ...gym,
+        distance: dist !== null ? parseFloat(dist.toFixed(1)) : null
+      };
+    });
+  }, [rawGyms, userLocation]);
 
   // 🚀 PERFORMANCE: useMemo replaces useState+useEffect for derived data
   const filteredGyms = useMemo(() => {
@@ -154,12 +161,16 @@ const GymListing = () => {
       );
     }
 
-    result = result.filter(gym =>
-      gym.distance <= filters.distance &&
-      gym.price >= filters.priceRange.min &&
-      gym.price <= filters.priceRange.max &&
-      gym.rating >= filters.minRating
-    );
+    result = result.filter(gym => {
+      // Only apply distance filter when user location is available
+      const passesDistance = gym.distance === null || gym.distance <= filters.distance;
+      return (
+        passesDistance &&
+        gym.price >= filters.priceRange.min &&
+        gym.price <= filters.priceRange.max &&
+        gym.rating >= filters.minRating
+      );
+    });
 
     if (filters?.amenities?.length > 0) {
       result = result.filter((gym) =>
@@ -171,7 +182,13 @@ const GymListing = () => {
 
     switch (sortBy) {
       case 'distance':
-        result.sort((a, b) => a.distance - b.distance);
+        // Gyms with null distance go to the end
+        result.sort((a, b) => {
+          if (a.distance === null && b.distance === null) return 0;
+          if (a.distance === null) return 1;
+          if (b.distance === null) return -1;
+          return a.distance - b.distance;
+        });
         break;
       case 'rating':
         result.sort((a, b) => b.rating - a.rating);
