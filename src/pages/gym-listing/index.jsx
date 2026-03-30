@@ -1,4 +1,4 @@
-import React, { useState, useEffect,  } from 'react';
+import React, { useState, useEffect, useMemo, useCallback } from 'react';
 
 import MainNavigation from '../../components/MainNavigation';
 import Icon from '../../components/AppIcon';
@@ -9,28 +9,24 @@ import MapView from "./components/MapView";
 import SearchBar from './components/SearchBar';
 import SortControls from './components/SortControls';
 import GymDetailsModal from './components/GymDetailsModal';
+import SkeletonCard from '../../components/ui/SkeletonCard';
 import { normalizeGymImages, normalizeImageUrl } from '../../utils/gymImageUtils';
 
 const GymListing = () => {
-  const calculateDistance = (lat1, lon1, lat2, lon2) => {
+  const calculateDistance = useCallback((lat1, lon1, lat2, lon2) => {
+    const R = 6371;
+    const dLat = (lat2 - lat1) * Math.PI / 180;
+    const dLon = (lon2 - lon1) * Math.PI / 180;
+    const a =
+      Math.sin(dLat/2) * Math.sin(dLat/2) +
+      Math.cos(lat1 * Math.PI/180) *
+      Math.cos(lat2 * Math.PI/180) *
+      Math.sin(dLon/2) *
+      Math.sin(dLon/2);
+    const c = 2 * Math.atan2(Math.sqrt(a), Math.sqrt(1-a));
+    return R * c;
+  }, []);
 
-const R = 6371;
-
-const dLat = (lat2 - lat1) * Math.PI / 180;
-const dLon = (lon2 - lon1) * Math.PI / 180;
-
-const a =
-Math.sin(dLat/2) * Math.sin(dLat/2) +
-Math.cos(lat1 * Math.PI/180) *
-Math.cos(lat2 * Math.PI/180) *
-Math.sin(dLon/2) *
-Math.sin(dLon/2);
-
-const c = 2 * Math.atan2(Math.sqrt(a), Math.sqrt(1-a));
-
-return R * c;
-
-};
   const [filters, setFilters] = useState({
     distance: 10,
     priceRange: { min: 0, max: 5000 }, 
@@ -45,157 +41,110 @@ return R * c;
   const [selectedGym, setSelectedGym] = useState(null);
   const [showDetailsModal, setShowDetailsModal] = useState(false);
   const [gyms, setGyms] = useState([]);
+  const [isLoading, setIsLoading] = useState(true);
   const [userLocation, setUserLocation] = useState(null);
 
   useEffect(() => {
-
-if (navigator.geolocation) {
-
-navigator.geolocation.getCurrentPosition(
-
-(position) => {
-
-const lat = position.coords.latitude;
-const lng = position.coords.longitude;
-
-console.log("USER LOCATION:", lat, lng);
-
-setUserLocation({
-lat,
-lng
-});
-
-},
-
-(error) => {
-console.log("Location permission denied");
-}
-
-);
-
-}
-
-}, []);
-useEffect(() => {
-
-  const fetchGyms = async () => {
-
-    try {
-
-      const res = await fetch(
-        `${import.meta.env.VITE_API_URL}/api/gyms`
+    if (navigator.geolocation) {
+      navigator.geolocation.getCurrentPosition(
+        (position) => {
+          setUserLocation({
+            lat: position.coords.latitude,
+            lng: position.coords.longitude
+          });
+        },
+        (error) => {
+          console.log("Location permission denied");
+        }
       );
-      if (!res.ok) {
-  console.log("Gym API error");
-  return;
-}
-      const data = await res.json();
-const formattedGyms = await Promise.all(
-data.map(async (gym, index) => {
-
-  const trainerRes = await fetch(
-    `${import.meta.env.VITE_API_URL}/trainers/${gym.email}`
-  );
-
-  const trainers = await trainerRes.json();
-
-  const supplementRes = await fetch(
-`${import.meta.env.VITE_API_URL}/supplements/${gym.email}`
-);
-
-const supplements = await supplementRes.json();
-
-const membershipRes = await fetch(
-`${import.meta.env.VITE_API_URL}/memberships/${gym.email}`
-);
-
-const memberships = await membershipRes.json();
-
- return {
-  id: index + 1,
-
-  name: gym.gym_name,
-  address: gym.address,
-  phone: gym.phone,
-  email: gym.email,
-  latitude: gym.latitude,
-  longitude: gym.longitude,
-  price: gym.monthly_fee,
-  members: gym.capacity,
-
- distance: userLocation
-  ? parseFloat(
-      calculateDistance(
-        userLocation.lat,
-        userLocation.lng,
-        gym.latitude,
-        gym.longitude
-      ).toFixed(1)
-    )
-  : 0, // add this
-  rating: 4, // add this
-
-  openTime: `${gym.opening_time} - ${gym.closing_time}`,
-
-  description: gym.gym_description,
-  ...(function buildImages() {
-    const normalizedImages = normalizeGymImages(gym.gym_images);
-    return {
-      image: normalizedImages[0],
-      images: normalizedImages
-    };
-  })(),
-
-    amenities: gym.amenities
-      ? gym.amenities.split(",").map(a => ({
-          name: a.trim(),
-          icon: "Check"
-        }))
-      : [],
-
-    trainers: trainers.map(t => ({
-      name: t.name,
-      specialization: t.specialization || "",
-      price: t.price,
-      image: normalizeImageUrl(t.image) || ''
-    })),
-
- supplements: supplements.map(s => ({
-id: s.id,
-name: s.name,
-price: s.price,
-image: s.image,
-description: s.description
-})),
-
-  
- memberships: memberships.map(m => ({
-    name: m.name,
-    price: m.price,
-    duration: m.duration,
-    description: m.description
-  }))
-  };
-
-})
-);
-      setGyms(formattedGyms);
-
-    } catch (error) {
-
-      console.log("Gym fetch error:", error);
-
     }
+  }, []);
 
-  };
-
-  fetchGyms();
-
-}, []);
-
- 
-  const [filteredGyms, setFilteredGyms] = useState([]);
+  // 🚀 PERFORMANCE: Single API call replaces 31+ calls (N+1 fix)
   useEffect(() => {
+    const fetchGyms = async () => {
+      setIsLoading(true);
+      try {
+        const res = await fetch(
+          `${import.meta.env.VITE_API_URL}/api/gyms-full`
+        );
+        if (!res.ok) {
+          console.log("Gym API error");
+          return;
+        }
+        const data = await res.json();
+
+        const formattedGyms = data.map((gym, index) => ({
+          id: index + 1,
+          name: gym.gym_name,
+          address: gym.address,
+          phone: gym.phone,
+          email: gym.email,
+          latitude: gym.latitude,
+          longitude: gym.longitude,
+          price: gym.monthly_fee,
+          members: gym.capacity,
+          distance: userLocation
+            ? parseFloat(
+                calculateDistance(
+                  userLocation.lat,
+                  userLocation.lng,
+                  gym.latitude,
+                  gym.longitude
+                ).toFixed(1)
+              )
+            : 0,
+          rating: 4,
+          openTime: `${gym.opening_time} - ${gym.closing_time}`,
+          description: gym.gym_description,
+          ...(function buildImages() {
+            const normalizedImages = normalizeGymImages(gym.gym_images);
+            return {
+              image: normalizedImages[0],
+              images: normalizedImages
+            };
+          })(),
+          amenities: gym.amenities
+            ? gym.amenities.split(",").map(a => ({
+                name: a.trim(),
+                icon: "Check"
+              }))
+            : [],
+          // 🚀 Data already included from /api/gyms-full — no extra fetches needed
+          trainers: (gym.trainers || []).map(t => ({
+            name: t.name,
+            specialization: t.specialization || "",
+            price: t.price,
+            image: normalizeImageUrl(t.image) || ''
+          })),
+          supplements: (gym.supplements || []).map(s => ({
+            id: s.id,
+            name: s.name,
+            price: s.price,
+            image: s.image,
+            description: s.description
+          })),
+          memberships: (gym.memberships || []).map(m => ({
+            name: m.name,
+            price: m.price,
+            duration: m.duration,
+            description: m.description
+          }))
+        }));
+
+        setGyms(formattedGyms);
+      } catch (error) {
+        console.log("Gym fetch error:", error);
+      } finally {
+        setIsLoading(false);
+      }
+    };
+
+    fetchGyms();
+  }, [userLocation, calculateDistance]);
+
+  // 🚀 PERFORMANCE: useMemo replaces useState+useEffect for derived data
+  const filteredGyms = useMemo(() => {
     let result = [...gyms];
 
     if (searchQuery) {
@@ -213,40 +162,41 @@ description: s.description
     );
 
     if (filters?.amenities?.length > 0) {
-      result = result?.filter((gym) =>
-      filters?.amenities?.every((amenity) =>
-      gym?.amenities?.some((a) => a?.name?.toLowerCase()?.includes(amenity))
-      )
+      result = result.filter((gym) =>
+        filters.amenities.every((amenity) =>
+          gym?.amenities?.some((a) => a?.name?.toLowerCase()?.includes(amenity))
+        )
       );
     }
 
     switch (sortBy) {
       case 'distance':
-        result?.sort((a, b) => a?.distance - b?.distance);
+        result.sort((a, b) => a.distance - b.distance);
         break;
       case 'rating':
-        result?.sort((a, b) => b?.rating - a?.rating);
+        result.sort((a, b) => b.rating - a.rating);
         break;
       case 'price-low':
-        result?.sort((a, b) => a?.price - b?.price);
+        result.sort((a, b) => a.price - b.price);
         break;
       case 'price-high':
-        result?.sort((a, b) => b?.price - a?.price);
+        result.sort((a, b) => b.price - a.price);
         break;
       case 'members':
-        result?.sort((a, b) => b?.members - a?.members);
+        result.sort((a, b) => b.members - a.members);
         break;
       case 'newest':
-        result?.sort((a, b) => b?.id - a?.id);
+        result.sort((a, b) => b.id - a.id);
         break;
       default:
         break;
     }
 
-    setFilteredGyms(result);
-  }, [filters, sortBy, searchQuery,gyms]);
+    return result;
+  }, [filters, sortBy, searchQuery, gyms]);
 
-  const handleResetFilters = () => {
+  // 🚀 PERFORMANCE: useCallback prevents child re-renders
+  const handleResetFilters = useCallback(() => {
     setFilters({
       distance: 10,
       priceRange: { min: 0, max: 500 },
@@ -254,16 +204,20 @@ description: s.description
       amenities: []
     });
     setSearchQuery('');
-  };
+  }, []);
 
-  const handleViewDetails = (gym) => {
+  const handleViewDetails = useCallback((gym) => {
     setSelectedGym(gym);
     setShowDetailsModal(true);
-  };
+  }, []);
 
-  const handleContact = (gym) => {
+  const handleContact = useCallback((gym) => {
     alert(`Contacting ${gym?.name}\nPhone: ${gym?.phone}\nEmail: ${gym?.email}`);
-  };
+  }, []);
+
+  const handleFilterToggle = useCallback(() => {
+    setShowFilters(prev => !prev);
+  }, []);
 
   return (
     <div className="min-h-screen bg-background">
@@ -280,9 +234,8 @@ description: s.description
               </p>
               <SearchBar
                 onSearch={setSearchQuery}
-                onFilterToggle={() => setShowFilters(!showFilters)}
+                onFilterToggle={handleFilterToggle}
                 showFilters={showFilters} />
-
             </div>
           </div>
         </div>
@@ -295,8 +248,7 @@ description: s.description
                 onFilterChange={setFilters}
                 onResetFilters={handleResetFilters}
                 isOpen={showFilters}
-                onToggle={() => setShowFilters(!showFilters)} />
-
+                onToggle={handleFilterToggle} />
             </aside>
 
             <div className="flex-1 min-w-0">
@@ -307,11 +259,19 @@ description: s.description
                   viewMode={viewMode}
                   onViewModeChange={setViewMode}
                   resultsCount={filteredGyms?.length} />
-
               </div>
 
-              {filteredGyms?.length === 0 ?
-              <div className="bg-card rounded-lg border border-border p-12 text-center">
+              {/* 🚀 PERFORMANCE: Skeleton loaders instead of blank page */}
+              {isLoading ? (
+                <div className={`grid gap-6 ${
+                  viewMode === 'grid' ? 'grid-cols-1 md:grid-cols-2 xl:grid-cols-3' : 'grid-cols-1'
+                }`}>
+                  {Array.from({ length: 6 }).map((_, i) => (
+                    <SkeletonCard key={i} />
+                  ))}
+                </div>
+              ) : filteredGyms?.length === 0 ? (
+                <div className="bg-card rounded-lg border border-border p-12 text-center">
                   <Icon name="SearchX" size={64} className="mx-auto mb-4 text-muted-foreground" />
                   <h3 className="text-xl font-semibold text-foreground mb-2">
                     No gyms found
@@ -320,39 +280,37 @@ description: s.description
                     Try adjusting your filters or search criteria
                   </p>
                   <Button
-                  variant="outline"
-                  iconName="RotateCcw"
-                  iconPosition="left"
-                  onClick={handleResetFilters}>
-
+                    variant="outline"
+                    iconName="RotateCcw"
+                    iconPosition="left"
+                    onClick={handleResetFilters}>
                     Reset Filters
                   </Button>
-                </div> :
-
-              <>
-  {viewMode === 'map' && (
-  <div className="h-[60vh] mb-6">
-    <MapView
-      gyms={filteredGyms}
-      selectedGym={selectedGym}
-      onGymSelect={setSelectedGym}
-    />
-  </div>
-)}
-      <div className={`grid gap-6 ${
-                viewMode === 'grid' ? 'grid-cols-1 md:grid-cols-2 xl:grid-cols-3' : 'grid-cols-1'}`
-                }>
-                    {filteredGyms?.map((gym) =>
-                  <GymCard
-                    key={gym?.id}
-                    gym={gym}
-                    onViewDetails={handleViewDetails}
-                    onContact={handleContact} />
-
+                </div>
+              ) : (
+                <>
+                  {viewMode === 'map' && (
+                    <div className="h-[60vh] mb-6">
+                      <MapView
+                        gyms={filteredGyms}
+                        selectedGym={selectedGym}
+                        onGymSelect={setSelectedGym}
+                      />
+                    </div>
                   )}
+                  <div className={`grid gap-6 ${
+                    viewMode === 'grid' ? 'grid-cols-1 md:grid-cols-2 xl:grid-cols-3' : 'grid-cols-1'}`
+                  }>
+                    {filteredGyms?.map((gym) =>
+                      <GymCard
+                        key={gym?.id}
+                        gym={gym}
+                        onViewDetails={handleViewDetails}
+                        onContact={handleContact} />
+                    )}
                   </div>
                 </>
-              }
+              )}
             </div>
           </div>
         </div>
@@ -370,6 +328,7 @@ description: s.description
   src="smartfit-logo.png"
   alt="Smart-Fit Logo"
    className="h-20 w-20 object-contain"
+  loading="lazy"
 />
   <span className="text-lg font-bold text-foreground">
     SmartFit

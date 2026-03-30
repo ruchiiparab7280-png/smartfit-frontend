@@ -1,36 +1,36 @@
-import React from "react";
+import React, { Suspense, lazy } from "react";
 import { BrowserRouter, Routes as RouterRoutes, Route } from "react-router-dom";
 import ScrollToTop from "components/ScrollToTop";
 import ErrorBoundary from "components/ErrorBoundary";
-import NotFound from "pages/NotFound";
-import SignInSignUp from './pages/sign-in-sign-up';
-import ForgotPassword from "./pages/sign-in-sign-up/reset";
-import UpdatePassword from "./pages/sign-in-sign-up/updatePassword";
-import GymListing from './pages/gym-listing';
-import UserDashboard from './pages/user-dashboard';
-import HomeWelcome from './pages/home-welcome';
-import PartnerWithUs from './pages/partner-with-us';
-import AboutUs from './pages/about-us';
-import ApprovalPending from "./pages/ApprovalPending";
-import AdminApproval from "./pages/admin-approval";
-import OwnerApproved from "./pages/owner-approved";
-import OwnerRejected from "./pages/owner-rejected";
-import OwnerPayment from "./pages/owner-payment";
-import GymOwnerDashboard from './pages/gym-owner-dashboard';
-import Contact from "./pages/contact";
-import PrivacyPolicy from "./pages/privacy-policy";
-import Terms from "./pages/terms";
-import Partnership from "./pages/partnership";
+import PageLoader from "components/PageLoader";
 
-
-
-
+// 🚀 PERFORMANCE: Code splitting — each route is loaded on-demand
+const SignInSignUp = lazy(() => import('./pages/sign-in-sign-up'));
+const ForgotPassword = lazy(() => import("./pages/sign-in-sign-up/reset"));
+const UpdatePassword = lazy(() => import("./pages/sign-in-sign-up/updatePassword"));
+const GymListing = lazy(() => import('./pages/gym-listing'));
+const UserDashboard = lazy(() => import('./pages/user-dashboard'));
+const HomeWelcome = lazy(() => import('./pages/home-welcome'));
+const PartnerWithUs = lazy(() => import('./pages/partner-with-us'));
+const AboutUs = lazy(() => import('./pages/about-us'));
+const ApprovalPending = lazy(() => import("./pages/ApprovalPending"));
+const AdminApproval = lazy(() => import("./pages/admin-approval"));
+const OwnerApproved = lazy(() => import("./pages/owner-approved"));
+const OwnerRejected = lazy(() => import("./pages/owner-rejected"));
+const OwnerPayment = lazy(() => import("./pages/owner-payment"));
+const GymOwnerDashboard = lazy(() => import('./pages/gym-owner-dashboard'));
+const Contact = lazy(() => import("./pages/contact"));
+const PrivacyPolicy = lazy(() => import("./pages/privacy-policy"));
+const Terms = lazy(() => import("./pages/terms"));
+const Partnership = lazy(() => import("./pages/partnership"));
+const NotFound = lazy(() => import("pages/NotFound"));
 
 const Routes = () => {
   return (
     <BrowserRouter>
       <ErrorBoundary>
       <ScrollToTop />
+      <Suspense fallback={<PageLoader />}>
       <RouterRoutes>
         {/* Define your route here */}
         <Route path="/" element={<HomeWelcome />} />
@@ -55,6 +55,7 @@ const Routes = () => {
         <Route path="/about-us" element={<AboutUs />} />
         <Route path="*" element={<NotFound />} />
       </RouterRoutes>
+      </Suspense>
       
       </ErrorBoundary>
     </BrowserRouter>

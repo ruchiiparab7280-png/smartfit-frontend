@@ -40,6 +40,7 @@ const GymCard = ({ gym, onViewDetails, onContact }) => {
           src={gym?.images?.[0] || gym?.image || "/assets/images/no_image.png"}
  alt={gym?.name || "Gym"}
           className="w-full h-full object-cover"
+          loading="lazy"
         />
         {gym?.featured && (
           <div className="absolute top-3 right-3 bg-accent text-accent-foreground px-3 py-1 rounded-md text-sm font-medium">
@@ -145,4 +146,5 @@ const GymCard = ({ gym, onViewDetails, onContact }) => {
   );
 };
 
-export default GymCard;
+// 🚀 PERFORMANCE: React.memo prevents re-render when gym data hasn't changed
+export default React.memo(GymCard);

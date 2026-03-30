@@ -226,4 +226,5 @@ const authenticatedItems = showDashboard
   );
 };
 
-export default MainNavigation;
+// 🚀 PERFORMANCE: React.memo — renders on every page but props rarely change
+export default React.memo(MainNavigation);

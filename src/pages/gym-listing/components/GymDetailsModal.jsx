@@ -7,10 +7,6 @@ import { normalizeGymImages } from '../../../utils/gymImageUtils';
 const GymDetailsModal = ({ gym, isOpen, onClose }) => {
   if (!isOpen || !gym) return null;
 
-  // 🔍 Debug: log full gym data and nested arrays
-  console.log('📦 Gym Data:', gym);
-  console.log('🏋️ gym.trainers:', gym.trainers);
-  console.log('💊 gym.supplements:', gym.supplements);
 
   const scrollRef = useRef(null);
 
@@ -691,6 +687,7 @@ const GymDetailsModal = ({ gym, isOpen, onClose }) => {
                   <img
                     src={trainer.image || '/assets/images/no_image.png'}
                     alt={trainer.name || 'Trainer'}
+                    loading="lazy"
                     onError={(e) => { e.target.onerror = null; e.target.src = '/assets/images/no_image.png'; }}
                     className="w-20 h-20 mx-auto rounded-full object-cover mb-2"
                   />
@@ -744,6 +741,7 @@ const GymDetailsModal = ({ gym, isOpen, onClose }) => {
                   <img
                     src={item.image || '/assets/images/no_image.png'}
                     alt="supplement"
+                    loading="lazy"
                     onError={(e) => { e.target.onerror = null; e.target.src = '/assets/images/no_image.png'; }}
                     className="w-20 h-20 mx-auto rounded object-cover mb-2"
                   />

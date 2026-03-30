@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from "react";
+import React, { useState, useEffect, useMemo, useCallback } from "react";
 import MainNavigation from "../../components/MainNavigation";
 import Icon from "../../components/AppIcon";
 import { useNavigate } from "react-router-dom";
@@ -21,9 +21,9 @@ const UserDashboard = () => {
   const navigate = useNavigate();
   const [workouts, setWorkouts] = useState([])
   const [profile, setProfile] = useState(null)
-  const updateProfile = (newData) => {
+  const updateProfile = useCallback((newData) => {
     setProfile(newData)
-  }
+  }, [])
   const [membership, setMembership] = useState(null)
   const [membershipGym, setMembershipGym] = useState(null)
   const [showGymModal, setShowGymModal] = useState(false)
@@ -126,7 +126,6 @@ const UserDashboard = () => {
       const res = await fetch(`${import.meta.env.VITE_API_URL}/user-memberships/${email}`)
 
       const data = await res.json()
-      console.log("user-memberships API response:", data)
 
       if (data.length > 0) {
         const firstMembership = data[0];
@@ -165,14 +164,6 @@ const UserDashboard = () => {
         } catch (err) {
           console.log("Gym details fetch error", err);
         }
-
-        console.log("Normalized membership (dashboard):", {
-          gym_name: firstMembership?.gym_name,
-          gym_city: firstMembership?.gym_city,
-          start_date: firstMembership?.start_date,
-          expiry_date: resolvedExpiryDate,
-          duration: firstMembership?.duration,
-        });
 
       }
 
@@ -226,44 +217,58 @@ const UserDashboard = () => {
     fetchProfile()
 
   }, [])
-  const calculateStreak = (workouts) => {
 
-    let streak = 0
-
+  // 🚀 PERFORMANCE: useMemo for expensive calculations
+  const streak = useMemo(() => {
+    let s = 0;
     for (let i = 0; i < workouts.length; i++) {
-
-      const allCompleted = workouts[i].exercises?.every(ex => ex.completed)
-
+      const allCompleted = workouts[i].exercises?.every(ex => ex.completed);
       if (allCompleted) {
-        streak++
+        s++;
       } else {
-        break
+        break;
       }
-
     }
+    return s;
+  }, [workouts]);
 
-    return streak
-
-  }
-  const calculateCalories = (workouts) => {
-
-    let total = 0
-
+  const caloriesBurned = useMemo(() => {
+    let total = 0;
     workouts.forEach(day => {
       if (day.exercises) {
         day.exercises.forEach(ex => {
           if (ex.completed) {
-            total += 8
+            total += 8;
           }
-        })
+        });
       }
-    })
+    });
+    return total;
+  }, [workouts]);
 
-    return total
-
-  }
+  // 🚀 PERFORMANCE: Memoized stats object
+  const stats = useMemo(() => ({
+    active_memberships: membership ? 1 : 0,
+    workouts_this_month: workouts.length,
+    calories_burned: caloriesBurned,
+    streak: streak
+  }), [membership, workouts.length, caloriesBurned, streak]);
 
   const [activeTab, setActiveTab] = useState("dashboard")
+
+  // 🚀 PERFORMANCE: useCallback for tab handlers
+  const handleTabChange = useCallback((tab) => {
+    setActiveTab(tab);
+  }, []);
+
+  const handleGoToGyms = useCallback((gymEmail) => {
+    localStorage.setItem("renewGym", gymEmail);
+    setActiveTab("gyms");
+  }, []);
+
+  const handleOpenGymModal = useCallback(() => {
+    setShowGymModal(true);
+  }, []);
 
   const renderContent = () => {
 
@@ -272,14 +277,7 @@ const UserDashboard = () => {
       case "dashboard":
         return (
           <>
-            <StatsOverview
-              stats={{
-                active_memberships: membership ? 1 : 0,
-                workouts_this_month: workouts.length,
-                calories_burned: calculateCalories(workouts),
-                streak: calculateStreak(workouts)
-              }}
-            />
+            <StatsOverview stats={stats} />
 
             <div className="grid grid-cols-1 lg:grid-cols-2 gap-6 mt-6">
               <WorkoutPlanCard workouts={workouts} setWorkouts={setWorkouts} />
@@ -297,11 +295,8 @@ const UserDashboard = () => {
         return membership ? (
           <MembershipCard
             membership={membership}
-            goToGyms={(gymEmail) => {
-              localStorage.setItem("renewGym", gymEmail)
-              setActiveTab("gyms")
-            }}
-            onViewGym={() => setShowGymModal(true)}
+            goToGyms={handleGoToGyms}
+            onViewGym={handleOpenGymModal}
           />
         ) : (
           <div className="bg-card p-10 rounded-lg text-center">
@@ -370,35 +365,35 @@ const UserDashboard = () => {
 
           <div className="space-y-3">
 
-            <button onClick={() => setActiveTab("dashboard")} className="flex gap-3 items-center hover:text-primary">
+            <button onClick={() => handleTabChange("dashboard")} className="flex gap-3 items-center hover:text-primary">
               <Icon name="LayoutDashboard" /> Dashboard
             </button>
 
-            <button onClick={() => setActiveTab("profile")} className="flex gap-3 items-center hover:text-primary">
+            <button onClick={() => handleTabChange("profile")} className="flex gap-3 items-center hover:text-primary">
               <Icon name="User" /> Profile
             </button>
 
-            <button onClick={() => setActiveTab("membership")} className="flex gap-3 items-center hover:text-primary">
+            <button onClick={() => handleTabChange("membership")} className="flex gap-3 items-center hover:text-primary">
               <Icon name="CreditCard" /> Membership
             </button>
 
-            <button onClick={() => setActiveTab("trial")} className="flex gap-3 items-center hover:text-primary">
+            <button onClick={() => handleTabChange("trial")} className="flex gap-3 items-center hover:text-primary">
               <Icon name="Clock" /> Free Trial
             </button>
 
-            <button onClick={() => setActiveTab("trainer")} className="flex gap-3 items-center hover:text-primary">
+            <button onClick={() => handleTabChange("trainer")} className="flex gap-3 items-center hover:text-primary">
               <Icon name="Users" /> Trainer Requests
             </button>
 
-            <button onClick={() => setActiveTab("supplements")} className="flex gap-3 items-center hover:text-primary">
+            <button onClick={() => handleTabChange("supplements")} className="flex gap-3 items-center hover:text-primary">
               <Icon name="ShoppingBag" /> Supplements
             </button>
 
-            <button onClick={() => setActiveTab("workout")} className="flex gap-3 items-center hover:text-primary">
+            <button onClick={() => handleTabChange("workout")} className="flex gap-3 items-center hover:text-primary">
               <Icon name="Dumbbell" /> Workout Plan
             </button>
 
-            <button onClick={() => setActiveTab("bmi")} className="flex gap-3 items-center hover:text-primary">
+            <button onClick={() => handleTabChange("bmi")} className="flex gap-3 items-center hover:text-primary">
               <Icon name="Activity" /> BMI Calculator
             </button>
 
