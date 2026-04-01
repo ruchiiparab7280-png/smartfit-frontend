@@ -23,6 +23,7 @@ const Contact = lazy(() => import("./pages/contact"));
 const PrivacyPolicy = lazy(() => import("./pages/privacy-policy"));
 const Terms = lazy(() => import("./pages/terms"));
 const Partnership = lazy(() => import("./pages/partnership"));
+const AdminDashboard = lazy(() => import('./pages/admin-dashboard'));
 const NotFound = lazy(() => import("pages/NotFound"));
 
 const Routes = () => {
@@ -53,6 +54,7 @@ const Routes = () => {
         <Route path="/partnership" element={<Partnership />} /> 
         
         <Route path="/about-us" element={<AboutUs />} />
+        <Route path="/admin-dashboard" element={<AdminDashboard />} />
         <Route path="*" element={<NotFound />} />
       </RouterRoutes>
       </Suspense>

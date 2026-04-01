@@ -1,0 +1,120 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>SmartFit DFD Level 1 Diagram</title>
+    <script src="https://cdn.jsdelivr.net/npm/mermaid@10/dist/mermaid.min.js"></script>
+    <style>
+        body { background: #ffffff; padding: 20px; font-family: Arial, sans-serif; display: flex; flex-direction: column; align-items: center; }
+        .mermaid { margin-top: 20px; background: white; padding: 20px; border: 1px solid #ddd; }
+        .controls { margin-top: 20px; }
+        button { padding: 10px 20px; font-size: 16px; cursor: pointer; background: #000; color: #fff; border: none; border-radius: 4px; }
+        @media print { .controls { display: none; } .mermaid { border: none; } body { padding: 0; } }
+    </style>
+</head>
+<body>
+    <h2>SmartFit DFD Level 1 Diagram</h2>
+    <div class="controls">
+        <button onclick="downloadPNG()">Download as PNG Image</button>
+    </div>
+    <div class="mermaid">
+%%{init: {'flowchart': {'curve': 'basis'}}}%%
+flowchart TD
+    classDef process fill:#fff,stroke:#000,stroke-width:2px,shape:circle,rx:20,ry:20;
+    classDef ds fill:#fff,stroke:#000,stroke-width:2px,shape:cylinder;
+    classDef ext fill:#fff,stroke:#000,stroke-width:2px,rx:4,ry:4;
+    User([User]):::ext
+    Owner([Gym Owner]):::ext
+    Admin([Admin]):::ext
+    P1(("1.0 \n Auth & \n Profile Mgmt")):::process
+    P2(("2.0 \n Gym \n Operations")):::process
+    P3(("3.0 \n Razorpay \n Bookings")):::process
+    P4(("4.0 \n Reporting & \n Analytics")):::process
+    D1[("D1. users")]:::ds
+    D2[("D2. gym_owner_requests")]:::ds
+    D3[("D3. user_memberships")]:::ds
+    User -->|Login Data| P1
+    P1 <-->|Read / Write| D1
+    P1 -->|Auth Tokens| User
+    Owner -->|Gym Updates, Trainers| P2
+    P2 <-->|CRUD Data| D2
+    User -->|Query Gyms| P2
+    P2 -->|Search Results| User
+    User -->|Payment Payload| P3
+    P3 <-->|Record Transaction| D3
+    P3 -->|Payment Receipt| User
+    Owner -->|Request Sales Stats| P4
+    D3 -->|Transaction Records| P4
+    P4 -->|Revenue Charts| Owner
+    Admin -->|Review Status| P2
+    </div>
+    <script>
+        mermaid.initialize({
+            startOnLoad: true,
+            theme: 'base',
+            securityLevel: 'loose',
+            flowchart: { htmlLabels: false },
+            sequence: { htmlLabels: false },
+            class: { htmlLabels: false },
+            themeVariables: {
+                primaryColor: '#ffffff',
+                primaryTextColor: '#000000',
+                primaryBorderColor: '#000000',
+                lineColor: '#000000',
+                secondaryColor: '#ffffff',
+                tertiaryColor: '#ffffff',
+                fontFamily: 'Arial, sans-serif'
+            }
+        });
+
+        function downloadPNG() {
+            const svg = document.querySelector('.mermaid svg');
+            if(!svg) { alert('SVG not loaded yet'); return; }
+            let viewBox = svg.getAttribute('viewBox');
+            let baseWidth, baseHeight;
+            if (viewBox) {
+                let coords = viewBox.split(' ');
+                baseWidth = parseFloat(coords[2]);
+                baseHeight = parseFloat(coords[3]);
+            } else {
+                let bounds = svg.getBoundingClientRect();
+                baseWidth = bounds.width; 
+                baseHeight = bounds.height;
+            }
+            const serializer = new XMLSerializer();
+            let svgStr = serializer.serializeToString(svg);
+            svgStr = svgStr.replace(/<svg([^>]*)>/, function(match, attrs) {
+                attrs = attrs.replace(/\b(width|height)="[^"]*"/g, '');
+                return '<svg' + attrs + ' width="' + baseWidth + '" height="' + baseHeight + '">';
+            });
+            svgStr = svgStr.replace(/max-width:[^;"]+;?/g, '');
+            const b64 = btoa(unescape(encodeURIComponent(svgStr)));
+            const img = new Image();
+            let a4w = 2480, a4h = 3508;
+            if (baseWidth > baseHeight) { a4w = 3508; a4h = 2480; }
+            const canvas = document.createElement('canvas');
+            const ctx = canvas.getContext('2d');
+            canvas.width = a4w; 
+            canvas.height = a4h;
+            img.onload = function () {
+                ctx.fillStyle = "#ffffff";
+                ctx.fillRect(0, 0, canvas.width, canvas.height);
+                const margin = 300;
+                const safeW = a4w - (margin * 2);
+                const safeH = a4h - (margin * 2);
+                const scale = Math.min(safeW / baseWidth, safeH / baseHeight);
+                const offsetX = (a4w - (baseWidth * scale)) / 2;
+                const offsetY = (a4h - (baseHeight * scale)) / 2;
+                ctx.translate(offsetX, offsetY);
+                ctx.scale(scale, scale);
+                ctx.drawImage(img, 0, 0);
+                const a = document.createElement('a');
+                a.download = document.title.split(' ').join('_') + '.png';
+                a.href = canvas.toDataURL('image/png');
+                a.click();
+            };
+            img.src = 'data:image/svg+xml;base64,' + b64;
+        }
+    </script>
+</body>
+</html>

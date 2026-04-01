@@ -1,0 +1,334 @@
+=============================================================
+SMARTFIT GYM MANAGEMENT SYSTEM - MERMAID DIAGRAM PROMPTS
+=============================================================
+You can copy and paste any of the text blocks below into AI 
+generators or the official Mermaid Live Editor (https://mermaid.live) 
+to instantly recreate your diagrams.
+=============================================================
+
+
+1. CLASS DIAGRAM (Database Mapped - Vertical Layout)
+=============================================================
+classDiagram
+    direction LR
+    class User {
+        +String email (PK)
+        +String name
+        +String role
+        +String reset_token
+        +register()
+        +requestPasswordReset()
+    }
+    class GymOwnerRequest {
+        +String email (PK)
+        +String gym_name
+        +String location
+        +String status
+        +String payment_status
+        +approveRequest()
+        +rejectRequest()
+    }
+    class Membership {
+        +String gym_email (FK)
+        +String plan_title
+        +Float price
+        +Int duration_days
+        +createPlan()
+    }
+    class UserMembership {
+        +String user_email (FK)
+        +String gym_email (FK)
+        +String status
+        +Date start_date
+        +Date validation
+        +bookMembership()
+    }
+    class Trainer {
+        +String gym_email (FK)
+        +String full_name
+        +String photo_url
+        +String specialization
+        +addTrainer()
+    }
+    class UserWorkout {
+        +String user_email (FK)
+        +String day_of_week
+        +String exercise_name
+        +Int sets
+        +Int reps
+        +manageWorkout()
+    }
+    class SupplementOrder {
+        +String user_email (FK)
+        +String gym_email (FK)
+        +Int quantity
+        +String status
+        +placeOrder()
+    }
+    User "1" -- "0..*" UserMembership : books >
+    GymOwnerRequest "1" -- "0..*" Membership : offers >
+    GymOwnerRequest "1" -- "0..*" Trainer : employs >
+    User "1" -- "0..*" UserWorkout : tracks >
+    User "1" -- "0..*" SupplementOrder : orders >
+    GymOwnerRequest "1" -- "0..*" UserMembership : has members >
+
+
+2. SEQUENCE DIAGRAM (Razorpay Booking Flow)
+=============================================================
+%%{init: {'themeVariables': {'fontSize': '18px', 'fontFamily': 'Arial'}, 'sequence': {'actorMargin': 40, 'messageMargin': 30}}}%%
+sequenceDiagram
+    autonumber
+    actor User
+    participant React as React<br>App
+    participant Razorpay as Razorpay
+    participant Node as Node<br>API
+    participant DB as Supabase<br>DB
+    
+    User->>React: Click "Book Membership"
+    React->>Node: POST /create-order
+    activate Node
+    Node->>Razorpay: Request Order ID
+    Razorpay-->>Node: Return Order ID
+    Node-->>React: Return ID & Key
+    deactivate Node
+    
+    React->>Razorpay: Open Payment Modal
+    User->>Razorpay: Pay with Card
+    Razorpay-->>React: Payment Success (ID)
+    
+    React->>Node: POST /verify {emails}
+    activate Node
+    Node->>DB: Verify User & Gym
+    activate DB
+    DB-->>Node: Valid
+    Node->>DB: INSERT user_memberships
+    DB-->>Node: Success
+    deactivate DB
+    Node-->>React: 200 OK (Successful)
+    deactivate Node
+    
+    React-->>User: Show Payment Success
+
+
+3. SYSTEM ARCHITECTURE DIAGRAM
+=============================================================
+%%{init: {'flowchart': {'curve': 'linear'}}}%%
+flowchart TD
+    classDef layer fill:#fff,stroke:#000,stroke-width:1.5px,rx:5,ry:5;
+    classDef db fill:#fff,stroke:#000,stroke-width:1.5px,shape:cylinder;
+    subgraph Client [Client Device Layer]
+        Browser([Web Browser / Mobile App])
+    end
+    subgraph Frontend [Presentation Layer - Vercel]
+        Vite[Vite + React UI]
+        Tailwind[Tailwind CSS Styling]
+    end
+    subgraph API [API Service Layer - Node.js]
+        Express[Express REST API routes]
+        Auth[Auth Middleware]
+        Logic[Business Logic Controllers]
+    end
+    subgraph DB [Data Persistance Layer - Supabase]
+        Postgres[(PostgreSQL Relational DB)]:::db
+        Storage[(Supabase Object Storage)]:::db
+    end
+    subgraph ThirdParty [Third-Party Services]
+        Razorpay[Razorpay Payment Gateway]
+        Resend[Resend Email API]
+    end
+    Browser <-->|HTTPS / JSON| Vite
+    Vite <-->|Axios Requests| Express
+    Express <--> Auth
+    Auth <--> Logic
+    Logic <--> Postgres
+    Logic <--> Storage
+    Logic <--> Razorpay
+    Logic -->|Send Confirmations| Resend
+
+
+4. USE CASE DIAGRAM
+=============================================================
+%%{init: {'flowchart': {'curve': 'basis'}}}%%
+flowchart LR
+    classDef actor fill:#fff,stroke:#000,stroke-width:2px,shape:circle;
+    classDef uc fill:#fff,stroke:#000,stroke-width:1.5px,shape:ellipse;
+    User([User]):::actor
+    Owner([Gym Owner]):::actor
+    Admin([System Admin]):::actor
+    subgraph SmartFit System Application
+        direction TB
+        UC1([Login / Register / Reset Password]):::uc
+        UC2([Browse Gyms & View Instructors]):::uc
+        UC3([Book Gym Memberships via Razorpay]):::uc
+        UC4([Manage Daily User Workouts]):::uc
+        UC5([Register New Gym & Pay Fees]):::uc
+        UC6([Manage Trainers & Supplements]):::uc
+        UC7([View Detailed Revenue Analytics]):::uc
+        UC8([Approve pending gym requests]):::uc
+        UC9([Monitor User Activity & Audits]):::uc
+    end
+    User --> UC1
+    User --> UC2
+    User --> UC3
+    User --> UC4
+    Owner --> UC1
+    Owner --> UC5
+    Owner --> UC6
+    Owner --> UC7
+    Admin --> UC1
+    Admin --> UC8
+    Admin --> UC9
+
+
+5. DFD LEVEL 0 (CONTEXT DIAGRAM)
+=============================================================
+%%{init: {'flowchart': {'curve': 'basis'}}}%%
+flowchart LR
+    classDef actor fill:#fff,stroke:#000,stroke-width:2px,shape:rect,rx:3,ry:3;
+    classDef system fill:#fff,stroke:#000,stroke-width:2px,shape:circle,color:#000,stroke-dasharray: 4 4;
+    User([Gym User]):::actor
+    Owner([Gym Owner]):::actor
+    Admin([System Admin]):::actor
+    System(("SmartFit \n Gym Management \n System")):::system
+    User -- "Registration, Logs, Razorpay Payments" --> System
+    System -- "Profiles, Gym List, Digital Invoices" --> User
+    Owner -- "Gym Details, Trainer Info, Schedules" --> System
+    System -- "Bookings, Revenue Stats, Member List" --> Owner
+    Admin -- "Platform Audits, Approvals" --> System
+    System -- "Gym Applications, Metrics" --> Admin
+
+
+6. DFD LEVEL 1 DIAGRAM
+=============================================================
+%%{init: {'flowchart': {'curve': 'basis'}}}%%
+flowchart TD
+    classDef process fill:#fff,stroke:#000,stroke-width:2px,shape:circle,rx:20,ry:20;
+    classDef ds fill:#fff,stroke:#000,stroke-width:2px,shape:cylinder;
+    classDef ext fill:#fff,stroke:#000,stroke-width:2px,rx:4,ry:4;
+    User([User]):::ext
+    Owner([Gym Owner]):::ext
+    Admin([Admin]):::ext
+    P1(("1.0 \n Auth & \n Profile Mgmt")):::process
+    P2(("2.0 \n Gym \n Operations")):::process
+    P3(("3.0 \n Razorpay \n Bookings")):::process
+    P4(("4.0 \n Reporting & \n Analytics")):::process
+    D1[("D1. users")]:::ds
+    D2[("D2. gym_owner_requests")]:::ds
+    D3[("D3. user_memberships")]:::ds
+    User -->|Login Data| P1
+    P1 <-->|Read / Write| D1
+    P1 -->|Auth Tokens| User
+    Owner -->|Gym Updates, Trainers| P2
+    P2 <-->|CRUD Data| D2
+    User -->|Query Gyms| P2
+    P2 -->|Search Results| User
+    User -->|Payment Payload| P3
+    P3 <-->|Record Transaction| D3
+    P3 -->|Payment Receipt| User
+    Owner -->|Request Sales Stats| P4
+    D3 -->|Transaction Records| P4
+    P4 -->|Revenue Charts| Owner
+    Admin -->|Review Status| P2
+
+
+7. SDLC DIAGRAM
+=============================================================
+%%{init: {'flowchart': {'curve': 'stepBefore'}}}%%
+flowchart TD
+    classDef step fill:#fff,stroke:#000,stroke-width:2px,rx:5,ry:5,color:#000;
+    A[Requirement Gathering & Feasibility]:::step
+    B[System Analysis \n Use Cases & DFDs]:::step
+    C[System Design \n Architecture & Supabase Schema]:::step
+    D[Development \n React JS frontend & Node API]:::step
+    E[Testing \n Functionality, Payments & Bugs]:::step
+    F[Deployment \n Vercel & Supabase Platform]:::step
+    G[Maintenance \n Scaling & Support]:::step
+    A --> B --> C --> D --> E --> F --> G
+
+
+8. ACTIVITY DIAGRAM (User Core Flow)
+=============================================================
+%%{init: {'flowchart': {'curve': 'basis'}}}%%
+flowchart TD
+    classDef startEnd fill:#000,stroke:#000,stroke-width:2px,shape:circle,color:#fff;
+    classDef action fill:#fff,stroke:#000,stroke-width:2px,rx:10,ry:10;
+    classDef decision fill:#fff,stroke:#000,stroke-width:2px,shape:diamond;
+
+    Start((Start)):::startEnd
+    A[Login / Register]:::action
+    B[Explore & Select Gym]:::action
+    C{View Gym \n Details?}:::decision
+    D[Review Trainers & Supplements]:::action
+    E{Book \n Membership?}:::decision
+    F[Razorpay Checkout]:::action
+    G{Payment \n Success?}:::decision
+    H[Save to Database]:::action
+    I[Dashboard & Workouts]:::action
+    End((End)):::startEnd
+
+    Start --> A --> B --> C
+    C -->|Yes| D --> E
+    C -->|No| E
+    E -->|No| B
+    E -->|Yes| F --> G
+    G -->|No| F
+    G -->|Yes| H --> I --> End
+
+
+9. ER DIAGRAM (Database Schema Entity-Relationships)
+=============================================================
+%%{init: {'theme': 'base', 'themeVariables': {'fontSize': '16px', 'fontFamily': 'Arial', 'primaryColor': '#ffffff', 'primaryTextColor': '#000000', 'primaryBorderColor': '#000000', 'lineColor': '#000000'}}}%%
+erDiagram
+    USERS {
+        string email PK
+        string name
+        string role
+        string reset_token
+    }
+    GYM_OWNER_REQUESTS {
+        string email PK
+        string gym_name
+        string status
+        string payment_status
+    }
+    MEMBERSHIPS {
+        uuid id PK
+        string gym_email FK
+        string plan_title
+        float price
+    }
+    USER_MEMBERSHIPS {
+        uuid id PK
+        string user_email FK
+        string gym_email FK
+        string status
+        date start_date
+    }
+    TRAINERS {
+        uuid id PK
+        string gym_email FK
+        string full_name
+        string specialization
+    }
+    USER_WORKOUTS {
+        uuid id PK
+        string user_email FK
+        string exercise_name
+        int sets
+    }
+    SUPPLEMENT_ORDERS {
+        uuid id PK
+        string user_email FK
+        string gym_email FK
+        int quantity
+        string status
+    }
+
+    USERS ||--o{ USER_MEMBERSHIPS : books
+    USERS ||--o{ USER_WORKOUTS : logs
+    USERS ||--o{ SUPPLEMENT_ORDERS : purchases
+    
+    GYM_OWNER_REQUESTS ||--o{ MEMBERSHIPS : offers
+    GYM_OWNER_REQUESTS ||--o{ TRAINERS : employs
+    GYM_OWNER_REQUESTS ||--o{ USER_MEMBERSHIPS : registers
+    GYM_OWNER_REQUESTS ||--o{ SUPPLEMENT_ORDERS : fulfills
