@@ -35,8 +35,8 @@ const AdminPlans = () => {
   const filtered = memberships.filter(m => {
     const q = search.toLowerCase();
     return (m.user_email || '').toLowerCase().includes(q) ||
-           (m.gym_name || '').toLowerCase().includes(q) ||
-           (m.plan_name || '').toLowerCase().includes(q);
+      (m.gym_name || '').toLowerCase().includes(q) ||
+      (m.plan_name || '').toLowerCase().includes(q);
   });
 
   if (loading) {
@@ -92,11 +92,10 @@ const AdminPlans = () => {
                   <td className="px-4 py-3 text-slate-400 hidden lg:table-cell">{m.duration || '—'}</td>
                   <td className="px-4 py-3 text-white font-medium">₹{formatINR(m.price)}</td>
                   <td className="px-4 py-3">
-                    <span className={`px-2.5 py-1 rounded-full text-xs font-semibold capitalize ${
-                      m.status === 'active' ? 'bg-emerald-500/10 text-emerald-400' :
-                      m.status === 'expired' ? 'bg-red-500/10 text-red-400' :
-                      'bg-slate-700 text-slate-300'
-                    }`}>
+                    <span className={`px-2.5 py-1 rounded-full text-xs font-semibold capitalize ${m.status === 'active' ? 'bg-emerald-500/10 text-emerald-400' :
+                        m.status === 'expired' ? 'bg-red-500/10 text-red-400' :
+                          'bg-slate-700 text-slate-300'
+                      }`}>
                       {m.status || '—'}
                     </span>
                   </td>

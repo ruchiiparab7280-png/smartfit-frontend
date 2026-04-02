@@ -40,11 +40,14 @@ const MainNavigation = () => {
 
 
 const dashboardPath =
-  role === "owner"
+  role === "admin"
+    ? "/admin-dashboard"
+    : role === "owner"
     ? "/gym-owner-dashboard"
     : "/user-dashboard";
 
 const showDashboard =
+  role === "admin" ||
   role === "user" ||
   (role === "owner" && paymentStatus === "paid");
 

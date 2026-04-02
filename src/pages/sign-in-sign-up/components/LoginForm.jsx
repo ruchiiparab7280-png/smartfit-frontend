@@ -84,7 +84,10 @@ const LoginForm = () => {
         // ROLE + APPROVAL BASED NAVIGATION
        // ROLE + STATUS BASED NAVIGATION
 
-if (data.user.role === "owner") {
+if (data.user.role === "admin") {
+  navigate("/admin-dashboard");
+}
+else if (data.user.role === "owner") {
 
   if (data.user.status === "not_submitted") {
     navigate("/partner-with-us");

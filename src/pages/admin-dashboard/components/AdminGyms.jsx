@@ -51,7 +51,7 @@ const AdminGyms = () => {
     const q = search.toLowerCase();
     return (g.gym_name || '').toLowerCase().includes(q) ||
            (g.email || '').toLowerCase().includes(q) ||
-           (g.address || '').toLowerCase().includes(q);
+           (g.full_name || '').toLowerCase().includes(q);
   });
 
   if (loading) {
@@ -89,11 +89,10 @@ const AdminGyms = () => {
             <thead>
               <tr className="text-left text-slate-500 border-b border-slate-800 bg-slate-900/50">
                 <th className="px-4 py-3 font-medium">Gym Name</th>
-                <th className="px-4 py-3 font-medium">Owner Email</th>
+                <th className="px-4 py-3 font-medium">Owner</th>
                 <th className="px-4 py-3 font-medium hidden md:table-cell">Phone</th>
                 <th className="px-4 py-3 font-medium hidden lg:table-cell">Address</th>
                 <th className="px-4 py-3 font-medium">Status</th>
-                <th className="px-4 py-3 font-medium">Payment</th>
                 <th className="px-4 py-3 font-medium">Actions</th>
               </tr>
             </thead>
@@ -106,14 +105,14 @@ const AdminGyms = () => {
                       <span className="text-white font-medium">{gym.gym_name || '—'}</span>
                     </div>
                   </td>
-                  <td className="px-4 py-3 text-slate-400">{gym.email}</td>
+                  <td className="px-4 py-3">
+                    <p className="text-slate-300 text-xs">{gym.full_name || '—'}</p>
+                    <p className="text-slate-500 text-xs">{gym.email}</p>
+                  </td>
                   <td className="px-4 py-3 text-slate-400 hidden md:table-cell">{gym.phone || '—'}</td>
                   <td className="px-4 py-3 text-slate-400 hidden lg:table-cell max-w-[200px] truncate">{gym.address || '—'}</td>
                   <td className="px-4 py-3">
-                    <StatusBadge status={gym.status} />
-                  </td>
-                  <td className="px-4 py-3">
-                    <PaymentBadge status={gym.payment_status} />
+                    <GymStatusBadge status={gym.status} paymentStatus={gym.payment_status} />
                   </td>
                   <td className="px-4 py-3">
                     {gym.status === 'pending' ? (
@@ -142,7 +141,7 @@ const AdminGyms = () => {
                 </tr>
               ))}
               {filtered.length === 0 && (
-                <tr><td colSpan={7} className="px-4 py-8 text-center text-slate-500">No gyms found</td></tr>
+                <tr><td colSpan={6} className="px-4 py-8 text-center text-slate-500">No gyms found</td></tr>
               )}
             </tbody>
           </table>
@@ -152,26 +151,20 @@ const AdminGyms = () => {
   );
 };
 
-const StatusBadge = ({ status }) => {
-  const styles = {
-    approved: 'bg-emerald-500/10 text-emerald-400',
-    pending: 'bg-amber-500/10 text-amber-400',
-    rejected: 'bg-red-500/10 text-red-400',
-  };
-  return (
-    <span className={`px-2.5 py-1 rounded-full text-xs font-semibold capitalize ${styles[status] || 'bg-slate-700 text-slate-300'}`}>
-      {status || '—'}
-    </span>
-  );
-};
-
-const PaymentBadge = ({ status }) => {
-  const isPaid = status === 'paid';
-  return (
-    <span className={`px-2.5 py-1 rounded-full text-xs font-semibold ${isPaid ? 'bg-emerald-500/10 text-emerald-400' : 'bg-slate-700 text-slate-400'}`}>
-      {isPaid ? 'Paid' : 'Unpaid'}
-    </span>
-  );
+const GymStatusBadge = ({ status, paymentStatus }) => {
+  if (status === 'approved' && paymentStatus === 'paid') {
+    return <span className="px-2.5 py-1 rounded-full text-xs font-semibold bg-emerald-500/10 text-emerald-400">Active (Plan Purchased)</span>;
+  }
+  if (status === 'approved') {
+    return <span className="px-2.5 py-1 rounded-full text-xs font-semibold bg-blue-500/10 text-blue-400">Approved (No Plan)</span>;
+  }
+  if (status === 'pending') {
+    return <span className="px-2.5 py-1 rounded-full text-xs font-semibold bg-amber-500/10 text-amber-400">Pending Approval</span>;
+  }
+  if (status === 'rejected') {
+    return <span className="px-2.5 py-1 rounded-full text-xs font-semibold bg-red-500/10 text-red-400">Rejected</span>;
+  }
+  return <span className="px-2.5 py-1 rounded-full text-xs font-semibold bg-slate-700 text-slate-300">{status || '—'}</span>;
 };
 
 export default React.memo(AdminGyms);

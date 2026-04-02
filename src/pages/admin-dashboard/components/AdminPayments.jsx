@@ -35,8 +35,8 @@ const AdminPayments = () => {
   const filtered = payments.filter(p => {
     const q = search.toLowerCase();
     return (p.email || '').toLowerCase().includes(q) ||
-           (p.type || '').toLowerCase().includes(q) ||
-           (p.payment_id || '').toLowerCase().includes(q);
+      (p.type || '').toLowerCase().includes(q) ||
+      (p.payment_id || '').toLowerCase().includes(q);
   });
 
   const totalAmount = payments.reduce((sum, p) => sum + Number(p.amount || 0), 0);
@@ -90,9 +90,8 @@ const AdminPayments = () => {
                 <tr key={p.id} className="border-b border-slate-800/50 last:border-0 hover:bg-slate-800/30 transition-colors">
                   <td className="px-4 py-3 text-white font-medium">{p.email}</td>
                   <td className="px-4 py-3">
-                    <span className={`px-2.5 py-1 rounded-full text-xs font-semibold ${
-                      p.type === 'Owner Registration' ? 'bg-purple-500/10 text-purple-400' : 'bg-blue-500/10 text-blue-400'
-                    }`}>
+                    <span className={`px-2.5 py-1 rounded-full text-xs font-semibold ${p.type === 'Owner Registration' ? 'bg-purple-500/10 text-purple-400' : 'bg-blue-500/10 text-blue-400'
+                      }`}>
                       {p.type}
                     </span>
                   </td>
@@ -101,12 +100,11 @@ const AdminPayments = () => {
                     {p.payment_id}
                   </td>
                   <td className="px-4 py-3">
-                    <span className={`px-2.5 py-1 rounded-full text-xs font-semibold capitalize ${
-                      p.status === 'success' ? 'bg-emerald-500/10 text-emerald-400' :
-                      p.status === 'active' ? 'bg-emerald-500/10 text-emerald-400' :
-                      p.status === 'failed' ? 'bg-red-500/10 text-red-400' :
-                      'bg-amber-500/10 text-amber-400'
-                    }`}>
+                    <span className={`px-2.5 py-1 rounded-full text-xs font-semibold capitalize ${p.status === 'success' ? 'bg-emerald-500/10 text-emerald-400' :
+                        p.status === 'active' ? 'bg-emerald-500/10 text-emerald-400' :
+                          p.status === 'failed' ? 'bg-red-500/10 text-red-400' :
+                            'bg-amber-500/10 text-amber-400'
+                      }`}>
                       {p.status || '—'}
                     </span>
                   </td>
