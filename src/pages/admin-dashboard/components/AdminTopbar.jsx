@@ -1,5 +1,6 @@
 import React from 'react';
-import { Menu, Bell, User } from 'lucide-react';
+import { useNavigate } from "react-router-dom";
+import { Menu, } from 'lucide-react';
 
 const sectionTitles = {
   dashboard: 'Dashboard',
@@ -10,6 +11,12 @@ const sectionTitles = {
 };
 
 const AdminTopbar = ({ activeSection, setSidebarOpen }) => {
+  const navigate = useNavigate();
+
+  const handleLogout = () => {
+    localStorage.clear();
+    navigate("/");
+  };
   return (
     <header className="bg-[#0f172a] border-b border-slate-800 px-4 lg:px-6 py-4 flex items-center justify-between flex-shrink-0">
       {/* Left — hamburger + title */}
@@ -31,28 +38,16 @@ const AdminTopbar = ({ activeSection, setSidebarOpen }) => {
           </p>
         </div>
       </div>
-
-      {/* Right — notifications + admin avatar */}
+      {/* Right side */}
       <div className="flex items-center gap-4">
-        {/* Notification bell */}
+
         <button
-          className="relative p-2 rounded-lg text-slate-400 hover:text-white hover:bg-slate-800 transition-colors"
-          aria-label="Notifications"
+          onClick={handleLogout}
+          className="bg-red-500 hover:bg-red-600 px-4 py-2 rounded-lg text-white text-sm font-medium transition"
         >
-          <Bell size={20} />
-          {/* Unread dot */}
-          <span className="absolute top-1.5 right-1.5 w-2 h-2 bg-orange-500 rounded-full" />
+          Logout
         </button>
 
-        {/* Admin avatar */}
-        <div className="flex items-center gap-2">
-          <div className="w-8 h-8 rounded-full bg-orange-500/20 border border-orange-500/40 flex items-center justify-center">
-            <User size={16} className="text-orange-400" />
-          </div>
-          <span className="hidden sm:block text-sm font-medium text-slate-300">
-            Admin
-          </span>
-        </div>
       </div>
     </header>
   );
