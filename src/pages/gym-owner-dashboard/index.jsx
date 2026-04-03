@@ -208,6 +208,10 @@ const DashboardHome = ({ setActiveSection }) => {
     { text: "Loading...", time: "", type: "loading" },
   ]);
 
+  // ── Owner / Gym info ──
+  const [ownerName, setOwnerName] = useState("");
+  const [gymName, setGymName] = useState("");
+
   // ── Plan Renewal State ──
   const [planStatus, setPlanStatus] = useState(null); // "ACTIVE" | "EXPIRED" | null
   const [planExpiryDate, setPlanExpiryDate] = useState(null);
@@ -215,7 +219,7 @@ const DashboardHome = ({ setActiveSection }) => {
   const [planLoading, setPlanLoading] = useState(true);
   const [renewLoading, setRenewLoading] = useState(false);
 
-  // ── Fetch plan info ──
+  // ── Fetch plan info + owner details ──
   const fetchPlanInfo = async () => {
     const ownerEmail = localStorage.getItem("userEmail");
     if (!ownerEmail) { setPlanLoading(false); return; }
@@ -223,6 +227,10 @@ const DashboardHome = ({ setActiveSection }) => {
     try {
       const res = await fetch(`${apiBase}/owner-gym/${ownerEmail}`);
       const data = await res.json();
+
+      // Set owner name & gym name from real DB data
+      if (data?.name) setOwnerName(data.name);
+      if (data?.gym_name) setGymName(data.gym_name);
 
       const expiry = data?.plan_expiry_date;
       const status = data?.plan_status;
@@ -588,10 +596,10 @@ const DashboardHome = ({ setActiveSection }) => {
     <div>
       <div className="mb-6">
         <h2 className="text-2xl font-bold text-white">
-          Welcome back, Gym Owner 👋
+          Welcome back, {ownerName || "Gym Owner"} 👋
         </h2>
         <p className="text-slate-400 mt-1">
-          Here's what's happening at SmartFit Multi Gym today
+          Here's what's happening at {gymName || "your gym"} today
         </p>
       </div>
 
@@ -729,7 +737,7 @@ const DashboardHome = ({ setActiveSection }) => {
         </div>
 
         <div className="bg-[#111827] rounded-xl shadow-sm border border-slate-800 p-6">
-          <h3 className="font-bold text-slate-800 mb-4">Quick Actions</h3>
+          <h3 className="font-bold text-white mb-4">Quick Actions</h3>
           <div className="space-y-2">
             {[
               {
@@ -751,7 +759,7 @@ const DashboardHome = ({ setActiveSection }) => {
                 label: "New Membership Plan",
                 section: "memberships",
                 color:
-                  "bg-orange-500 text-white hover:bg-orange-600bg-orange-500 text-white hover:bg-orange-600",
+                  "bg-orange-500 text-white hover:bg-orange-600",
               },
               {
                 label: "View Earnings",
