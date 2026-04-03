@@ -84,3 +84,13 @@ CREATE INDEX IF NOT EXISTS idx_gym_reviews_gym_email
 -- DONE! All high-impact indexes created.
 -- These optimize the most frequently queried fields.
 -- ============================================================
+
+-- ============================================================
+-- GYM PLAN RENEWAL: Add columns to gym_owner_requests
+-- Run this in Supabase SQL Editor to enable plan renewal
+-- ============================================================
+
+ALTER TABLE gym_owner_requests
+ADD COLUMN IF NOT EXISTS plan_expiry_date DATE,
+ADD COLUMN IF NOT EXISTS plan_status TEXT DEFAULT 'EXPIRED',
+ADD COLUMN IF NOT EXISTS last_payment_id TEXT;

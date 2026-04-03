@@ -110,8 +110,8 @@ const GymOwnerDashboard = () => {
               key={item?.id}
               onClick={() => { setActiveSection(item?.id); setSidebarOpen(false); }}
               className={`w-full flex items-center gap-3 px-3 py-2.5 rounded-lg mb-1 text-sm font-medium transition-colors ${activeSection === item.id
-                  ? 'bg-orange-500 text-white'
-                  : 'text-slate-400 hover:text-white hover:bg-slate-800'
+                ? 'bg-orange-500 text-white'
+                : 'text-slate-400 hover:text-white hover:bg-slate-800'
                 }`}
             >
               {item?.icon}
@@ -207,6 +207,150 @@ const DashboardHome = ({ setActiveSection }) => {
     { text: "Loading...", time: "", type: "loading" },
     { text: "Loading...", time: "", type: "loading" },
   ]);
+
+  // ── Plan Renewal State ──
+  const [planStatus, setPlanStatus] = useState(null); // "ACTIVE" | "EXPIRED" | null
+  const [planExpiryDate, setPlanExpiryDate] = useState(null);
+  const [daysRemaining, setDaysRemaining] = useState(null);
+  const [planLoading, setPlanLoading] = useState(true);
+  const [renewLoading, setRenewLoading] = useState(false);
+
+  // ── Fetch plan info ──
+  const fetchPlanInfo = async () => {
+    const ownerEmail = localStorage.getItem("userEmail");
+    if (!ownerEmail) { setPlanLoading(false); return; }
+    const apiBase = import.meta.env.VITE_API_URL;
+    try {
+      const res = await fetch(`${apiBase}/owner-gym/${ownerEmail}`);
+      const data = await res.json();
+
+      const expiry = data?.plan_expiry_date;
+      const status = data?.plan_status;
+
+      if (expiry && status === "ACTIVE") {
+        const expiryDate = new Date(expiry);
+        const today = new Date();
+        const diffMs = expiryDate.getTime() - today.getTime();
+        const diffDays = Math.ceil(diffMs / (1000 * 60 * 60 * 24));
+        setPlanExpiryDate(expiry);
+        setDaysRemaining(diffDays);
+        setPlanStatus(diffDays > 0 ? "ACTIVE" : "EXPIRED");
+      } else {
+        setPlanStatus("EXPIRED");
+        setPlanExpiryDate(null);
+        setDaysRemaining(0);
+      }
+    } catch (err) {
+      console.log("Plan info fetch error:", err);
+      setPlanStatus("EXPIRED");
+      setDaysRemaining(0);
+    }
+    setPlanLoading(false);
+  };
+
+  // ── Razorpay script loader (same as owner-payment) ──
+  const loadScript = (src) => {
+    return new Promise((resolve) => {
+      const existing = document.querySelector(`script[src="${src}"]`);
+      if (existing) { resolve(true); return; }
+      const script = document.createElement("script");
+      script.src = src;
+      script.onload = () => resolve(true);
+      script.onerror = () => resolve(false);
+      document.body.appendChild(script);
+    });
+  };
+
+  // ── Renew Plan handler ──
+  const handleRenewPlan = async () => {
+    if (renewLoading) return; // Prevent duplicate clicks
+    setRenewLoading(true);
+
+    const apiBase = import.meta.env.VITE_API_URL;
+    const ownerEmail = localStorage.getItem("userEmail");
+
+    try {
+      const loaded = await loadScript("https://checkout.razorpay.com/v1/checkout.js");
+      if (!loaded) {
+        alert("Razorpay SDK failed to load. Please check your internet connection.");
+        setRenewLoading(false);
+        return;
+      }
+
+      // Step 1: Create order
+      const orderRes = await fetch(`${apiBase}/api/plan/create-order`, {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ email: ownerEmail }),
+      });
+      const orderData = await orderRes.json();
+
+      if (!orderData.id) {
+        alert("Failed to create renewal order. Please try again.");
+        setRenewLoading(false);
+        return;
+      }
+
+      // Step 2: Razorpay Options
+      const options = {
+        key: orderData.key,
+        amount: orderData.amount,
+        currency: orderData.currency,
+        name: "SmartFit",
+        description: "Gym Plan Renewal – ₹5,000/year",
+        order_id: orderData.id,
+        handler: async function (response) {
+          try {
+            const verifyRes = await fetch(`${apiBase}/api/plan/verify-payment`, {
+              method: "POST",
+              headers: { "Content-Type": "application/json" },
+              body: JSON.stringify({
+                ...response,
+                email: ownerEmail,
+              }),
+            });
+            const verifyData = await verifyRes.json();
+
+            if (verifyData.success) {
+              alert("Plan renewed successfully! ✅");
+              // Refresh plan info
+              await fetchPlanInfo();
+            } else {
+              alert("Payment verification failed ❌. Please contact support.");
+            }
+          } catch (verifyErr) {
+            console.error("Verify error:", verifyErr);
+            alert("Verification error. Please contact support.");
+          }
+          setRenewLoading(false);
+        },
+        modal: {
+          ondismiss: function () {
+            setRenewLoading(false);
+          },
+        },
+        prefill: {
+          email: ownerEmail || "",
+        },
+        theme: {
+          color: "#f97316",
+        },
+      };
+
+      const paymentObject = new window.Razorpay(options);
+      paymentObject.open();
+    } catch (error) {
+      console.error("Renew Plan Error:", error);
+      alert("Payment failed. Please try again.");
+      setRenewLoading(false);
+    }
+  };
+
+  const showRenewButton = planStatus === "EXPIRED" || (daysRemaining !== null && daysRemaining <= 7);
+
+  useEffect(() => {
+    fetchPlanInfo();
+  }, []);
 
   useEffect(() => {
     const ownerEmail = localStorage.getItem("userEmail");
@@ -451,6 +595,93 @@ const DashboardHome = ({ setActiveSection }) => {
         </p>
       </div>
 
+      {/* ── Plan Status Card ── */}
+      <div className="mb-8">
+        <div className={`bg-[#111827] rounded-xl shadow-lg border ${planStatus === "ACTIVE" && daysRemaining > 7
+            ? "border-emerald-500/40"
+            : planStatus === "ACTIVE" && daysRemaining <= 7
+              ? "border-amber-500/40"
+              : "border-red-500/40"
+          } p-6`}>
+          <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
+            {/* Left: Plan info */}
+            <div className="flex items-start gap-4">
+              <div className={`w-12 h-12 rounded-xl flex items-center justify-center flex-shrink-0 ${planStatus === "ACTIVE"
+                  ? "bg-emerald-500/10 text-emerald-400"
+                  : "bg-red-500/10 text-red-400"
+                }`}>
+                <CreditCard size={24} />
+              </div>
+              <div>
+                <h3 className="text-lg font-bold text-white mb-1">Gym Plan Status</h3>
+                {planLoading ? (
+                  <p className="text-slate-400 text-sm">Loading plan info...</p>
+                ) : planStatus === "ACTIVE" ? (
+                  <>
+                    <div className="flex items-center gap-2 mb-1">
+                      <span className="inline-flex items-center gap-1 px-2.5 py-0.5 rounded-full text-xs font-semibold bg-emerald-500/10 text-emerald-400 border border-emerald-500/20">
+                        <span className="w-1.5 h-1.5 rounded-full bg-emerald-400"></span>
+                        ACTIVE
+                      </span>
+                      {daysRemaining !== null && daysRemaining <= 7 && (
+                        <span className="inline-flex items-center gap-1 px-2.5 py-0.5 rounded-full text-xs font-semibold bg-amber-500/10 text-amber-400 border border-amber-500/20">
+                          ⚠️ Expiring soon
+                        </span>
+                      )}
+                    </div>
+                    <p className="text-slate-300 text-sm">
+                      Your Plan: <span className="text-white font-semibold">Active till {planExpiryDate}</span>
+                    </p>
+                    <p className="text-slate-400 text-xs mt-0.5">
+                      {daysRemaining} day{daysRemaining !== 1 ? "s" : ""} remaining
+                    </p>
+                  </>
+                ) : (
+                  <>
+                    <div className="flex items-center gap-2 mb-1">
+                      <span className="inline-flex items-center gap-1 px-2.5 py-0.5 rounded-full text-xs font-semibold bg-red-500/10 text-red-400 border border-red-500/20">
+                        <span className="w-1.5 h-1.5 rounded-full bg-red-400"></span>
+                        EXPIRED
+                      </span>
+                    </div>
+                    <p className="text-slate-300 text-sm">
+                      {planExpiryDate
+                        ? <>Your plan expired on <span className="text-red-400 font-semibold">{planExpiryDate}</span></>
+                        : "No active plan found. Please renew to continue."}
+                    </p>
+                  </>
+                )}
+              </div>
+            </div>
+
+            {/* Right: Renew button */}
+            {!planLoading && showRenewButton && (
+              <button
+                id="renew-plan-btn"
+                onClick={handleRenewPlan}
+                disabled={renewLoading}
+                className={`flex-shrink-0 px-6 py-3 rounded-xl text-sm font-bold transition-all duration-200 ${renewLoading
+                    ? "bg-slate-600 text-slate-300 cursor-not-allowed"
+                    : "bg-orange-500 hover:bg-orange-600 text-white shadow-lg shadow-orange-500/20 hover:shadow-orange-500/30"
+                  }`}
+              >
+                {renewLoading ? (
+                  <span className="flex items-center gap-2">
+                    <svg className="animate-spin h-4 w-4" viewBox="0 0 24 24">
+                      <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4" fill="none"></circle>
+                      <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
+                    </svg>
+                    Processing...
+                  </span>
+                ) : (
+                  <>Renew Plan – ₹5,000/year</>
+                )}
+              </button>
+            )}
+          </div>
+        </div>
+      </div>
+
       {/* Stat cards */}
       <div className="grid grid-cols-1 sm:grid-cols-2 xl:grid-cols-4 gap-5 mb-8">
         {statCards?.map((card) => (
@@ -462,8 +693,8 @@ const DashboardHome = ({ setActiveSection }) => {
               <span className="text-2xl">{card?.icon}</span>
               <span
                 className={`text-xs font-semibold px-2 py-0.5 rounded-full ${card?.positive
-                    ? "bg-green-100 text-green-700"
-                    : "bg-red-100 text-red-600"
+                  ? "bg-green-100 text-green-700"
+                  : "bg-red-100 text-red-600"
                   }`}
               >
                 {card?.change}
