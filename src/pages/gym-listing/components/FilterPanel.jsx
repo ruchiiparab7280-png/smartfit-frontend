@@ -62,7 +62,7 @@ const FilterPanel = ({ filters, onFilterChange, onResetFilters, isOpen, onToggle
           <input
             type="range"
             min="1"
-            max="5"
+            max="10"
             step="0.5"
             value={filters?.distance}
             onChange={handleDistanceChange}
@@ -70,7 +70,7 @@ const FilterPanel = ({ filters, onFilterChange, onResetFilters, isOpen, onToggle
           />
           <div className="flex justify-between text-xs text-muted-foreground mt-1">
             <span>1 km</span>
-            <span>5 km</span>
+            <span>10 km</span>
           </div>
         </div>
 

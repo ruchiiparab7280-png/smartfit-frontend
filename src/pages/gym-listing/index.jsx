@@ -31,7 +31,7 @@ const getDistance = (lat1, lon1, lat2, lon2) => {
 const GymListing = () => {
 
   const [filters, setFilters] = useState({
-    distance: 2.5,
+    distance: 5,
     priceRange: { min: 0, max: 5000 },
     minRating: 1,
     amenities: []
@@ -57,6 +57,7 @@ const GymListing = () => {
             lat: position.coords.latitude,
             lng: position.coords.longitude
           };
+          console.log('[SmartFit] 📍 User location obtained:', loc);
           setUserLocation(loc);
           setLocationStatus('granted');
           // Automatically trigger the nearby query when location is obtained
@@ -86,7 +87,7 @@ const GymListing = () => {
       setIsLoading(true);
       try {
         const [lat, lng] = searchQuery.replace('nearby:', '').split(',');
-        const url = `${import.meta.env.VITE_API_URL}/api/gyms/nearby?lat=${lat}&lng=${lng}&radius=2.5`;
+        const url = `${import.meta.env.VITE_API_URL}/api/gyms/nearby?lat=${lat}&lng=${lng}&radius=10`;
 
         const res = await fetch(url);
         if (!res.ok) {
@@ -158,10 +159,12 @@ const GymListing = () => {
 
   // 3) Recalculate distances reactively when location or raw data changes
   const gyms = useMemo(() => {
+    console.log('[SmartFit] 🔄 Recalculating distances for', rawGyms.length, 'gyms. User location:', userLocation);
     return rawGyms.map(gym => {
       const dist = userLocation
         ? getDistance(userLocation.lat, userLocation.lng, gym.latitude, gym.longitude)
         : null;
+      console.log(`[SmartFit] 🏋️ ${gym.name}: lat=${gym.latitude}, lng=${gym.longitude}, distance=${dist !== null ? dist.toFixed(1) + ' km' : 'N/A'}`);
       return {
         ...gym,
         distance: dist !== null ? parseFloat(dist.toFixed(1)) : null
@@ -175,8 +178,8 @@ const GymListing = () => {
 
     if (searchQuery) {
       if (searchQuery.startsWith('nearby:')) {
-        // STRICT filter: only gyms within 2.5 km radius
-        result = result.filter(gym => gym.distance !== null && gym.distance <= 2.5);
+        // Nearby search: let the distance slider filter handle radius
+        // (no pre-filter here — filters.distance below does the work)
       } else {
         result = result.filter(gym =>
           gym.name.toLowerCase().includes(searchQuery.toLowerCase()) ||
@@ -184,8 +187,7 @@ const GymListing = () => {
         );
       }
     } else if (locationStatus === 'granted') {
-      // If we have location but no specific query, default to 2.5km
-      result = result.filter(gym => gym.distance !== null && gym.distance <= 2.5);
+      // If we have location but no specific query, let distance slider handle it
     } else {
       // No search and no location/denied? Empty list as per requirements.
       return [];
@@ -194,7 +196,8 @@ const GymListing = () => {
     result = result.filter(gym => {
       // STRICT filter: always enforce user location + distance range
       if (locationStatus !== 'granted') return false;
-      const passesDistance = gym.distance !== null && gym.distance <= filters.distance;
+      // If gym has no coordinates, still show it (distance will display as "Unavailable")
+      const passesDistance = gym.distance === null || gym.distance <= filters.distance;
       return (
         passesDistance &&
         gym.price >= filters.priceRange.min &&
@@ -246,7 +249,7 @@ const GymListing = () => {
   // 🚀 PERFORMANCE: useCallback prevents child re-renders
   const handleResetFilters = useCallback(() => {
     setFilters({
-      distance: 2.5,
+      distance: 5,
       priceRange: { min: 0, max: 5000 },
       minRating: 1,
       amenities: []
@@ -341,7 +344,7 @@ const GymListing = () => {
                 <div className="bg-card rounded-lg border border-border p-12 text-center">
                   <Icon name="SearchX" size={64} className="mx-auto mb-4 text-muted-foreground" />
                   <h3 className="text-xl font-semibold text-foreground mb-2">
-                    No gyms found within 2.5 km
+                    No gyms found nearby
                   </h3>
                   <p className="text-muted-foreground">
                     We couldn't find any gyms close to your current location.

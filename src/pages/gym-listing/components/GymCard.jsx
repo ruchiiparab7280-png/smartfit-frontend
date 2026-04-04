@@ -38,7 +38,7 @@ const GymCard = ({ gym, onViewDetails, onContact }) => {
       <div className="relative h-48 overflow-hidden">
         <Image
           src={gym?.images?.[0] || gym?.image || "/assets/images/no_image.png"}
- alt={gym?.name || "Gym"}
+          alt={gym?.name || "Gym"}
           className="w-full h-full object-cover"
           loading="lazy"
         />

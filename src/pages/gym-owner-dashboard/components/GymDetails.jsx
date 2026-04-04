@@ -46,28 +46,28 @@ const GymDetails = () => {
 
         const email = localStorage.getItem("userEmail");
 
-       const res = await fetch(
-  `${import.meta.env.VITE_API_URL}/owner-gym/${email}`
-);
+        const res = await fetch(
+          `${import.meta.env.VITE_API_URL}/owner-gym/${email}`
+        );
 
-const data = await res.json();
+        const data = await res.json();
 
-setFormData({
-  gymName: data.gym_name || "",
-  address: data.address || "",
-  contactNumber: data.phone || "",
-  email: data.email || "",
-  openingTime: data.opening_time ? data.opening_time.slice(0,5) : "",
-  closingTime: data.closing_time ? data.closing_time.slice(0,5) : "",
-  description: data.gym_description || "",
-  amenities: data.amenities
-    ? data.amenities.split(",").map((a) => a.trim())
-    : [],
-});
+        setFormData({
+          gymName: data.gym_name || "",
+          address: data.address || "",
+          contactNumber: data.phone || "",
+          email: data.email || "",
+          openingTime: data.opening_time ? data.opening_time.slice(0, 5) : "",
+          closingTime: data.closing_time ? data.closing_time.slice(0, 5) : "",
+          description: data.gym_description || "",
+          amenities: data.amenities
+            ? data.amenities.split(",").map((a) => a.trim())
+            : [],
+        });
 
-const rawImages = data?.gym_images;
-const existingImages = normalizeGymImages(rawImages);
-setImageItems(existingImages.map((src) => ({ src })));
+        const rawImages = data?.gym_images;
+        const existingImages = normalizeGymImages(rawImages);
+        setImageItems(existingImages.map((src) => ({ src })));
       } catch (error) {
         console.log("Fetch error:", error);
       }
@@ -260,7 +260,7 @@ setImageItems(existingImages.map((src) => ({ src })));
               name="gymName"
               value={formData.gymName}
               onChange={handleChange}
-             className="w-full px-4 py-2.5 rounded-lg bg-[#0f172a] border border-slate-700 text-white"
+              className="w-full px-4 py-2.5 rounded-lg bg-[#0f172a] border border-slate-700 text-white"
             />
           </div>
 
@@ -351,20 +351,20 @@ setImageItems(existingImages.map((src) => ({ src })));
             />
           </div>
 
-<div>
-  <label className="block text-sm font-semibold text-slate-300 mb-2">
-    UPI ID (For Membership Payments)
-  </label>
+          <div>
+            <label className="block text-sm font-semibold text-slate-300 mb-2">
+              UPI ID (For Membership Payments)
+            </label>
 
-  <input
-    type="text"
-    name="upiId"
-    value={formData.upiId}
-    onChange={handleChange}
-    placeholder="example@upi"
-    className="w-full px-4 py-2.5 rounded-lg bg-[#0f172a] border border-slate-700 text-white"
-  />
-</div>
+            <input
+              type="text"
+              name="upiId"
+              value={formData.upiId}
+              onChange={handleChange}
+              placeholder="example@upi"
+              className="w-full px-4 py-2.5 rounded-lg bg-[#0f172a] border border-slate-700 text-white"
+            />
+          </div>
           {/* Amenities */}
           <div className="md:col-span-2">
 
@@ -438,12 +438,12 @@ setImageItems(existingImages.map((src) => ({ src })));
         </div>
 
         <button
-  type="button"
-  onClick={handleSave}
-  className="mt-6 px-6 py-2 bg-orange-500 hover:bg-orange-600 text-white rounded-lg cursor-pointer"
->
-  Save Changes
-</button>
+          type="button"
+          onClick={handleSave}
+          className="mt-6 px-6 py-2 bg-orange-500 hover:bg-orange-600 text-white rounded-lg cursor-pointer"
+        >
+          Save Changes
+        </button>
 
         {saved && (
           <p className="text-green-600 mt-2">
