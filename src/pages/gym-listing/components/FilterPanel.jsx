@@ -62,14 +62,15 @@ const FilterPanel = ({ filters, onFilterChange, onResetFilters, isOpen, onToggle
           <input
             type="range"
             min="1"
-            max="50"
+            max="5"
+            step="0.5"
             value={filters?.distance}
             onChange={handleDistanceChange}
             className="w-full h-2 bg-muted rounded-lg appearance-none cursor-pointer accent-primary"
           />
           <div className="flex justify-between text-xs text-muted-foreground mt-1">
             <span>1 km</span>
-            <span>50 km</span>
+            <span>5 km</span>
           </div>
         </div>
 
@@ -112,11 +113,10 @@ const FilterPanel = ({ filters, onFilterChange, onResetFilters, isOpen, onToggle
               <button
                 key={rating}
                 onClick={() => handleRatingChange(rating)}
-                className={`flex-1 py-2 rounded-md text-sm font-medium transition-base ${
-                  filters?.minRating === rating
+                className={`flex-1 py-2 rounded-md text-sm font-medium transition-base ${filters?.minRating === rating
                     ? 'bg-primary text-primary-foreground'
                     : 'bg-muted text-muted-foreground hover:bg-muted/80'
-                }`}
+                  }`}
               >
                 {rating}★
               </button>

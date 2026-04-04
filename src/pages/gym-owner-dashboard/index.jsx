@@ -61,8 +61,18 @@ const formatRelativeTime = (dateLike) => {
 };
 
 const GymOwnerDashboard = () => {
+  const navigate = useNavigate();
   const [activeSection, setActiveSection] = useState('dashboard');
   const [sidebarOpen, setSidebarOpen] = useState(false);
+
+  // RBAC Protection
+  useEffect(() => {
+    const role = localStorage.getItem("userRole");
+    const auth = localStorage.getItem("isAuthenticated");
+    if (auth !== "true" || role !== "owner") {
+      navigate("/sign-in-sign-up");
+    }
+  }, [navigate]);
 
   const renderContent = () => {
     switch (activeSection) {

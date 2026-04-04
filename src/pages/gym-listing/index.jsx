@@ -31,7 +31,7 @@ const getDistance = (lat1, lon1, lat2, lon2) => {
 const GymListing = () => {
 
   const [filters, setFilters] = useState({
-    distance: 10,
+    distance: 2.5,
     priceRange: { min: 0, max: 5000 },
     minRating: 1,
     amenities: []
@@ -46,33 +46,49 @@ const GymListing = () => {
   const [rawGyms, setRawGyms] = useState([]);
   const [isLoading, setIsLoading] = useState(true);
   const [userLocation, setUserLocation] = useState(null);
+  const [locationStatus, setLocationStatus] = useState('pending'); // 'pending', 'granted', 'denied'
 
-  // 1) Get user location once
+  // 1) Get user location once on mount
   useEffect(() => {
     if (navigator.geolocation) {
       navigator.geolocation.getCurrentPosition(
         (position) => {
-          setUserLocation({
+          const loc = {
             lat: position.coords.latitude,
             lng: position.coords.longitude
-          });
+          };
+          setUserLocation(loc);
+          setLocationStatus('granted');
+          // Automatically trigger the nearby query when location is obtained
+          setSearchQuery(`nearby:${loc.lat},${loc.lng}`);
         },
         () => {
-          console.log("Location permission denied — distances unavailable");
+          console.log("Location permission denied");
+          setLocationStatus('denied');
+          setIsLoading(false);
         },
         { enableHighAccuracy: true, timeout: 10000, maximumAge: 60000 }
       );
+    } else {
+      setLocationStatus('denied');
+      setIsLoading(false);
     }
   }, []);
 
-  // 2) Fetch gyms once (no location dependency — avoids re-fetch)
+  // 2) Fetch gyms triggered by searchQuery (only if granted)
   useEffect(() => {
     const fetchGyms = async () => {
+      if (!searchQuery.startsWith('nearby:')) {
+        // Only allow nearby searches as per requirements
+        return;
+      }
+
       setIsLoading(true);
       try {
-        const res = await fetch(
-          `${import.meta.env.VITE_API_URL}/api/gyms-full`
-        );
+        const [lat, lng] = searchQuery.replace('nearby:', '').split(',');
+        const url = `${import.meta.env.VITE_API_URL}/api/gyms/nearby?lat=${lat}&lng=${lng}&radius=2.5`;
+
+        const res = await fetch(url);
         if (!res.ok) {
           console.log("Gym API error");
           return;
@@ -80,7 +96,7 @@ const GymListing = () => {
         const data = await res.json();
 
         const formattedGyms = data.map((gym, index) => ({
-          id: index + 1,
+          id: gym.id || index + 1,
           name: gym.gym_name,
           address: gym.address,
           phone: gym.phone,
@@ -92,6 +108,7 @@ const GymListing = () => {
           rating: 4,
           openTime: `${gym.opening_time} - ${gym.closing_time}`,
           description: gym.gym_description,
+          distance: gym.distance || null,
           ...(function buildImages() {
             const normalizedImages = normalizeGymImages(gym.gym_images);
             return {
@@ -101,9 +118,9 @@ const GymListing = () => {
           })(),
           amenities: gym.amenities
             ? gym.amenities.split(",").map(a => ({
-                name: a.trim(),
-                icon: "Check"
-              }))
+              name: a.trim(),
+              icon: "Check"
+            }))
             : [],
           trainers: (gym.trainers || []).map(t => ({
             name: t.name,
@@ -134,8 +151,10 @@ const GymListing = () => {
       }
     };
 
-    fetchGyms();
-  }, []);
+    if (locationStatus === 'granted') {
+      fetchGyms();
+    }
+  }, [searchQuery, locationStatus]);
 
   // 3) Recalculate distances reactively when location or raw data changes
   const gyms = useMemo(() => {
@@ -155,15 +174,27 @@ const GymListing = () => {
     let result = [...gyms];
 
     if (searchQuery) {
-      result = result.filter(gym =>
-        gym.name.toLowerCase().includes(searchQuery.toLowerCase()) ||
-        gym.address.toLowerCase().includes(searchQuery.toLowerCase())
-      );
+      if (searchQuery.startsWith('nearby:')) {
+        // STRICT filter: only gyms within 2.5 km radius
+        result = result.filter(gym => gym.distance !== null && gym.distance <= 2.5);
+      } else {
+        result = result.filter(gym =>
+          gym.name.toLowerCase().includes(searchQuery.toLowerCase()) ||
+          gym.address.toLowerCase().includes(searchQuery.toLowerCase())
+        );
+      }
+    } else if (locationStatus === 'granted') {
+      // If we have location but no specific query, default to 2.5km
+      result = result.filter(gym => gym.distance !== null && gym.distance <= 2.5);
+    } else {
+      // No search and no location/denied? Empty list as per requirements.
+      return [];
     }
 
     result = result.filter(gym => {
-      // Only apply distance filter when user location is available
-      const passesDistance = gym.distance === null || gym.distance <= filters.distance;
+      // STRICT filter: always enforce user location + distance range
+      if (locationStatus !== 'granted') return false;
+      const passesDistance = gym.distance !== null && gym.distance <= filters.distance;
       return (
         passesDistance &&
         gym.price >= filters.priceRange.min &&
@@ -215,8 +246,8 @@ const GymListing = () => {
   // 🚀 PERFORMANCE: useCallback prevents child re-renders
   const handleResetFilters = useCallback(() => {
     setFilters({
-      distance: 10,
-      priceRange: { min: 0, max: 500 },
+      distance: 2.5,
+      priceRange: { min: 0, max: 5000 },
       minRating: 1,
       amenities: []
     });
@@ -278,11 +309,30 @@ const GymListing = () => {
                   resultsCount={filteredGyms?.length} />
               </div>
 
-              {/* 🚀 PERFORMANCE: Skeleton loaders instead of blank page */}
-              {isLoading ? (
-                <div className={`grid gap-6 ${
-                  viewMode === 'grid' ? 'grid-cols-1 md:grid-cols-2 xl:grid-cols-3' : 'grid-cols-1'
-                }`}>
+              {/* Location Pending/Denied UI */}
+              {locationStatus === 'pending' ? (
+                <div className="bg-card rounded-lg border border-border p-12 text-center">
+                  <Icon name="Loader2" size={64} className="mx-auto mb-4 text-primary animate-spin" />
+                  <h3 className="text-xl font-semibold text-foreground mb-2">
+                    Detecting your location...
+                  </h3>
+                  <p className="text-muted-foreground">
+                    Please allow location access to find gyms near you.
+                  </p>
+                </div>
+              ) : locationStatus === 'denied' ? (
+                <div className="bg-card rounded-lg border border-red-200 p-12 text-center text-red-600 bg-red-50/10">
+                  <Icon name="MapPinOff" size={64} className="mx-auto mb-4" />
+                  <h3 className="text-xl font-semibold mb-2 text-foreground">
+                    Please enable location to find nearby gyms
+                  </h3>
+                  <p className="text-muted-foreground">
+                    Location access is required to show gyms in your area. Please enable location permissions in your browser settings to proceed.
+                  </p>
+                </div>
+              ) : isLoading ? (
+                <div className={`grid gap-6 ${viewMode === 'grid' ? 'grid-cols-1 md:grid-cols-2 xl:grid-cols-3' : 'grid-cols-1'
+                  }`}>
                   {Array.from({ length: 6 }).map((_, i) => (
                     <SkeletonCard key={i} />
                   ))}
@@ -291,18 +341,11 @@ const GymListing = () => {
                 <div className="bg-card rounded-lg border border-border p-12 text-center">
                   <Icon name="SearchX" size={64} className="mx-auto mb-4 text-muted-foreground" />
                   <h3 className="text-xl font-semibold text-foreground mb-2">
-                    No gyms found
+                    No gyms found within 2.5 km
                   </h3>
-                  <p className="text-muted-foreground mb-6">
-                    Try adjusting your filters or search criteria
+                  <p className="text-muted-foreground">
+                    We couldn't find any gyms close to your current location.
                   </p>
-                  <Button
-                    variant="outline"
-                    iconName="RotateCcw"
-                    iconPosition="left"
-                    onClick={handleResetFilters}>
-                    Reset Filters
-                  </Button>
                 </div>
               ) : (
                 <>
@@ -315,8 +358,7 @@ const GymListing = () => {
                       />
                     </div>
                   )}
-                  <div className={`grid gap-6 ${
-                    viewMode === 'grid' ? 'grid-cols-1 md:grid-cols-2 xl:grid-cols-3' : 'grid-cols-1'}`
+                  <div className={`grid gap-6 ${viewMode === 'grid' ? 'grid-cols-1 md:grid-cols-2 xl:grid-cols-3' : 'grid-cols-1'}`
                   }>
                     {filteredGyms?.map((gym) =>
                       <GymCard
@@ -340,19 +382,19 @@ const GymListing = () => {
       <footer className="bg-card border-t border-border mt-16">
         <div className="container-custom py-8">
           <div className="flex flex-col md:flex-row items-center justify-between space-y-4 md:space-y-0">
-           <div className="flex items-center space-x-2">
- <img
-  src="smartfit-logo.png"
-  alt="Smart-Fit Logo"
-   className="h-20 w-20 object-contain"
-  loading="lazy"
-/>
-  <span className="text-lg font-bold text-foreground">
-    SmartFit
-  </span>
-</div>
+            <div className="flex items-center space-x-2">
+              <img
+                src="smartfit-logo.png"
+                alt="Smart-Fit Logo"
+                className="h-20 w-20 object-contain"
+                loading="lazy"
+              />
+              <span className="text-lg font-bold text-foreground">
+                SmartFit
+              </span>
+            </div>
             <p className="text-sm text-muted-foreground">
-                © {new Date()?.getFullYear()} SmartFit. All rights reserved.              </p>
+              © {new Date()?.getFullYear()} SmartFit. All rights reserved.              </p>
             <div className="flex items-center space-x-4">
               <a href="https://www.facebook.com/share/1Cuz1fQh3i/" target="_blank" rel="noopener noreferrer" className="text-muted-foreground hover:text-primary transition-base">
                 <Icon name="Facebook" size={20} />

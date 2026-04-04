@@ -68,54 +68,52 @@ const LoginForm = () => {
       const data = await response.json();
 
       if (response.ok) {
-         console.log(data.user);
+        // Clear any old session data first
+        localStorage.clear();
 
-;
-
-        // Save login info
+        // Save new login info
         localStorage.setItem("isAuthenticated", "true");
         localStorage.setItem("userEmail", data.user.email);
         localStorage.setItem("userName", data.user.name);
         localStorage.setItem("userRole", data.user.role);
         localStorage.setItem("userStatus", data.user.status);
         localStorage.setItem("userId", data.user.id);
-
-        localStorage.setItem("paymentStatus", data.user.payment_status)
+        localStorage.setItem("paymentStatus", data.user.payment_status);
         // ROLE + APPROVAL BASED NAVIGATION
-       // ROLE + STATUS BASED NAVIGATION
+        // ROLE + STATUS BASED NAVIGATION
 
-if (data.user.role === "admin") {
-  navigate("/admin-dashboard");
-}
-else if (data.user.role === "owner") {
+        if (data.user.role === "admin") {
+          navigate("/admin-dashboard");
+        }
+        else if (data.user.role === "owner") {
 
-  if (data.user.status === "not_submitted") {
-    navigate("/partner-with-us");
-  }
+          if (data.user.status === "not_submitted") {
+            navigate("/partner-with-us");
+          }
 
-  else if (data.user.status === "pending") {
-    navigate("/approval-pending");
-  }
+          else if (data.user.status === "pending") {
+            navigate("/approval-pending");
+          }
 
-  else if (data.user.status === "approved") {
+          else if (data.user.status === "approved") {
 
-    const payment = localStorage.getItem("paymentStatus");
+            const payment = localStorage.getItem("paymentStatus");
 
-    if(payment === "paid"){
-      navigate("/gym-owner-dashboard");
-    } else {
-      navigate("/owner-approved");
-    }
-  }
+            if (payment === "paid") {
+              navigate("/gym-owner-dashboard");
+            } else {
+              navigate("/owner-approved");
+            }
+          }
 
-  else if (data.user.status === "rejected") {
-    navigate("/owner-rejected");
-  }
+          else if (data.user.status === "rejected") {
+            navigate("/owner-rejected");
+          }
 
-}
-else {
-  navigate("/user-dashboard");
-}
+        }
+        else {
+          navigate("/user-dashboard");
+        }
 
       } else {
         setErrors({ submit: data.message });
@@ -161,24 +159,24 @@ else {
         </button>
       </div>
 
-    <div className="flex items-center justify-between">
+      <div className="flex items-center justify-between">
 
-  <Checkbox
-    label="Remember me"
-    name="rememberMe"
-    checked={formData.rememberMe}
-    onChange={handleChange}
-  />
+        <Checkbox
+          label="Remember me"
+          name="rememberMe"
+          checked={formData.rememberMe}
+          onChange={handleChange}
+        />
 
-  <button
-    type="button"
-    onClick={() => navigate("/forgot-password")}
-    className="text-sm text-primary hover:underline"
-  >
-    Forgot Password?
-  </button>
+        <button
+          type="button"
+          onClick={() => navigate("/forgot-password")}
+          className="text-sm text-primary hover:underline"
+        >
+          Forgot Password?
+        </button>
 
-</div>
+      </div>
 
       {errors.submit && (
         <p className="text-red-500 text-sm">{errors.submit}</p>
