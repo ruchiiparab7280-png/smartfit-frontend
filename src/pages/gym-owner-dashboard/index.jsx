@@ -1,4 +1,5 @@
 import React, { useEffect, useState } from 'react';
+import { useNavigate } from "react-router-dom";
 import GymDetails from './components/GymDetails';
 import FreeTrialRequests from "./components/FreeTrialRequests";
 import TrainerManagement from './components/TrainerManagement';
@@ -616,17 +617,17 @@ const DashboardHome = ({ setActiveSection }) => {
       {/* ── Plan Status Card ── */}
       <div className="mb-8">
         <div className={`bg-[#111827] rounded-xl shadow-lg border ${planStatus === "ACTIVE" && daysRemaining > 7
-            ? "border-emerald-500/40"
-            : planStatus === "ACTIVE" && daysRemaining <= 7
-              ? "border-amber-500/40"
-              : "border-red-500/40"
+          ? "border-emerald-500/40"
+          : planStatus === "ACTIVE" && daysRemaining <= 7
+            ? "border-amber-500/40"
+            : "border-red-500/40"
           } p-6`}>
           <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
             {/* Left: Plan info */}
             <div className="flex items-start gap-4">
               <div className={`w-12 h-12 rounded-xl flex items-center justify-center flex-shrink-0 ${planStatus === "ACTIVE"
-                  ? "bg-emerald-500/10 text-emerald-400"
-                  : "bg-red-500/10 text-red-400"
+                ? "bg-emerald-500/10 text-emerald-400"
+                : "bg-red-500/10 text-red-400"
                 }`}>
                 <CreditCard size={24} />
               </div>
@@ -679,8 +680,8 @@ const DashboardHome = ({ setActiveSection }) => {
                 onClick={handleRenewPlan}
                 disabled={renewLoading}
                 className={`flex-shrink-0 px-6 py-3 rounded-xl text-sm font-bold transition-all duration-200 ${renewLoading
-                    ? "bg-slate-600 text-slate-300 cursor-not-allowed"
-                    : "bg-orange-500 hover:bg-orange-600 text-white shadow-lg shadow-orange-500/20 hover:shadow-orange-500/30"
+                  ? "bg-slate-600 text-slate-300 cursor-not-allowed"
+                  : "bg-orange-500 hover:bg-orange-600 text-white shadow-lg shadow-orange-500/20 hover:shadow-orange-500/30"
                   }`}
               >
                 {renewLoading ? (
