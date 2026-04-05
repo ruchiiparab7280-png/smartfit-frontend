@@ -180,7 +180,7 @@ const GymDetailsModal = ({ gym, isOpen, onClose }) => {
 
         handler: async function (response) {
 
-          await fetch(`${import.meta.env.VITE_API_URL}/payment/verify`, {
+          await fetch(`${import.meta.env.VITE_API_URL}/payment/verify-signature`, {
             method: "POST",
             headers: {
               "Content-Type": "application/json"
@@ -303,6 +303,11 @@ const GymDetailsModal = ({ gym, isOpen, onClose }) => {
       return;
     }
 
+    if (!startDate) {
+      alert("Please select a start date");
+      return;
+    }
+
 
     const res = await fetch(`${import.meta.env.VITE_API_URL}/payment/create-order`, {
       method: "POST",
@@ -326,7 +331,7 @@ const GymDetailsModal = ({ gym, isOpen, onClose }) => {
 
       handler: async function (response) {
 
-        await fetch(`${import.meta.env.VITE_API_URL}/payment/verify`, {
+        await fetch(`${import.meta.env.VITE_API_URL}/payment/verify-signature`, {
           method: "POST",
           headers: {
             "Content-Type": "application/json"
