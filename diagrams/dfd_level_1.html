@@ -2,7 +2,7 @@
 <html lang="en">
 <head>
     <meta charset="UTF-8">
-    <title>SmartFit System Architecture Diagram</title>
+    <title>SmartFit DFD Level 1 Diagram</title>
     <script src="https://cdn.jsdelivr.net/npm/mermaid@10/dist/mermaid.min.js"></script>
     <style>
         body {
@@ -17,40 +17,25 @@
         }
 
         h2 {
-            margin-bottom: 10px;
+            margin-bottom: 20px;
             font-size: 32px;
         }
 
-        /* Container allowing the graphic to stretch freely */
         .mermaid {
             margin-top: 10px;
             background: white;
-            width: 100%;
             display: flex;
             justify-content: center;
-            overflow-x: auto;
+            width: 100%;
+            /* Strict scaling without layout distortion */
+            transform: scale(1.3);
+            transform-origin: top center;
+            margin-bottom: 300px;
         }
 
-        /* Proportional magnifier identical to the optimized layout standard */
         .mermaid svg {
-            width: 1400px !important; /* Scale multiplier for clear display on monitors */
-            max-width: 1400px !important;
-            height: auto !important;
-        }
-
-        /* Thick structural print vectors for the screen */
-        .mermaid svg path:not(.marker),
-        .mermaid svg line,
-        .mermaid svg rect,
-        .mermaid svg polygon,
-        .mermaid svg circle {
-            stroke-width: 3px !important;
-        }
-
-        /* Strict prevention of text smudging */
-        .mermaid svg text,
-        .mermaid svg tspan {
-            stroke-width: 0 !important;
+            max-width: 100%;
+            height: auto;
         }
 
         .controls {
@@ -76,55 +61,77 @@
 </head>
 
 <body>
-    <h2>SmartFit System Architecture Diagram</h2>
+    <h2>SmartFit Level 1 Data Flow Diagram (DFD)</h2>
     <div class="controls">
         <button onclick="downloadPNG()">Download as Portrait A4 PNG</button>
     </div>
     <div class="mermaid">
         flowchart TD
-            %% Primary Architecture Nodes
-            User((Web Client<br>Modern Browser))
-            
-            subgraph PresentationTier [Presentation Layer]
-                React[React.js Single Page Application<br>UI Components, Dynamic State]
-            end
-            
-            subgraph ApplicationTier [Application logic Layer]
-                Node[Node.js + Express.js API<br>REST Controllers, Core Logic]
-                Multer[Multer Module<br>File Handling]
-                AuthEngine[Authentication Engine<br>JWT & Token Security]
-                
-                Node --- Multer
-                Node --- AuthEngine
-            end
-            
-            subgraph DataTier [Data Persistence Layer]
-                Supabase[(Supabase PostgreSQL<br>Relational Database)]
-                Storage[(Supabase Storage<br>Image & File Buckets)]
-            end
-            
-            subgraph ExternalServices [Third-Party Services]
-                Razorpay((Razorpay API<br>Payment Gateway))
-                Resend((Resend API<br>SMTP Email Delivery))
-            end
+            %% Primary External Entities (Square syntax)
+            Ext_User[User / Gym Member]
+            Ext_Owner[Gym Owner / Admin]
+            Ext_Razorpay[Razorpay API]
+            Ext_Resend[Resend SMTP]
 
-            %% Data Flow Edges
-            User -->|HTTPS GET/POST| PresentationTier
-            PresentationTier -->|JSON REST API| ApplicationTier
+            %% Level 1 Sub-Processes (Circle syntax)
+            P1((1.0<br>User Auth &<br>Profile Mgmt))
+            P2((2.0<br>Gym Discovery<br>& Browsing))
+            P3((3.0<br>Membership Booking<br>& Transactions))
+            P4((4.0<br>E-Commerce<br>Supplement Store))
+
+            %% Data Stores (Cylinder syntax)
+            D1[(D1: Users DB)]
+            D2[(D2: Gyms/Trainers DB)]
+            D3[(D3: Memberships DB)]
+            D4[(D4: Supplements DB)]
+
+            %% Process 1.0 Data Flow
+            Ext_User -->|Login Credentials| P1
+            P1 -->|Store JWT & Profile| D1
+            D1 -.->|Read Auth Status| P1
+            P1 -->|Trigger Password Reset| Ext_Resend
             
-            ApplicationTier -->|External Webhooks via HTTP| ExternalServices
-            ApplicationTier -->|SQL / Supabase Client| DataTier
+            %% Process 2.0 Data Flow
+            Ext_Owner -->|Register Gym Info| P2
+            P2 -->|Save Details| D2
+            Ext_User -->|Search Queries| P2
+            D2 -.->|Return Gym List| P2
+            P2 -->|Display Results| Ext_User
             
-            %% Technical relationships logic structuring the graphic to render vertically
-            React --> |Axios Data Fetch| Node
-            Node --> |Direct API Key| Razorpay
-            AuthEngine --> |API Key Execution| Resend
-            Node --> |CRUD Execution| Supabase
-            Multer --> |Bucket Upload stream| Storage
+            %% Process 3.0 Data Flow
+            Ext_User -->|Select Plan & Confirm| P3
+            D2 -.->|Validate Plan ID| P3
+            P3 -->|Initiate Payment Order| Ext_Razorpay
+            Ext_Razorpay -->|Payment Signature Match| P3
+            P3 -->|Commit Active Sub| D3
+            D3 -.->|Confirm Status| P3
+            P3 -->|Generate Receipt UI| Ext_User
+            
+            %% Process 4.0 Data Flow
+            Ext_User -->|Add Cart Items| P4
+            P4 -->|Process Checkout| Ext_Razorpay
+            P4 -->|Deduct Stock| D4
+            D4 -.->|Check Inventory| P4
+            P4 -->|Order Confirmation UI| Ext_User
+            Ext_Owner -->|Manage Inventory| P4
+
+            %% Strict Black & White Formatting Rules
+            %% External Entities: Bold solid borders #000, white fill #fff
+            classDef external fill:#ffffff,stroke:#000000,stroke-width:3px,font-weight:bold,color:#000000;
+            
+            %% Processes: Solid borders #000, white fill #fff
+            classDef process fill:#ffffff,stroke:#000000,stroke-width:2.5px,color:#000000;
+            
+            %% Data Stores: Solid borders #000, white fill #fff, italicize code labels
+            classDef store fill:#ffffff,stroke:#000000,stroke-width:2.5px,font-style:italic,color:#000000;
+            
+            class Ext_User,Ext_Owner,Ext_Razorpay,Ext_Resend external;
+            class P1,P2,P3,P4 process;
+            class D1,D2,D3,D4 store;
     </div>
 
     <script>
-        // Use standard initialization mapped from our structurally perfect diagrams
+        // High-legibility monochrome engine configuration
         mermaid.initialize({
             startOnLoad: true,
             securityLevel: 'loose',
@@ -133,16 +140,14 @@
                 primaryColor: '#ffffff',
                 primaryTextColor: '#000000',
                 primaryBorderColor: '#000000',
-                lineColor: '#000000',
-                secondaryColor: '#f4f4f4',
-                tertiaryColor: '#ffffff',
+                lineColor: '#000000',      // Guaranteed pure black arrows
                 fontFamily: 'Arial, sans-serif',
-                fontSize: '24px' // Highly stable base font-size; the CSS width multiplier natively zooms this up perfectly
+                fontSize: '22px'           // High base font logic before zooming
             },
             flowchart: {
-                nodeSpacing: 70,
-                rankSpacing: 80,
-                htmlLabels: false // STRICTLY False to prevent <foreignObject> <div> clipping bugs natively!
+                nodeSpacing: 50,
+                rankSpacing: 60,
+                htmlLabels: true
             }
         });
 
@@ -162,31 +167,16 @@
                 baseHeight = bounds.height;
             }
 
-            // Target the physical A4 Resolution explicitly
             const targetResolutionMaxAxis = 2480;
             const scale = targetResolutionMaxAxis / Math.max(baseWidth, baseHeight);
 
             const targetWidth = baseWidth * scale;
             const targetHeight = baseHeight * scale;
 
-            const graphicalElements = svg.querySelectorAll('path, rect, line, circle, polygon');
-            graphicalElements.forEach(el => {
-                if (el.getAttribute('stroke') !== 'none' && el.style.stroke !== 'none') {
-                    el.style.strokeWidth = '3px';
-                }
-            });
-
-            const textElements = svg.querySelectorAll('text, tspan, .label');
-            textElements.forEach(el => {
-                el.style.fontFamily = '"Segoe UI", Tahoma, Geneva, Verdana, sans-serif';
-                el.style.fontWeight = '600';
-                el.style.strokeWidth = '0';
-            });
-
+            // Strict rendering constraint without geometric blobs
             const serializer = new XMLSerializer();
             let svgStr = serializer.serializeToString(svg);
 
-            // Reassign boundaries explicitly to execute native scaler
             svgStr = svgStr.replace(/<svg([^>]*)>/, function (match, attrs) {
                 attrs = attrs.replace(/\b(width|height)="[^"]*"/g, '');
                 return '<svg' + attrs + ' width="' + targetWidth + '" height="' + targetHeight + '">';
@@ -211,7 +201,7 @@
                 ctx.drawImage(img, padding / 2, padding / 2);
 
                 const a = document.createElement('a');
-                a.download = 'SmartFit_System_Architecture_Diagram.png';
+                a.download = 'SmartFit_DFD_Level_1_Diagram.png';
                 a.href = canvas.toDataURL('image/png', 1.0);
                 a.click();
             };

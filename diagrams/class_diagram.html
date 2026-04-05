@@ -5,90 +5,200 @@
     <title>SmartFit Class Diagram</title>
     <script src="https://cdn.jsdelivr.net/npm/mermaid@10/dist/mermaid.min.js"></script>
     <style>
-        body { background: #ffffff; padding: 20px; font-family: Arial, sans-serif; display: flex; flex-direction: column; align-items: center; }
-        .mermaid { margin-top: 20px; background: white; padding: 20px; border: 1px solid #ddd; }
-        .controls { margin-top: 20px; }
-        button { padding: 10px 20px; font-size: 16px; cursor: pointer; background: #000; color: #fff; border: none; border-radius: 4px; }
-        @media print { .controls { display: none; } .mermaid { border: none; } body { padding: 0; } }
+        body { 
+            background: #ffffff; 
+            padding: 20px; 
+            font-family: Arial, sans-serif; 
+            display: flex; 
+            flex-direction: column; 
+            align-items: center; 
+            margin: 0;
+        }
+        h2 { margin-bottom: 5px; }
+        .mermaid { 
+            margin-top: 10px; 
+            background: white; 
+        }
+        .controls { margin-bottom: 20px; }
+        button { 
+            padding: 10px 20px; 
+            font-size: 16px; 
+            cursor: pointer; 
+            background: #000; 
+            color: #fff; 
+            border: none; 
+            border-radius: 4px; 
+        }
+        @media print { 
+            .controls { display: none; } 
+            body { padding: 0; } 
+        }
     </style>
 </head>
 <body>
-    <h2>SmartFit Class Diagram (Database Mapped)</h2>
+    <h2>SmartFit Class Diagram (Database Entities)</h2>
     <div class="controls">
-        <button onclick="downloadPNG()">Download as PNG Image</button>
+        <button onclick="downloadPNG()">Download as Portrait A4 PNG</button>
     </div>
     <div class="mermaid">
+%%{init: {
+  'theme': 'base',
+  'themeVariables': {
+    'primaryColor': '#ffffff',
+    'primaryTextColor': '#000000',
+    'primaryBorderColor': '#000000',
+    'lineColor': '#000000',
+    'secondaryColor': '#ffffff',
+    'tertiaryColor': '#ffffff',
+    'fontFamily': 'Arial, sans-serif',
+    'edgeLabelBackground': '#ffffff',
+    'fontSize': '26px'
+  }
+}}%%
 classDiagram
     direction LR
+
     class User {
-        +String email (PK)
-        +String name
-        +String role
-        +String reset_token
+        +email (PK)
+        +name
+        +phone
+        +role
+        +token
         +register()
-        +requestPasswordReset()
+        +login()
     }
+
     class GymOwnerRequest {
-        +String email (PK)
-        +String gym_name
-        +String location
-        +String status
-        +String payment_status
-        +approveRequest()
-        +rejectRequest()
+        +email (PK)
+        +gym_name
+        +address
+        +latitude
+        +longitude
+        +status
+        +pay_status
+        +approve()
+        +update()
     }
-    class Membership {
-        +String gym_email (FK)
-        +String plan_title
-        +Float price
-        +Int duration_days
-        +createPlan()
-    }
-    class UserMembership {
-        +String user_email (FK)
-        +String gym_email (FK)
-        +String status
-        +Date start_date
-        +Date validation
-        +bookMembership()
-    }
+
     class Trainer {
-        +String gym_email (FK)
-        +String full_name
-        +String photo_url
-        +String specialization
-        +addTrainer()
+        +id (PK)
+        +gym_email (FK)
+        +name
+        +specialty
+        +price
+        +add()
     }
-    class UserWorkout {
-        +String user_email (FK)
-        +String day_of_week
-        +String exercise_name
-        +Int sets
-        +Int reps
-        +manageWorkout()
+
+    class Supplement {
+        +id (PK)
+        +gym_email (FK)
+        +name
+        +price
+        +desc
+        +add()
     }
+
+    class Membership {
+        +id (PK)
+        +gym_email (FK)
+        +name
+        +price
+        +duration
+        +create()
+    }
+
+    class UserMembership {
+        +id (PK)
+        +user_email (FK)
+        +gym_email (FK)
+        +status
+        +start_date
+        +validate()
+    }
+
+    class TrainerBooking {
+        +id (PK)
+        +user_email (FK)
+        +gym_email (FK)
+        +trainer_name
+        +status
+        +date
+        +book()
+    }
+
     class SupplementOrder {
-        +String user_email (FK)
-        +String gym_email (FK)
-        +Int quantity
-        +String status
-        +placeOrder()
+        +id (PK)
+        +user_email (FK)
+        +gym_email (FK)
+        +supp_name
+        +quantity
+        +status
+        +order()
     }
-    User "1" -- "0..*" UserMembership : books >
-    GymOwnerRequest "1" -- "0..*" Membership : offers >
-    GymOwnerRequest "1" -- "0..*" Trainer : employs >
-    User "1" -- "0..*" UserWorkout : tracks >
-    User "1" -- "0..*" SupplementOrder : orders >
-    GymOwnerRequest "1" -- "0..*" UserMembership : has members >
+
+    class FreeTrialRequest {
+        +id (PK)
+        +user_email (FK)
+        +gym_email (FK)
+        +date
+        +status
+        +book()
+    }
+
+    class UserWorkout {
+        +id (PK)
+        +user_email (FK)
+        +day
+        +exercise
+        +sets
+        +done
+        +add()
+    }
+
+    class GymReview {
+        +id (PK)
+        +user_email (FK)
+        +gym_email (FK)
+        +rating
+        +comment
+        +add()
+    }
+
+    %% User to Shared/Isolated (Col 1 to Col 2)
+    User "1" --> "0..*" UserMembership : subscribes
+    User "1" --> "0..*" TrainerBooking : books
+    User "1" --> "0..*" SupplementOrder : orders
+    User "1" --> "0..*" FreeTrialRequest : requests
+    User "1" --> "0..*" GymReview : writes
+    User "1" --> "0..*" UserWorkout : tracks
+
+    %% Gym to Shared (Col 3 to Col 2, using reverse link so Gym is placed on the right)
+    UserMembership "0..*" <-- "1" GymOwnerRequest : has
+    TrainerBooking "0..*" <-- "1" GymOwnerRequest : hosts
+    SupplementOrder "0..*" <-- "1" GymOwnerRequest : fulfills
+    FreeTrialRequest "0..*" <-- "1" GymOwnerRequest : gets
+    GymReview "0..*" <-- "1" GymOwnerRequest : gets
+
+    %% Gym to Isolated (Col 3 to Col 4)
+    GymOwnerRequest "1" --> "0..*" Trainer : employs
+    GymOwnerRequest "1" --> "0..*" Supplement : sells
+    GymOwnerRequest "1" --> "0..*" Membership : offers
     </div>
     <script>
         mermaid.initialize({
             startOnLoad: true,
             theme: 'base',
             securityLevel: 'loose',
-            flowchart: { htmlLabels: false },
+            flowchart: { 
+                htmlLabels: false,
+                rankSpacing: 60,
+                nodeSpacing: 40
+            },
             sequence: { htmlLabels: false },
-            class: { htmlLabels: false },
+            class: { 
+                htmlLabels: false,
+                useMaxWidth: false
+            },
             themeVariables: {
                 primaryColor: '#ffffff',
                 primaryTextColor: '#000000',
@@ -96,13 +206,20 @@ classDiagram
                 lineColor: '#000000',
                 secondaryColor: '#ffffff',
                 tertiaryColor: '#ffffff',
-                fontFamily: 'Arial, sans-serif'
+                fontFamily: 'Arial, sans-serif',
+                edgeLabelBackground: '#ffffff',
+                fontSize: '28px'
             }
         });
 
         function downloadPNG() {
             const svg = document.querySelector('.mermaid svg');
             if(!svg) { alert('SVG not loaded yet'); return; }
+            
+            // Standard A4 dimensions in Portrait mode (300 DPI approx)
+            const a4w = 2480;
+            const a4h = 3508;
+            
             let viewBox = svg.getAttribute('viewBox');
             let baseWidth, baseHeight;
             if (viewBox) {
@@ -114,36 +231,54 @@ classDiagram
                 baseWidth = bounds.width; 
                 baseHeight = bounds.height;
             }
+            
+            // Allow a reasonable margin
+            const margin = 120;
+            const safeW = a4w - (margin * 2);
+            const safeH = a4h - (margin * 2);
+            
+            // Calculate scale
+            const scale = Math.min(safeW / baseWidth, safeH / baseHeight);
+            const targetWidth = baseWidth * scale;
+            const targetHeight = baseHeight * scale;
+            
             const serializer = new XMLSerializer();
             let svgStr = serializer.serializeToString(svg);
+            
+            // CRITICAL FIX: To prevent blurry text, we must force the SVG to natively
+            // render at the high-res target dimensions, NOT the screen dimensions!
             svgStr = svgStr.replace(/<svg([^>]*)>/, function(match, attrs) {
                 attrs = attrs.replace(/\b(width|height)="[^"]*"/g, '');
-                return '<svg' + attrs + ' width="' + baseWidth + '" height="' + baseHeight + '">';
+                return '<svg' + attrs + ' width="' + targetWidth + '" height="' + targetHeight + '">';
             });
             svgStr = svgStr.replace(/max-width:[^;"]+;?/g, '');
+            svgStr = svgStr.replace(/stroke-width:[^;"]+;?/g, 'stroke-width: 3px;');
+            
+            // Replace external font declarations with inline styles purely for safety
+            svgStr = svgStr.replace(/font-family:[^;"]+;?/g, 'font-family: Arial, sans-serif; font-weight: bold;');
+            
             const b64 = btoa(unescape(encodeURIComponent(svgStr)));
             const img = new Image();
-            let a4w = 2480, a4h = 3508;
-            if (baseWidth > baseHeight) { a4w = 3508; a4h = 2480; }
+            
             const canvas = document.createElement('canvas');
             const ctx = canvas.getContext('2d');
             canvas.width = a4w; 
             canvas.height = a4h;
+            
             img.onload = function () {
+                // Fill white background
                 ctx.fillStyle = "#ffffff";
                 ctx.fillRect(0, 0, canvas.width, canvas.height);
-                const margin = 300;
-                const safeW = a4w - (margin * 2);
-                const safeH = a4h - (margin * 2);
-                const scale = Math.min(safeW / baseWidth, safeH / baseHeight);
-                const offsetX = (a4w - (baseWidth * scale)) / 2;
-                const offsetY = (a4h - (baseHeight * scale)) / 2;
-                ctx.translate(offsetX, offsetY);
-                ctx.scale(scale, scale);
-                ctx.drawImage(img, 0, 0);
+                
+                const offsetX = (a4w - targetWidth) / 2;
+                const offsetY = (a4h - targetHeight) / 2;
+                
+                // Draw directly without scale because the image IS high resolution now!
+                ctx.drawImage(img, offsetX, offsetY);
+                
                 const a = document.createElement('a');
-                a.download = document.title.split(' ').join('_') + '.png';
-                a.href = canvas.toDataURL('image/png');
+                a.download = 'SmartFit_Class_Diagram_Portrait.png';
+                a.href = canvas.toDataURL('image/png', 1.0);
                 a.click();
             };
             img.src = 'data:image/svg+xml;base64,' + b64;

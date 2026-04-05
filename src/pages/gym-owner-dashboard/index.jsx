@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from 'react';
-import { useNavigate } from "react-router-dom";
+import { useNavigate } from 'react-router-dom';
 import GymDetails from './components/GymDetails';
 import FreeTrialRequests from "./components/FreeTrialRequests";
 import TrainerManagement from './components/TrainerManagement';
@@ -243,15 +243,23 @@ const DashboardHome = ({ setActiveSection }) => {
       if (data?.name) setOwnerName(data.name);
       if (data?.gym_name) setGymName(data.gym_name);
 
-      const expiry = data?.plan_expiry_date;
-      const status = data?.plan_status;
+      // Resolve expiry: if not set (new user), grant 1 year from creation date
+      let resolvedExpiry = data?.plan_expiry_date;
 
-      if (expiry && status === "ACTIVE") {
-        const expiryDate = new Date(expiry);
+      // Assume a new user has an implicitly active 1 year plan from their request date
+      if (!resolvedExpiry && data?.created_at) {
+        const createdDate = new Date(data.created_at);
+        createdDate.setFullYear(createdDate.getFullYear() + 1);
+        resolvedExpiry = createdDate.toISOString().split("T")[0];
+      }
+
+      if (resolvedExpiry) {
+        const expiryDate = new Date(resolvedExpiry);
         const today = new Date();
         const diffMs = expiryDate.getTime() - today.getTime();
         const diffDays = Math.ceil(diffMs / (1000 * 60 * 60 * 24));
-        setPlanExpiryDate(expiry);
+
+        setPlanExpiryDate(resolvedExpiry);
         setDaysRemaining(diffDays);
         setPlanStatus(diffDays > 0 ? "ACTIVE" : "EXPIRED");
       } else {

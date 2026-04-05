@@ -2,100 +2,185 @@
 <html lang="en">
 <head>
     <meta charset="UTF-8">
-    <title>SmartFit ER Diagram</title>
+    <title>SmartFit Entity Relationship Diagram</title>
     <script src="https://cdn.jsdelivr.net/npm/mermaid@10/dist/mermaid.min.js"></script>
     <style>
-        body { background: #ffffff; padding: 20px; font-family: Arial, sans-serif; display: flex; flex-direction: column; align-items: center; }
-        .mermaid { margin-top: 20px; background: white; padding: 20px; border: 1px solid #ddd; }
-        .controls { margin-top: 20px; }
-        button { padding: 10px 20px; font-size: 16px; cursor: pointer; background: #000; color: #fff; border: none; border-radius: 4px; }
-        @media print { .controls { display: none; } .mermaid { border: none; } body { padding: 0; } }
+        body {
+            background: #ffffff;
+            padding: 40px;
+            font-family: Arial, sans-serif;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            margin: 0;
+            text-align: center;
+        }
+
+        h2 {
+            margin-bottom: 5px;
+            font-size: 32px;
+        }
+
+        .mermaid {
+            margin-top: 10px;
+            background: white;
+            display: flex;
+            justify-content: center;
+            width: 100%;
+            /* Magnifies the native ER diagram cleanly on your screen! */
+            transform: scale(1.3);
+            transform-origin: top center;
+            margin-bottom: 400px;
+        }
+
+        /* Pure scaling leveraging the DOM without SVG box distortion */
+        .mermaid svg {
+            max-width: 100%;
+            height: auto;
+        }
+
+        .controls {
+            margin-bottom: 20px;
+        }
+
+        button {
+            padding: 15px 30px;
+            font-size: 24px;
+            font-weight: bold;
+            cursor: pointer;
+            background: #000;
+            color: #fff;
+            border: none;
+            border-radius: 6px;
+        }
+
+        @media print {
+            .controls { display: none; }
+            body { padding: 0; }
+        }
     </style>
 </head>
+
 <body>
-    <h2>SmartFit ER Diagram (Entity-Relationship)</h2>
+    <h2>SmartFit Entity Relationship Diagram (ERD)</h2>
     <div class="controls">
-        <button onclick="downloadPNG()">Download as PNG Image</button>
+        <button onclick="downloadPNG()">Download as Portrait A4 PNG</button>
     </div>
     <div class="mermaid">
-%%{init: {'theme': 'base', 'themeVariables': {'fontSize': '16px', 'fontFamily': 'Arial', 'primaryColor': '#ffffff', 'primaryTextColor': '#000000', 'primaryBorderColor': '#000000', 'lineColor': '#000000'}}}%%
-erDiagram
-    USERS {
-        string email PK
-        string name
-        string role
-        string reset_token
-    }
-    GYM_OWNER_REQUESTS {
-        string email PK
-        string gym_name
-        string status
-        string payment_status
-    }
-    MEMBERSHIPS {
-        uuid id PK
-        string gym_email FK
-        string plan_title
-        float price
-    }
-    USER_MEMBERSHIPS {
-        uuid id PK
-        string user_email FK
-        string gym_email FK
-        string status
-        date start_date
-    }
-    TRAINERS {
-        uuid id PK
-        string gym_email FK
-        string full_name
-        string specialization
-    }
-    USER_WORKOUTS {
-        uuid id PK
-        string user_email FK
-        string exercise_name
-        int sets
-    }
-    SUPPLEMENT_ORDERS {
-        uuid id PK
-        string user_email FK
-        string gym_email FK
-        int quantity
-        string status
-    }
+        flowchart TD
+            %% ER Diagram: Entities (Yellow Rectangles)
+            E1[Supplier]
+            E2[Warehouse]
+            E3[Employee]
+            E4[Project]
+            E5[Part]
+            
+            %% ER Diagram: Relationships (Blue Diamonds)
+            R_Supply{Supply}
+            R_Inventory{Inventory}
+            R_Work{Work}
+            R_Manager{Manager}
+            
+            %% Ternary Supply Relationship
+            E1 ---|m| R_Supply
+            R_Supply ---|n| E4
+            R_Supply ---|p| E5
+            
+            %% Inventory Relationship
+            E2 ---|1| R_Inventory
+            R_Inventory ---|n| E5
+            
+            %% Work Relationship
+            E2 ---|1| R_Work
+            R_Work ---|n| E3
+            
+            %% Manager Self-Relationship
+            E3 ---|1| R_Manager
+            R_Manager ---|n| E3
+            
+            %% Attributes - Supplier (Purple Ovals)
+            A1_1((Supply))
+            A1_2((Supplier<br>code))
+            A1_3((Supplier<br>name))
+            A1_4((Address))
+            A1_5((Phone<br>number))
+            A1_6((Supplier<br>account))
+            E1 --- A1_1
+            E1 --- A1_2
+            E1 --- A1_3
+            E1 --- A1_4
+            E1 --- A1_5
+            E1 --- A1_6
 
-    USERS ||--o{ USER_MEMBERSHIPS : books
-    USERS ||--o{ USER_WORKOUTS : logs
-    USERS ||--o{ SUPPLEMENT_ORDERS : purchases
-    
-    GYM_OWNER_REQUESTS ||--o{ MEMBERSHIPS : offers
-    GYM_OWNER_REQUESTS ||--o{ TRAINERS : employs
-    GYM_OWNER_REQUESTS ||--o{ USER_MEMBERSHIPS : registers
-    GYM_OWNER_REQUESTS ||--o{ SUPPLEMENT_ORDERS : fulfills
+            %% Attributes - Project
+            A4_1((Project<br>number))
+            A4_2((Budget))
+            A4_3((Launch<br>time))
+            E4 --- A4_1
+            E4 --- A4_2
+            E4 --- A4_3
+
+            %% Attributes - Part
+            A5_1((Part<br>number))
+            A5_2((Name))
+            A5_3((Specificatio<br>n))
+            A5_4((Unit<br>price))
+            A5_5((Description))
+            E5 --- A5_1
+            E5 --- A5_2
+            E5 --- A5_3
+            E5 --- A5_4
+            E5 --- A5_5
+
+            %% Attributes - Warehouse
+            A2_1((Warehouse<br>number))
+            A2_2((area))
+            A2_3((Phone<br>number))
+            E2 --- A2_1
+            E2 --- A2_2
+            E2 --- A2_3
+
+            %% Attributes - Employee
+            A3_1((Employee<br>number))
+            A3_2((Name))
+            A3_3((Age))
+            A3_4((Title))
+            E3 --- A3_1
+            E3 --- A3_2
+            E3 --- A3_3
+            E3 --- A3_4
+
+            %% Apply Precise Boardmix Visual Coloring
+            classDef entity fill:#FFE699,stroke:#D6B656,stroke-width:2px,font-weight:bold,font-size:22px,color:#000;
+            classDef attribute fill:#E1D5E7,stroke:#9673A6,stroke-width:2px,font-size:20px,color:#000;
+            classDef relationship fill:#DAE8FC,stroke:#6C8EBF,stroke-width:2px,font-size:20px,color:#000;
+            
+            class E1,E2,E3,E4,E5 entity;
+            class R_Supply,R_Inventory,R_Work,R_Manager relationship;
+            class A1_1,A1_2,A1_3,A1_4,A1_5,A1_6,A4_1,A4_2,A4_3,A5_1,A5_2,A5_3,A5_4,A5_5,A2_1,A2_2,A2_3,A3_1,A3_2,A3_3,A3_4 attribute;
     </div>
+
     <script>
         mermaid.initialize({
             startOnLoad: true,
-            theme: 'base',
             securityLevel: 'loose',
-            flowchart: { htmlLabels: false },
-            sequence: { htmlLabels: false },
-            class: { htmlLabels: false },
+            theme: 'base',
             themeVariables: {
-                primaryColor: '#ffffff',
-                primaryTextColor: '#000000',
-                primaryBorderColor: '#000000',
                 lineColor: '#000000',
-                secondaryColor: '#ffffff',
-                tertiaryColor: '#ffffff',
-                fontFamily: 'Arial, sans-serif'
+                fontFamily: 'Arial, sans-serif',
+                fontSize: '20px'
+            },
+            flowchart: {
+                nodeSpacing: 50,
+                rankSpacing: 60,
+                htmlLabels: true
             }
         });
 
         function downloadPNG() {
             const svg = document.querySelector('.mermaid svg');
-            if(!svg) { alert('SVG not loaded yet'); return; }
+            if (!svg) { alert('SVG not loaded yet'); return; }
+
             let viewBox = svg.getAttribute('viewBox');
             let baseWidth, baseHeight;
             if (viewBox) {
@@ -104,39 +189,48 @@ erDiagram
                 baseHeight = parseFloat(coords[3]);
             } else {
                 let bounds = svg.getBoundingClientRect();
-                baseWidth = bounds.width; 
+                baseWidth = bounds.width;
                 baseHeight = bounds.height;
             }
+
+            const targetResolutionMaxAxis = 2480;
+            const scale = targetResolutionMaxAxis / Math.max(baseWidth, baseHeight);
+
+            const targetWidth = baseWidth * scale;
+            const targetHeight = baseHeight * scale;
+
+            // Stripped the devastating global stroke-width JS hacks out completely
+            // Restricting explicitly to pure high-res geometry math
+
             const serializer = new XMLSerializer();
             let svgStr = serializer.serializeToString(svg);
-            svgStr = svgStr.replace(/<svg([^>]*)>/, function(match, attrs) {
+
+            svgStr = svgStr.replace(/<svg([^>]*)>/, function (match, attrs) {
                 attrs = attrs.replace(/\b(width|height)="[^"]*"/g, '');
-                return '<svg' + attrs + ' width="' + baseWidth + '" height="' + baseHeight + '">';
+                return '<svg' + attrs + ' width="' + targetWidth + '" height="' + targetHeight + '">';
             });
+
             svgStr = svgStr.replace(/max-width:[^;"]+;?/g, '');
+
             const b64 = btoa(unescape(encodeURIComponent(svgStr)));
             const img = new Image();
-            let a4w = 2480, a4h = 3508;
-            if (baseWidth > baseHeight) { a4w = 3508; a4h = 2480; }
+
             const canvas = document.createElement('canvas');
             const ctx = canvas.getContext('2d');
-            canvas.width = a4w; 
-            canvas.height = a4h;
+
+            const padding = 80;
+            canvas.width = targetWidth + padding;
+            canvas.height = targetHeight + padding;
+
             img.onload = function () {
                 ctx.fillStyle = "#ffffff";
                 ctx.fillRect(0, 0, canvas.width, canvas.height);
-                const margin = 300;
-                const safeW = a4w - (margin * 2);
-                const safeH = a4h - (margin * 2);
-                const scale = Math.min(safeW / baseWidth, safeH / baseHeight);
-                const offsetX = (a4w - (baseWidth * scale)) / 2;
-                const offsetY = (a4h - (baseHeight * scale)) / 2;
-                ctx.translate(offsetX, offsetY);
-                ctx.scale(scale, scale);
-                ctx.drawImage(img, 0, 0);
+
+                ctx.drawImage(img, padding / 2, padding / 2);
+
                 const a = document.createElement('a');
-                a.download = document.title.split(' ').join('_') + '.png';
-                a.href = canvas.toDataURL('image/png');
+                a.download = 'SmartFit_ER_Diagram.png';
+                a.href = canvas.toDataURL('image/png', 1.0);
                 a.click();
             };
             img.src = 'data:image/svg+xml;base64,' + b64;

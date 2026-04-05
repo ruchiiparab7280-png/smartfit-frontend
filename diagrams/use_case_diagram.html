@@ -5,72 +5,156 @@
     <title>SmartFit Usecase Diagram</title>
     <script src="https://cdn.jsdelivr.net/npm/mermaid@10/dist/mermaid.min.js"></script>
     <style>
-        body { background: #ffffff; padding: 20px; font-family: Arial, sans-serif; display: flex; flex-direction: column; align-items: center; }
-        .mermaid { margin-top: 20px; background: white; padding: 20px; border: 1px solid #ddd; }
-        .controls { margin-top: 20px; }
+        body { 
+            background: #ffffff; 
+            padding: 20px; 
+            font-family: Arial, sans-serif; 
+            display: flex; 
+            flex-direction: column; 
+            align-items: center; 
+            margin: 0;
+        }
+        h2 { margin-bottom: 5px; }
+        .mermaid { margin-top: 10px; background: white; }
+        .controls { margin-bottom: 20px; }
         button { padding: 10px 20px; font-size: 16px; cursor: pointer; background: #000; color: #fff; border: none; border-radius: 4px; }
-        @media print { .controls { display: none; } .mermaid { border: none; } body { padding: 0; } }
+        @media print { .controls { display: none; } body { padding: 0; } }
     </style>
 </head>
 <body>
     <h2>SmartFit Usecase Diagram</h2>
     <div class="controls">
-        <button onclick="downloadPNG()">Download as PNG Image</button>
+        <button onclick="downloadPNG()">Download as Portrait A4 PNG</button>
     </div>
     <div class="mermaid">
-%%{init: {'flowchart': {'curve': 'basis'}}}%%
+%%{init: {
+  'flowchart': {
+    'curve': 'basis',
+    'rankSpacing': 60,
+    'nodeSpacing': 50
+  },
+  'theme': 'base',
+  'themeVariables': {
+    'primaryColor': '#ffffff',
+    'primaryTextColor': '#000000',
+    'primaryBorderColor': '#000000',
+    'lineColor': '#000000',
+    'secondaryColor': '#ffffff',
+    'tertiaryColor': '#ffffff',
+    'fontFamily': 'Arial, sans-serif',
+    'edgeLabelBackground': '#ffffff',
+    'clusterBkg': '#ffffff',
+    'clusterBorder': '#000000',
+    'fontSize': '28px'
+  }
+}}%%
 flowchart LR
-    classDef actor fill:#fff,stroke:#000,stroke-width:2px,shape:circle;
-    classDef uc fill:#fff,stroke:#000,stroke-width:1.5px,shape:ellipse;
-    User([User]):::actor
-    Owner([Gym Owner]):::actor
-    Admin([System Admin]):::actor
-    subgraph SmartFit System Application
-        direction TB
-        UC1([Login / Register / Reset Password]):::uc
-        UC2([Browse Gyms & View Instructors]):::uc
-        UC3([Book Gym Memberships via Razorpay]):::uc
-        UC4([Manage Daily User Workouts]):::uc
-        UC5([Register New Gym & Pay Fees]):::uc
-        UC6([Manage Trainers & Supplements]):::uc
-        UC7([View Detailed Revenue Analytics]):::uc
-        UC8([Approve pending gym requests]):::uc
-        UC9([Monitor User Activity & Audits]):::uc
+    classDef actor fill:none,stroke:none;
+    classDef uc fill:#fff,stroke:#000,stroke-width:2px,shape:ellipse;
+    
+    %% Actors with explicit empty padding lines to create bounding space for SVG injection
+    User([" \n \n \n \n \nUser\n \n "]):::actor
+    Owner([" \n \n \n \n \nGym Owner\n \n "]):::actor
+    Admin([" \n \n \n \n \nSystem Admin\n \n "]):::actor
+    
+    subgraph SmartFit Gym Management System
+        UC_Auth(["Authenticate\nUser"]):::uc
+        UC_Login(["Login &\nRegister"]):::uc
+        
+        UC_Browse(["Browse Gyms\n& Instructors"]):::uc
+        UC_Book(["Book Gym\nMembership"]):::uc
+        UC_Trial(["Book Free\nTrial"]):::uc
+        UC_Workout(["Track Daily\nWorkout"]):::uc
+        
+        UC_Pay(["Process\nPayment"]):::uc
+        
+        UC_RegGym(["Register\nNew Gym"]):::uc
+        UC_Manage(["Manage Trainers\n& Supplements"]):::uc
+        UC_Ana(["View Revenue\nAnalytics"]):::uc
+        
+        UC_Approve(["Approve Gym\nRequests"]):::uc
+        UC_Audit(["System\nAudit"]):::uc
+        
+        %% Use French quotes for textbook specific includes alongside explicitly dashed arrows
+        UC_Login -.->|«include»| UC_Auth
+        UC_Book -.->|«include»| UC_Pay
+        UC_RegGym -.->|«include»| UC_Pay
     end
-    User --> UC1
-    User --> UC2
-    User --> UC3
-    User --> UC4
-    Owner --> UC1
-    Owner --> UC5
-    Owner --> UC6
-    Owner --> UC7
-    Admin --> UC1
-    Admin --> UC8
-    Admin --> UC9
+    
+    %% Connect Left Actor with solid pointing arrows
+    User --- UC_Login
+    User --- UC_Browse
+    User --- UC_Book
+    User --- UC_Trial
+    User --- UC_Workout
+    
+    %% INVISIBLE RANK FORCER: Forces Owner and Admin to explicitly anchor
+    %% to the literal right-hand side of the System boundary (rank > UC_Pay/UC_Auth)
+    UC_Pay ~~~ Owner
+    UC_Auth ~~~ Owner
+    UC_Pay ~~~ Admin
+    UC_Auth ~~~ Admin
+
+    %% Connect Right Actors (Solid structural associations without arrowheads)
+    UC_RegGym --- Owner
+    UC_Manage --- Owner
+    UC_Ana --- Owner
+    
+    UC_Approve --- Admin
+    UC_Audit --- Admin
     </div>
     <script>
         mermaid.initialize({
             startOnLoad: true,
-            theme: 'base',
-            securityLevel: 'loose',
-            flowchart: { htmlLabels: false },
-            sequence: { htmlLabels: false },
-            class: { htmlLabels: false },
-            themeVariables: {
-                primaryColor: '#ffffff',
-                primaryTextColor: '#000000',
-                primaryBorderColor: '#000000',
-                lineColor: '#000000',
-                secondaryColor: '#ffffff',
-                tertiaryColor: '#ffffff',
-                fontFamily: 'Arial, sans-serif'
+            securityLevel: 'loose'
+        });
+        
+        // Bulletproof MutationObserver to ensure we NEVER miss the Mermaid rendering cycle
+        // This guarantees the stick-figure script executes exactly when the graphic is painted to the DOM!
+        const stickmanObserver = new MutationObserver((mutations, obs) => {
+            const svg = document.querySelector('.mermaid svg');
+            if (svg) {
+                const actors = svg.querySelectorAll('.node.actor');
+                if (actors.length > 0) {
+                    obs.disconnect(); // Stop observing permanently once found to save resources
+                    
+                    actors.forEach(node => {
+                        // Strip out the underlying Mermaid pill-box UI completely
+                        const bg = node.querySelector('.label-container, rect, circle, ellipse, polygon, path.basic');
+                        if (bg) bg.style.display = 'none';
+                        
+                        // Dynamically append pure mathematical UML SVGs onto the graphic node!
+                        const stickman = document.createElementNS("http://www.w3.org/2000/svg", "g");
+                        stickman.innerHTML = `
+                          <circle cx="0" cy="-65" r="14" fill="none" stroke="black" stroke-width="4"/>
+                          <line x1="0" y1="-51" x2="0" y2="-10" stroke="black" stroke-width="4"/>
+                          <line x1="-25" y1="-35" x2="25" y2="-35" stroke="black" stroke-width="4"/>
+                          <line x1="0" y1="-10" x2="-20" y2="15" stroke="black" stroke-width="4"/>
+                          <line x1="0" y1="-10" x2="20" y2="15" stroke="black" stroke-width="4"/>
+                        `;
+                        
+                        const labelGroup = node.querySelector('.label');
+                        if (labelGroup) {
+                            // No hacky CSS transform modifications needed anymore! 
+                            // The math draws the actor entirely floating above the text natively.
+                            node.insertBefore(stickman, labelGroup);
+                        }
+                    });
+                }
             }
         });
+        
+        // Begin watching immediately
+        stickmanObserver.observe(document.body, { childList: true, subtree: true });
 
         function downloadPNG() {
             const svg = document.querySelector('.mermaid svg');
             if(!svg) { alert('SVG not loaded yet'); return; }
+            
+            // Standard A4 dimensions MUST always be Forced Portrait
+            const a4w = 2480; 
+            const a4h = 3508;
+            
             let viewBox = svg.getAttribute('viewBox');
             let baseWidth, baseHeight;
             if (viewBox) {
@@ -82,36 +166,52 @@ flowchart LR
                 baseWidth = bounds.width; 
                 baseHeight = bounds.height;
             }
+            
+            // Margin for breathing room
+            const margin = 120;
+            const safeW = a4w - (margin * 2);
+            const safeH = a4h - (margin * 2);
+            
+            // Calculate explicit scaling to target A4 size
+            const scale = Math.min(safeW / baseWidth, safeH / baseHeight);
+            const targetWidth = baseWidth * scale;
+            const targetHeight = baseHeight * scale;
+            
             const serializer = new XMLSerializer();
             let svgStr = serializer.serializeToString(svg);
+            
+            // CRITICAL FIX: Make the SVG natively scale to target resolution to prevent blurry artifacts
             svgStr = svgStr.replace(/<svg([^>]*)>/, function(match, attrs) {
                 attrs = attrs.replace(/\b(width|height)="[^"]*"/g, '');
-                return '<svg' + attrs + ' width="' + baseWidth + '" height="' + baseHeight + '">';
+                return '<svg' + attrs + ' width="' + targetWidth + '" height="' + targetHeight + '">';
             });
             svgStr = svgStr.replace(/max-width:[^;"]+;?/g, '');
+            // Enforce thicker stroke logic for crystal clear print
+            svgStr = svgStr.replace(/stroke-width:[^;"]+;?/g, 'stroke-width: 3px;');
+            svgStr = svgStr.replace(/font-family:[^;"]+;?/g, 'font-family: Arial, sans-serif; font-weight: bold;');
+            
             const b64 = btoa(unescape(encodeURIComponent(svgStr)));
             const img = new Image();
-            let a4w = 2480, a4h = 3508;
-            if (baseWidth > baseHeight) { a4w = 3508; a4h = 2480; }
+            
             const canvas = document.createElement('canvas');
             const ctx = canvas.getContext('2d');
             canvas.width = a4w; 
             canvas.height = a4h;
+            
             img.onload = function () {
+                // Background
                 ctx.fillStyle = "#ffffff";
                 ctx.fillRect(0, 0, canvas.width, canvas.height);
-                const margin = 300;
-                const safeW = a4w - (margin * 2);
-                const safeH = a4h - (margin * 2);
-                const scale = Math.min(safeW / baseWidth, safeH / baseHeight);
-                const offsetX = (a4w - (baseWidth * scale)) / 2;
-                const offsetY = (a4h - (baseHeight * scale)) / 2;
-                ctx.translate(offsetX, offsetY);
-                ctx.scale(scale, scale);
-                ctx.drawImage(img, 0, 0);
+                
+                const offsetX = (a4w - targetWidth) / 2;
+                const offsetY = (a4h - targetHeight) / 2;
+                
+                // Direct draw since Vector matches precise target resolution
+                ctx.drawImage(img, offsetX, offsetY);
+                
                 const a = document.createElement('a');
-                a.download = document.title.split(' ').join('_') + '.png';
-                a.href = canvas.toDataURL('image/png');
+                a.download = 'SmartFit_Usecase_Diagram_Portrait.png';
+                a.href = canvas.toDataURL('image/png', 1.0);
                 a.click();
             };
             img.src = 'data:image/svg+xml;base64,' + b64;

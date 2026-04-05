@@ -1,6 +1,5 @@
 <!DOCTYPE html>
 <html lang="en">
-
 <head>
     <meta charset="UTF-8">
     <title>SmartFit Activity Diagram</title>
@@ -8,104 +7,154 @@
     <style>
         body {
             background: #ffffff;
-            padding: 20px;
+            padding: 40px;
             font-family: Arial, sans-serif;
             display: flex;
             flex-direction: column;
             align-items: center;
+            margin: 0;
+            text-align: center;
         }
 
+        h2 {
+            margin-bottom: 10px;
+            font-size: 32px;
+        }
+
+        /* Container allowing the graphic to stretch freely */
         .mermaid {
-            margin-top: 20px;
+            margin-top: 10px;
             background: white;
-            padding: 20px;
-            border: 1px solid #ddd;
+            width: 100%;
+            display: flex;
+            justify-content: center;
+            overflow-x: auto;
+        }
+
+        /* Proportional magnifier identical to the optimized Sequence Diagram standard */
+        .mermaid svg {
+            width: 1400px !important; /* Scale multiplier for clear display */
+            max-width: 1400px !important;
+            height: auto !important;
+        }
+
+        /* Thick structural print vectors for the screen */
+        .mermaid svg path:not(.marker),
+        .mermaid svg line,
+        .mermaid svg rect,
+        .mermaid svg polygon,
+        .mermaid svg circle {
+            stroke-width: 3px !important;
+        }
+
+        /* Strict prevention of text smudging */
+        .mermaid svg text,
+        .mermaid svg tspan {
+            stroke-width: 0 !important;
         }
 
         .controls {
-            margin-top: 20px;
+            margin-bottom: 30px;
         }
 
         button {
-            padding: 10px 20px;
-            font-size: 16px;
+            padding: 15px 30px;
+            font-size: 24px;
+            font-weight: bold;
             cursor: pointer;
             background: #000;
             color: #fff;
             border: none;
-            border-radius: 4px;
+            border-radius: 6px;
         }
 
         @media print {
-            .controls {
-                display: none;
-            }
-
-            .mermaid {
-                border: none;
-            }
-
-            body {
-                padding: 0;
-            }
+            .controls { display: none; }
+            body { padding: 0; }
         }
     </style>
 </head>
 
 <body>
-    <h2>SmartFit Activity Diagram (User Core Flow)</h2>
+    <h2>SmartFit Activity Diagram (Gym Booking Flow)</h2>
     <div class="controls">
-        <button onclick="downloadPNG()">Download as PNG Image</button>
+        <button onclick="downloadPNG()">Download as Portrait A4 PNG</button>
     </div>
     <div class="mermaid">
-        %%{init: {'flowchart': {'curve': 'basis'}}}%%
         flowchart TD
-        classDef startEnd fill:#000,stroke:#000,stroke-width:2px,shape:circle,color:#fff;
-        classDef action fill:#fff,stroke:#000,stroke-width:2px,rx:10,ry:10;
-        classDef decision fill:#fff,stroke:#000,stroke-width:2px,shape:diamond;
+            %% Native UML Activity Shapes and Configurations
+            Start((Start))
+            Stop((Stop))
+            
+            Auth[User Authentication / Login]
+            Browse[Browse Gym Centers & Trainers]
+            Select[Select Gym & Membership Plan]
+            Book[Click Book Membership]
+            
+            FetchAPI[Backend POST /create-order]
+            Gateway[Initiate Razorpay Gateway Modal]
+            InputDetails[User Enters Card / UPI Details]
+            
+            Check{Payment<br>Successful?}
+            
+            Verify[AES/HMAC Signature Verification]
+            Fail[Display Error Toast / Alert]
+            
+            DBInsert[INSERT user_memberships Row]
+            DBUpdate[UPDATE Gym Revenue Statistics]
+            Dash[Redirect to User Dashboard]
 
-        Start((Start)):::startEnd
-        A[Login / Register]:::action
-        B[Explore & Select Gym]:::action
-        C{View Gym \n Details?}:::decision
-        D[Review Trainers & Supplements]:::action
-        E{Book \n Membership?}:::decision
-        F[Razorpay Checkout]:::action
-        G{Payment \n Success?}:::decision
-        H[Save to Database]:::action
-        I[Dashboard & Workouts]:::action
-        End((End)):::startEnd
-
-        Start --> A --> B --> C
-        C -->|Yes| D --> E
-        C -->|No| E
-        E -->|No| B
-        E -->|Yes| F --> G
-        G -->|No| F
-        G -->|Yes| H --> I --> End
+            %% Linear Flow Mappings
+            Start --> Auth
+            Auth --> Browse
+            Browse --> Select
+            Select --> Book
+            Book --> FetchAPI
+            FetchAPI --> Gateway
+            Gateway --> InputDetails
+            InputDetails --> Check
+            
+            %% Conditional Branching
+            Check -- Yes --> Verify
+            Check -- No --> Fail
+            
+            %% Loop back on failure
+            Fail --> Gateway
+            
+            %% Success Processing Flow
+            Verify --> DBInsert
+            DBInsert --> DBUpdate
+            DBUpdate --> Dash
+            Dash --> Stop
     </div>
+
     <script>
+        // Use standard initialization mapped from our successful Class Diagram layouts
         mermaid.initialize({
             startOnLoad: true,
-            theme: 'base',
             securityLevel: 'loose',
-            flowchart: { htmlLabels: false },
-            sequence: { htmlLabels: false },
-            class: { htmlLabels: false },
+            theme: 'base',
             themeVariables: {
                 primaryColor: '#ffffff',
                 primaryTextColor: '#000000',
                 primaryBorderColor: '#000000',
                 lineColor: '#000000',
-                secondaryColor: '#ffffff',
+                secondaryColor: '#f4f4f4',
                 tertiaryColor: '#ffffff',
-                fontFamily: 'Arial, sans-serif'
+                fontFamily: 'Arial, sans-serif',
+                fontSize: '24px' // Highly stable base font-size; the CSS width multiplier does the heavy lifting visually
+            },
+            flowchart: {
+                nodeSpacing: 70,
+                rankSpacing: 80,
+                htmlLabels: false // STRICTLY False to prevent <foreignObject> <div> clipping bugs!
             }
         });
 
         function downloadPNG() {
             const svg = document.querySelector('.mermaid svg');
             if (!svg) { alert('SVG not loaded yet'); return; }
+
             let viewBox = svg.getAttribute('viewBox');
             let baseWidth, baseHeight;
             if (viewBox) {
@@ -117,41 +166,62 @@
                 baseWidth = bounds.width;
                 baseHeight = bounds.height;
             }
+
+            // CRITICAL FIX: Ensure resolution strikes A4 standard without dumping dead padding rows
+            const targetResolutionMaxAxis = 2480;
+            const scale = targetResolutionMaxAxis / Math.max(baseWidth, baseHeight);
+
+            const targetWidth = baseWidth * scale;
+            const targetHeight = baseHeight * scale;
+
+            // DOM-level styling application before XML translation
+            const graphicalElements = svg.querySelectorAll('path, rect, line, circle, polygon');
+            graphicalElements.forEach(el => {
+                if (el.getAttribute('stroke') !== 'none' && el.style.stroke !== 'none') {
+                    el.style.strokeWidth = '3px';
+                }
+            });
+
+            const textElements = svg.querySelectorAll('text, tspan, .label');
+            textElements.forEach(el => {
+                el.style.fontFamily = '"Segoe UI", Tahoma, Geneva, Verdana, sans-serif';
+                el.style.fontWeight = '600';
+                el.style.strokeWidth = '0';
+            });
+
             const serializer = new XMLSerializer();
             let svgStr = serializer.serializeToString(svg);
+
             svgStr = svgStr.replace(/<svg([^>]*)>/, function (match, attrs) {
                 attrs = attrs.replace(/\b(width|height)="[^"]*"/g, '');
-                return '<svg' + attrs + ' width="' + baseWidth + '" height="' + baseHeight + '">';
+                return '<svg' + attrs + ' width="' + targetWidth + '" height="' + targetHeight + '">';
             });
+
             svgStr = svgStr.replace(/max-width:[^;"]+;?/g, '');
+
             const b64 = btoa(unescape(encodeURIComponent(svgStr)));
             const img = new Image();
-            let a4w = 2480, a4h = 3508;
-            if (baseWidth > baseHeight) { a4w = 3508; a4h = 2480; }
+
             const canvas = document.createElement('canvas');
             const ctx = canvas.getContext('2d');
-            canvas.width = a4w;
-            canvas.height = a4h;
+
+            const padding = 80;
+            canvas.width = targetWidth + padding;
+            canvas.height = targetHeight + padding;
+
             img.onload = function () {
                 ctx.fillStyle = "#ffffff";
                 ctx.fillRect(0, 0, canvas.width, canvas.height);
-                const margin = 300;
-                const safeW = a4w - (margin * 2);
-                const safeH = a4h - (margin * 2);
-                const scale = Math.min(safeW / baseWidth, safeH / baseHeight);
-                const offsetX = (a4w - (baseWidth * scale)) / 2;
-                const offsetY = (a4h - (baseHeight * scale)) / 2;
-                ctx.translate(offsetX, offsetY);
-                ctx.scale(scale, scale);
-                ctx.drawImage(img, 0, 0);
+
+                ctx.drawImage(img, padding / 2, padding / 2);
+
                 const a = document.createElement('a');
-                a.download = document.title.split(' ').join('_') + '.png';
-                a.href = canvas.toDataURL('image/png');
+                a.download = 'SmartFit_Activity_Diagram.png';
+                a.href = canvas.toDataURL('image/png', 1.0);
                 a.click();
             };
             img.src = 'data:image/svg+xml;base64,' + b64;
         }
     </script>
 </body>
-
 </html>

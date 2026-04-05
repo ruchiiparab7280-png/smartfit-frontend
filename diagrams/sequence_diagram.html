@@ -1,79 +1,175 @@
 <!DOCTYPE html>
 <html lang="en">
+
 <head>
     <meta charset="UTF-8">
     <title>SmartFit Sequence Diagram</title>
     <script src="https://cdn.jsdelivr.net/npm/mermaid@10/dist/mermaid.min.js"></script>
     <style>
-        body { background: #ffffff; padding: 20px; font-family: Arial, sans-serif; display: flex; flex-direction: column; align-items: center; }
-        .mermaid { margin-top: 20px; background: white; padding: 20px; border: 1px solid #ddd; }
-        .controls { margin-top: 20px; }
-        button { padding: 10px 20px; font-size: 16px; cursor: pointer; background: #000; color: #fff; border: none; border-radius: 4px; }
-        @media print { .controls { display: none; } .mermaid { border: none; } body { padding: 0; } }
+        body {
+            background: #ffffff;
+            padding: 40px;
+            font-family: Arial, sans-serif;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            margin: 0;
+            text-align: center;
+        }
+
+        h2 {
+            margin-bottom: 10px;
+            font-size: 32px;
+        }
+
+        /* Container allowing the graphic to stretch freely */
+        .mermaid {
+            margin-top: 10px;
+            background: white;
+            width: 100%;
+            display: flex;
+            justify-content: center;
+            overflow-x: auto;
+        }
+
+        /* THE MAGIC BULLET: Proportionally magnify the native SVG globally instead of hacking individual nodes */
+        .mermaid svg {
+            width: 1600px !important;
+            /* Forces massive diagram size uniformly on screen */
+            max-width: 1600px !important;
+            height: auto !important;
+        }
+
+        /* Force heavily visible structural lines across the entire diagram exclusively on screen */
+        .mermaid svg path:not(.marker),
+        .mermaid svg line,
+        .mermaid svg rect {
+            stroke-width: 3px !important;
+        }
+
+        /* Defend text from the line-thickener so fonts remain crisp */
+        .mermaid svg text,
+        .mermaid svg tspan {
+            stroke-width: 0 !important;
+        }
+
+        .controls {
+            margin-bottom: 30px;
+        }
+
+        button {
+            padding: 15px 30px;
+            font-size: 28px;
+            font-weight: bold;
+            cursor: pointer;
+            background: #000;
+            color: #fff;
+            border: none;
+            border-radius: 6px;
+        }
+
+        @media print {
+            .controls {
+                display: none;
+            }
+
+            body {
+                padding: 0;
+            }
+        }
     </style>
 </head>
+
 <body>
-    <h2>SmartFit Sequence Diagram (Razorpay Booking Flow)</h2>
+    <h2>SmartFit Sequence Diagram (Razorpay Booking Lifecycle)</h2>
     <div class="controls">
-        <button onclick="downloadPNG()">Download as PNG Image</button>
+        <button onclick="downloadPNG()">Download as Portrait A4 PNG</button>
     </div>
     <div class="mermaid">
-%%{init: {'themeVariables': {'fontSize': '18px', 'fontFamily': 'Arial'}, 'sequence': {'actorMargin': 40, 'messageMargin': 30}}}%%
-sequenceDiagram
-    autonumber
-    actor User
-    participant React as React<br>App
-    participant Razorpay as Razorpay
-    participant Node as Node<br>API
-    participant DB as Supabase<br>DB
-    
-    User->>React: Click "Book Membership"
-    React->>Node: POST /create-order
-    activate Node
-    Node->>Razorpay: Request Order ID
-    Razorpay-->>Node: Return Order ID
-    Node-->>React: Return ID & Key
-    deactivate Node
-    
-    React->>Razorpay: Open Payment Modal
-    User->>Razorpay: Pay with Card
-    Razorpay-->>React: Payment Success (ID)
-    
-    React->>Node: POST /verify {emails}
-    activate Node
-    Node->>DB: Verify User & Gym
-    activate DB
-    DB-->>Node: Valid
-    Node->>DB: INSERT user_memberships
-    DB-->>Node: Success
-    deactivate DB
-    Node-->>React: 200 OK (Successful)
-    deactivate Node
-    
-    React-->>User: Show Payment Success
+        sequenceDiagram
+        autonumber
+
+        actor User as User
+        participant Frontend as React<br>App
+        participant Backend as Node.js<br>API
+        participant Razorpay as Razorpay<br>Auth Server
+        participant DB as Supabase<br>DB
+
+        %% Initiation Phase
+        User->>Frontend: Clicks "Book Membership" Card
+
+        Frontend->>Backend: POST /create-custom-order
+        activate Backend
+
+        Backend->>Razorpay: orders.create(amount, currency)
+        activate Razorpay
+        Razorpay-->>Backend: Returns Order ID (seq_XXX)
+        deactivate Razorpay
+
+        Backend-->>Frontend: JSON Response { order_id, key_id }
+        deactivate Backend
+
+        %% Web Client Transaction Phase
+        Frontend->>User: Renders Razorpay Secure Modal
+        User->>Frontend: Submits Payment Form Details
+
+        Frontend->>Razorpay: Initiates direct JS transaction handler
+        activate Razorpay
+        Razorpay-->>Frontend: Success Response (payment_id, signature)
+        deactivate Razorpay
+
+        %% Backend Verification & Database Persistence Phase
+        Frontend->>Backend: POST /verify-payment (Passes signature limits)
+        activate Backend
+
+        Note over Backend,Razorpay: Backend generates SHA256 HMAC<br>signature using Razorpay hidden secret
+        Backend->>Backend: Validates HMAC Signature Match natively
+
+        Backend->>DB: INSERT INTO DB.user_memberships (status=active)
+        activate DB
+        DB-->>Backend: Confirmation Payload (Row Stored)
+        deactivate DB
+
+        Backend->>DB: UPDATE Gym analytics mapping
+        activate DB
+        DB-->>Backend: Stats Synchronized
+        deactivate DB
+
+        Backend-->>Frontend: HTTP 200 OK (Payment Verified Structurally)
+        deactivate Backend
+
+        %% Conclusion
+        Frontend-->>User: Reroutes to Success Dashboard View
     </div>
+
     <script>
+        // Completely standardized Mermaid Initialization strictly without CSS font-hacks that crash bounding algorithms
         mermaid.initialize({
             startOnLoad: true,
-            theme: 'base',
             securityLevel: 'loose',
-            flowchart: { htmlLabels: false },
-            sequence: { htmlLabels: false },
-            class: { htmlLabels: false },
+            theme: 'base',
             themeVariables: {
                 primaryColor: '#ffffff',
                 primaryTextColor: '#000000',
                 primaryBorderColor: '#000000',
                 lineColor: '#000000',
-                secondaryColor: '#ffffff',
+                secondaryColor: '#f4f4f4',
                 tertiaryColor: '#ffffff',
-                fontFamily: 'Arial, sans-serif'
+                fontFamily: 'Arial, sans-serif',
+                fontSize: '28px' // Extremely balanced base size; the CSS width scaler magnifies this massively automatically
+            },
+            sequence: {
+                actorMargin: 80,
+                messageMargin: 50,
+                noteMargin: 30,
+                boxMargin: 20
             }
         });
 
         function downloadPNG() {
             const svg = document.querySelector('.mermaid svg');
-            if(!svg) { alert('SVG not loaded yet'); return; }
+            if (!svg) { alert('SVG not loaded yet'); return; }
+
             let viewBox = svg.getAttribute('viewBox');
             let baseWidth, baseHeight;
             if (viewBox) {
@@ -82,43 +178,74 @@ sequenceDiagram
                 baseHeight = parseFloat(coords[3]);
             } else {
                 let bounds = svg.getBoundingClientRect();
-                baseWidth = bounds.width; 
+                baseWidth = bounds.width;
                 baseHeight = bounds.height;
             }
+
+            // CRITICAL FIX: Eliminate arbitrarily huge A4 white-space borders.
+            // Calculate a scale specifically to guarantee absolute crispness when pasted 
+            // into an A4 word doc (approx 2480px) without generating dead white filler space.
+            const targetResolutionMaxAxis = 2480;
+            const scale = targetResolutionMaxAxis / Math.max(baseWidth, baseHeight);
+
+            // Tight bounds strictly enveloping the actual vector logic
+            const targetWidth = baseWidth * scale;
+            const targetHeight = baseHeight * scale;
+
+            // Safely apply print styling strictly by DOM tree before serializing!
+            const graphicalElements = svg.querySelectorAll('path, rect, line, circle, polygon');
+            graphicalElements.forEach(el => {
+                if (el.getAttribute('stroke') !== 'none' && el.style.stroke !== 'none') {
+                    el.style.strokeWidth = '3px';
+                }
+            });
+
+            const textElements = svg.querySelectorAll('text, .messageText, .actor, tspan');
+            textElements.forEach(el => {
+                el.style.fontFamily = '"Segoe UI", Tahoma, Geneva, Verdana, sans-serif';
+                el.style.fontWeight = '600';
+                el.style.strokeWidth = '0';
+            });
+
             const serializer = new XMLSerializer();
             let svgStr = serializer.serializeToString(svg);
-            svgStr = svgStr.replace(/<svg([^>]*)>/, function(match, attrs) {
+
+            // Force the underlying SVG mathematical vectors to Native Print resolution
+            svgStr = svgStr.replace(/<svg([^>]*)>/, function (match, attrs) {
                 attrs = attrs.replace(/\b(width|height)="[^"]*"/g, '');
-                return '<svg' + attrs + ' width="' + baseWidth + '" height="' + baseHeight + '">';
+                return '<svg' + attrs + ' width="' + targetWidth + '" height="' + targetHeight + '">';
             });
+
+            // Clean up potentially conflicting max-width caps
             svgStr = svgStr.replace(/max-width:[^;"]+;?/g, '');
+
             const b64 = btoa(unescape(encodeURIComponent(svgStr)));
             const img = new Image();
-            let a4w = 2480, a4h = 3508;
-            if (baseWidth > baseHeight) { a4w = 3508; a4h = 2480; }
+
             const canvas = document.createElement('canvas');
             const ctx = canvas.getContext('2d');
-            canvas.width = a4w; 
-            canvas.height = a4h;
+
+            // TIGHTLY wrap the canvas explicitly to exactly fit the diagram bounds! No extra space filler.
+            const padding = 60; // Just enough safe-zone to wrap the borders
+            canvas.width = targetWidth + padding;
+            canvas.height = targetHeight + padding;
+
             img.onload = function () {
+                // Paint pure white background tightly around the diagram
                 ctx.fillStyle = "#ffffff";
                 ctx.fillRect(0, 0, canvas.width, canvas.height);
-                const margin = 300;
-                const safeW = a4w - (margin * 2);
-                const safeH = a4h - (margin * 2);
-                const scale = Math.min(safeW / baseWidth, safeH / baseHeight);
-                const offsetX = (a4w - (baseWidth * scale)) / 2;
-                const offsetY = (a4h - (baseHeight * scale)) / 2;
-                ctx.translate(offsetX, offsetY);
-                ctx.scale(scale, scale);
-                ctx.drawImage(img, 0, 0);
+
+                // Print directly with minimal dead padding
+                ctx.drawImage(img, padding / 2, padding / 2);
+
                 const a = document.createElement('a');
-                a.download = document.title.split(' ').join('_') + '.png';
-                a.href = canvas.toDataURL('image/png');
+                a.download = 'SmartFit_Sequence_Diagram_Print.png';
+                a.href = canvas.toDataURL('image/png', 1.0);
                 a.click();
             };
             img.src = 'data:image/svg+xml;base64,' + b64;
         }
     </script>
 </body>
+
 </html>
