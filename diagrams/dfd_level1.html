@@ -1,0 +1,234 @@
+﻿<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8"/>
+<title>SmartFit – DFD Level 1</title>
+<style>
+  @page { size: A4 portrait; margin: 0; }
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+  body {
+    background: #fff;
+    width: 210mm;
+    font-family: 'Segoe UI', Arial, sans-serif;
+    color: #000;
+    padding: 5mm;
+  }
+  h1 {
+    text-align: center;
+    font-size: 16pt;
+    font-weight: 900;
+    letter-spacing: 2px;
+    text-transform: uppercase;
+    margin-bottom: 1mm;
+  }
+  .subtitle { text-align: center; font-size: 9pt; color: #333; margin-bottom: 3mm; }
+  svg { display: block; margin: 0 auto; width: 196mm; height: auto; }
+  .below { width: 196mm; margin: 0 auto; }
+  .legend {
+    display: flex; align-items: center; gap: 16px;
+    margin-top: 6px; padding: 5px 12px;
+    background: #f5f5f5; border: 1px solid #bbb;
+    border-radius: 6px; font-size: 10pt; flex-wrap: wrap;
+  }
+  .legend-item { display: flex; align-items: center; gap: 5px; }
+  .leg-rect { width: 32px; height: 16px; border: 2px solid #000; display: inline-block; }
+  .leg-circle { width: 24px; height: 24px; border: 2px solid #000; border-radius: 50%; display: inline-block; }
+  .leg-arrow { width: 30px; height: 2px; background: #000; position: relative; display: inline-block; }
+  .leg-arrow::after { content:''; position:absolute; right:0; top:-4px; border:5px solid transparent; border-left:7px solid #000; }
+  .download-btn {
+    display: block; margin: 8px auto 0; padding: 7px 26px;
+    background: #000; color: #fff; font-size: 12pt; font-weight: 700;
+    border: none; border-radius: 8px; cursor: pointer; letter-spacing: 1px;
+  }
+  .download-btn:hover { background: #333; }
+</style>
+</head>
+<body>
+
+<h1>SmartFit — DFD Level 1</h1>
+<div class="subtitle">Detailed Data Flow Diagram — Gym Management &amp; Fitness Platform</div>
+
+<svg id="dfd-svg" viewBox="0 0 620 900" xmlns="http://www.w3.org/2000/svg">
+<defs>
+  <marker id="arr" markerWidth="8" markerHeight="6" refX="7" refY="3" orient="auto">
+    <polygon points="0 0,8 3,0 6" fill="#000"/>
+  </marker>
+</defs>
+
+<!-- outer border box -->
+<rect x="8" y="8" width="604" height="884" rx="8" fill="#fff" stroke="#bbb" stroke-width="1.5"/>
+
+<!-- ══════════════════════════════════════════════
+     EXTERNAL ENTITIES
+══════════════════════════════════════════════ -->
+
+<!-- USER — top centre -->
+<rect x="258" y="24" width="104" height="36" rx="4" fill="#fff" stroke="#000" stroke-width="2"/>
+<text x="310" y="47" text-anchor="middle" font-size="14" font-weight="900" fill="#000">User</text>
+
+<!-- GYM OWNER — left middle -->
+<rect x="30" y="490" width="110" height="36" rx="4" fill="#fff" stroke="#000" stroke-width="2"/>
+<text x="85" y="513" text-anchor="middle" font-size="13" font-weight="800" fill="#000">Gym Owner</text>
+
+<!-- ADMIN — right middle -->
+<rect x="480" y="490" width="100" height="36" rx="4" fill="#fff" stroke="#000" stroke-width="2"/>
+<text x="530" y="513" text-anchor="middle" font-size="13" font-weight="800" fill="#000">Admin</text>
+
+<!-- ══════════════════════════════════════════════
+     PROCESSES  (circles)
+══════════════════════════════════════════════ -->
+
+<!-- P1.0 Auth & Profile Mgmt — top left -->
+<circle cx="130" cy="190" r="52" fill="#fff" stroke="#000" stroke-width="2"/>
+<text x="130" y="181" text-anchor="middle" font-size="11" font-weight="900" fill="#000">1.0</text>
+<text x="130" y="196" text-anchor="middle" font-size="11" font-weight="700" fill="#000">Auth &amp;</text>
+<text x="130" y="211" text-anchor="middle" font-size="11" font-weight="700" fill="#000">Profile Mgmt</text>
+
+<!-- P3.0 Razorpay Bookings — top right -->
+<circle cx="400" cy="190" r="52" fill="#fff" stroke="#000" stroke-width="2"/>
+<text x="400" y="181" text-anchor="middle" font-size="11" font-weight="900" fill="#000">3.0</text>
+<text x="400" y="196" text-anchor="middle" font-size="11" font-weight="700" fill="#000">Razorpay</text>
+<text x="400" y="211" text-anchor="middle" font-size="11" font-weight="700" fill="#000">Bookings</text>
+
+<!-- P4.0 Reporting & Analytics — centre left -->
+<circle cx="220" cy="530" r="52" fill="#fff" stroke="#000" stroke-width="2"/>
+<text x="220" y="521" text-anchor="middle" font-size="11" font-weight="900" fill="#000">4.0</text>
+<text x="220" y="536" text-anchor="middle" font-size="11" font-weight="700" fill="#000">Reporting &amp;</text>
+<text x="220" y="551" text-anchor="middle" font-size="11" font-weight="700" fill="#000">Analytics</text>
+
+<!-- P2.0 Gym Operations — centre right -->
+<circle cx="450" cy="640" r="52" fill="#fff" stroke="#000" stroke-width="2"/>
+<text x="450" y="631" text-anchor="middle" font-size="11" font-weight="900" fill="#000">2.0</text>
+<text x="450" y="646" text-anchor="middle" font-size="11" font-weight="700" fill="#000">Gym</text>
+<text x="450" y="661" text-anchor="middle" font-size="11" font-weight="700" fill="#000">Operations</text>
+
+<!-- ══════════════════════════════════════════════
+     DATA STORES  (cylinder style — two ellipses + rect body)
+══════════════════════════════════════════════ -->
+
+<!-- D1. users — below P1.0 -->
+<rect x="60" y="316" width="140" height="38" fill="#fff" stroke="#000" stroke-width="2"/>
+<ellipse cx="130" cy="316" rx="70" ry="12" fill="#fff" stroke="#000" stroke-width="2"/>
+<ellipse cx="130" cy="354" rx="70" ry="12" fill="#fff" stroke="#000" stroke-width="2"/>
+<text x="130" y="340" text-anchor="middle" font-size="12" font-weight="800" fill="#000">D1. users</text>
+
+<!-- D3. user_memberships — below P3.0 -->
+<rect x="300" y="316" width="200" height="38" fill="#fff" stroke="#000" stroke-width="2"/>
+<ellipse cx="400" cy="316" rx="100" ry="12" fill="#fff" stroke="#000" stroke-width="2"/>
+<ellipse cx="400" cy="354" rx="100" ry="12" fill="#fff" stroke="#000" stroke-width="2"/>
+<text x="400" y="340" text-anchor="middle" font-size="12" font-weight="800" fill="#000">D3. user_memberships</text>
+
+<!-- D2. gym_owner_requests — bottom -->
+<rect x="300" y="770" width="220" height="38" fill="#fff" stroke="#000" stroke-width="2"/>
+<ellipse cx="410" cy="770" rx="110" ry="12" fill="#fff" stroke="#000" stroke-width="2"/>
+<ellipse cx="410" cy="808" rx="110" ry="12" fill="#fff" stroke="#000" stroke-width="2"/>
+<text x="410" y="794" text-anchor="middle" font-size="12" font-weight="800" fill="#000">D2. gym_owner_requests</text>
+
+<!-- ══════════════════════════════════════════════
+     DATA FLOWS
+══════════════════════════════════════════════ -->
+
+<!-- USER → P1.0  Login Data -->
+<line x1="270" y1="55" x2="175" y2="142" stroke="#000" stroke-width="1.8" marker-end="url(#arr)"/>
+<text x="188" y="90" text-anchor="middle" font-size="10" font-weight="700" fill="#000">Login Data</text>
+
+<!-- P1.0 → USER  Auth Tokens -->
+<line x1="172" y1="140" x2="268" y2="53" stroke="#000" stroke-width="1.8" marker-end="url(#arr)"/>
+<text x="248" y="118" text-anchor="middle" font-size="10" font-weight="700" fill="#000">Auth Tokens</text>
+
+<!-- USER → P3.0  Payment Payload -->
+<line x1="350" y1="55" x2="355" y2="140" stroke="#000" stroke-width="1.8" marker-end="url(#arr)"/>
+<text x="318" y="90" text-anchor="middle" font-size="10" font-weight="700" fill="#000">Payment Payload</text>
+
+<!-- P3.0 → USER  Payment Receipt -->
+<line x1="358" y1="140" x2="353" y2="55" stroke="#000" stroke-width="1.8" marker-end="url(#arr)"/>
+<text x="420" y="90" text-anchor="middle" font-size="10" font-weight="700" fill="#000">Payment Receipt</text>
+
+<!-- USER → P2.0  Query Gyms (long right curve) -->
+<path d="M 362 42 C 580 42 580 600 500 620" stroke="#000" stroke-width="1.8" fill="none" marker-end="url(#arr)"/>
+<text x="570" y="200" text-anchor="middle" font-size="10" font-weight="700" fill="#000">Query Gyms</text>
+
+<!-- P2.0 → USER  Search Results (long right curve back) -->
+<path d="M 502 622 C 600 622 600 44 364 44" stroke="#000" stroke-width="1.8" fill="none" marker-end="url(#arr)"/>
+<text x="608" y="380" text-anchor="middle" font-size="10" font-weight="700" fill="#000">Search Results</text>
+
+<!-- P1.0 → D1  Read / Write -->
+<line x1="130" y1="242" x2="130" y2="304" stroke="#000" stroke-width="1.8" marker-end="url(#arr)"/>
+<text x="148" y="278" font-size="10" font-weight="700" fill="#000">Read / Write</text>
+
+<!-- P3.0 → D3  Record Transaction -->
+<line x1="400" y1="242" x2="400" y2="304" stroke="#000" stroke-width="1.8" marker-end="url(#arr)"/>
+<text x="410" y="278" font-size="10" font-weight="700" fill="#000">Record Transaction</text>
+
+<!-- D3 → P4.0  Transaction Records -->
+<line x1="360" y1="362" x2="262" y2="484" stroke="#000" stroke-width="1.8" marker-end="url(#arr)"/>
+<text x="280" y="420" text-anchor="middle" font-size="10" font-weight="700" fill="#000">Transaction Records</text>
+
+<!-- GYM OWNER → P4.0  Request Sales Stats -->
+<line x1="140" y1="508" x2="170" y2="540" stroke="#000" stroke-width="1.8" marker-end="url(#arr)"/>
+<text x="108" y="530" text-anchor="middle" font-size="10" font-weight="700" fill="#000">Request Sales Stats</text>
+
+<!-- P4.0 → GYM OWNER  Revenue Charts -->
+<line x1="168" y1="542" x2="138" y2="510" stroke="#000" stroke-width="1.8" marker-end="url(#arr)"/>
+<text x="72" y="558" text-anchor="middle" font-size="10" font-weight="700" fill="#000">Revenue Charts</text>
+
+<!-- GYM OWNER → P2.0  Gym Updates, Trainers -->
+<line x1="140" y1="516" x2="400" y2="620" stroke="#000" stroke-width="1.8" marker-end="url(#arr)"/>
+<text x="270" y="590" text-anchor="middle" font-size="10" font-weight="700" fill="#000">Gym Updates, Trainers</text>
+
+<!-- ADMIN → P2.0  Review Status -->
+<line x1="480" y1="516" x2="490" y2="590" stroke="#000" stroke-width="1.8" marker-end="url(#arr)"/>
+<text x="520" y="558" text-anchor="middle" font-size="10" font-weight="700" fill="#000">Review Status</text>
+
+<!-- P2.0 → D2  CRUD Data -->
+<line x1="450" y1="692" x2="430" y2="758" stroke="#000" stroke-width="1.8" marker-end="url(#arr)"/>
+<text x="468" y="730" text-anchor="middle" font-size="10" font-weight="700" fill="#000">CRUD Data</text>
+
+</svg>
+
+<div class="below">
+  <div class="legend">
+    <strong>Legend:</strong>
+    <div class="legend-item"><span class="leg-rect"></span> External Entity</div>
+    <div class="legend-item"><span class="leg-circle"></span> Process</div>
+    <div class="legend-item" style="gap:4px">
+      <svg width="50" height="22" viewBox="0 0 50 22">
+        <rect x="0" y="4" width="50" height="14" fill="#fff" stroke="#000" stroke-width="1.5"/>
+        <ellipse cx="25" cy="4" rx="25" ry="6" fill="#fff" stroke="#000" stroke-width="1.5"/>
+        <ellipse cx="25" cy="18" rx="25" ry="6" fill="#fff" stroke="#000" stroke-width="1.5"/>
+      </svg>
+      Data Store
+    </div>
+    <div class="legend-item"><span class="leg-arrow"></span> Data Flow</div>
+  </div>
+  <button class="download-btn" onclick="downloadDiagram()">⬇ Download as Image</button>
+</div>
+
+<script>
+function downloadDiagram() {
+  const svg = document.getElementById('dfd-svg');
+  const svgData = new XMLSerializer().serializeToString(svg);
+  const canvas = document.createElement('canvas');
+  const scale = 3;
+  const vb = svg.viewBox.baseVal;
+  canvas.width  = vb.width  * scale;
+  canvas.height = vb.height * scale;
+  const ctx = canvas.getContext('2d');
+  ctx.fillStyle = '#ffffff';
+  ctx.fillRect(0, 0, canvas.width, canvas.height);
+  const img = new Image();
+  const blob = new Blob([svgData], { type: 'image/svg+xml;charset=utf-8' });
+  const url  = URL.createObjectURL(blob);
+  img.onload = function () {
+    ctx.drawImage(img, 0, 0, canvas.width, canvas.height);
+    URL.revokeObjectURL(url);
+    const a = document.createElement('a');
+    a.download = 'smartfit_dfd_level1.png';
+    a.href = canvas.toDataURL('image/png');
+    a.click();
+  };
+  img.src = url;
+}
+</script>
+</body>
+</html>

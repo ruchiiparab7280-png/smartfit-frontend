@@ -1,0 +1,312 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8"/>
+<title>SmartFit – DFD Level 0</title>
+<style>
+  @page { size: A4 portrait; margin: 0; }
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+  body {
+    background: #fff;
+    width: 210mm;
+    font-family: 'Segoe UI', Arial, sans-serif;
+    color: #000;
+    padding: 6mm;
+  }
+  h1 {
+    text-align: center;
+    font-size: 18pt;
+    font-weight: 900;
+    letter-spacing: 2px;
+    text-transform: uppercase;
+    margin-bottom: 1mm;
+  }
+  .subtitle {
+    text-align: center;
+    font-size: 10pt;
+    color: #0e0d0d;
+    margin-bottom: 4mm;
+  }
+  svg {
+    display: block;
+    margin: 0 auto;
+    width: 196mm;
+    height: auto;
+  }
+  .below {
+    width: 196mm;
+    margin: 0 auto;
+  }
+  .legend {
+    display: flex;
+    align-items: center;
+    gap: 20px;
+    margin-top: 8px;
+    padding: 6px 14px;
+    background: #f5f5f5;
+    border: 1px solid #bbb;
+    border-radius: 6px;
+    font-size: 10pt;
+    flex-wrap: wrap;
+  }
+  .legend-item { display: flex; align-items: center; gap: 6px; }
+  .leg-rect {
+    width: 36px; height: 18px;
+    border: 2.5px solid #000;
+    display: inline-block;
+  }
+  .leg-circle {
+    width: 52px; height: 28px;
+    border: 2.5px solid #000;
+    border-radius: 50%;
+    display: inline-block;
+  }
+  .leg-dstore {
+    display: inline-flex;
+    align-items: center;
+    width: 52px; height: 18px;
+    border-top: 2.5px solid #000;
+    border-bottom: 2.5px solid #000;
+  }
+  .leg-arrow {
+    width: 36px; height: 2px;
+    background: #000;
+    position: relative;
+    display: inline-block;
+  }
+  .leg-arrow::after {
+    content: '';
+    position: absolute;
+    right: 0; top: -4px;
+    border: 5px solid transparent;
+    border-left: 7px solid #000;
+  }
+  .download-btn {
+    display: block;
+    margin: 10px auto 0;
+    padding: 8px 28px;
+    background: #000;
+    color: #fff;
+    font-size: 12pt;
+    font-weight: 700;
+    border: none;
+    border-radius: 8px;
+    cursor: pointer;
+    letter-spacing: 1px;
+  }
+  .download-btn:hover { background: #333; }
+</style>
+</head>
+<body>
+
+<h1>SmartFit — DFD Level 0</h1>
+<div class="subtitle">Context Diagram — Gym Management &amp; Fitness Platform</div>
+
+<svg id="dfd-svg" viewBox="0 0 740 860" xmlns="http://www.w3.org/2000/svg">
+  <defs>
+    <marker id="arr" markerWidth="9" markerHeight="7" refX="8" refY="3.5" orient="auto">
+      <polygon points="0 0, 9 3.5, 0 7" fill="#000"/>
+    </marker>
+  </defs>
+
+  <!-- ============================================================
+       CENTRAL PROCESS — SmartFit System (large circle, centre)
+  ============================================================ -->
+  <circle cx="370" cy="430" r="110" fill="#fff" stroke="#000" stroke-width="3"/>
+  <text x="370" y="420" text-anchor="middle" font-size="16" font-weight="900" fill="#000">SmartFit</text>
+  <text x="370" y="440" text-anchor="middle" font-size="16" font-weight="900" fill="#000">System</text>
+  <text x="370" y="460" text-anchor="middle" font-size="11" fill="#444" font-style="italic">Process 0</text>
+
+  <!-- ============================================================
+       EXTERNAL ENTITIES  (rectangles)
+       1. User          — top-left
+       2. Gym Owner     — top-right
+       3. Admin         — bottom-left
+       4. Razorpay      — bottom-right
+       5. Email Service — bottom-centre
+  ============================================================ -->
+
+  <!-- 1. USER — top-left -->
+  <rect x="30" y="30" width="150" height="56" rx="6" fill="#fff" stroke="#000" stroke-width="2.5"/>
+  <text x="105" y="55" text-anchor="middle" font-size="14" font-weight="800" fill="#000">User</text>
+  <text x="105" y="74" text-anchor="middle" font-size="10" fill="#444">(Registered Member)</text>
+
+  <!-- 2. GYM OWNER — top-right -->
+  <rect x="560" y="30" width="150" height="56" rx="6" fill="#fff" stroke="#000" stroke-width="2.5"/>
+  <text x="635" y="55" text-anchor="middle" font-size="14" font-weight="800" fill="#000">Gym Owner</text>
+  <text x="635" y="74" text-anchor="middle" font-size="10" fill="#444">(Partner)</text>
+
+  <!-- 3. ADMIN — bottom-left -->
+  <rect x="30" y="760" width="150" height="56" rx="6" fill="#fff" stroke="#000" stroke-width="2.5"/>
+  <text x="105" y="785" text-anchor="middle" font-size="14" font-weight="800" fill="#000">Admin</text>
+  <text x="105" y="804" text-anchor="middle" font-size="10" fill="#444">(Platform Manager)</text>
+
+  <!-- 4. RAZORPAY — bottom-right -->
+  <rect x="560" y="760" width="150" height="56" rx="6" fill="#fff" stroke="#000" stroke-width="2.5"/>
+  <text x="635" y="785" text-anchor="middle" font-size="14" font-weight="800" fill="#000">Razorpay</text>
+  <text x="635" y="804" text-anchor="middle" font-size="10" fill="#444">(Payment Gateway)</text>
+
+  <!-- 5. EMAIL SERVICE — bottom-centre -->
+  <rect x="295" y="790" width="150" height="50" rx="6" fill="#fff" stroke="#000" stroke-width="2.5"/>
+  <text x="370" y="812" text-anchor="middle" font-size="14" font-weight="800" fill="#000">Email Service</text>
+  <text x="370" y="830" text-anchor="middle" font-size="10" fill="#444">(Nodemailer / SMTP)</text>
+
+  <!-- ============================================================
+       DATA FLOWS — USER ↔ SYSTEM
+  ============================================================ -->
+
+  <!-- User → System: Registration / Login / Profile data -->
+  <line x1="180" y1="68" x2="262" y2="360" stroke="#000" stroke-width="2" marker-end="url(#arr)"/>
+  <rect x="148" y="185" width="108" height="32" rx="4" fill="#fff"/>
+  <text x="202" y="199" text-anchor="middle" font-size="10" font-weight="700" fill="#000">Sign Up / Login</text>
+  <text x="202" y="212" text-anchor="middle" font-size="10" fill="#000">Credentials</text>
+
+  <!-- System → User: Auth token / Dashboard data -->
+  <line x1="260" y1="370" x2="178" y2="76" stroke="#000" stroke-width="2" marker-end="url(#arr)"/>
+  <rect x="56" y="230" width="108" height="32" rx="4" fill="#fff"/>
+  <text x="110" y="244" text-anchor="middle" font-size="10" font-weight="700" fill="#000">Auth Response /</text>
+  <text x="110" y="257" text-anchor="middle" font-size="10" fill="#000">Dashboard Data</text>
+
+  <!-- User → System: Membership / Trial / Review / Supplement order -->
+  <line x1="180" y1="80" x2="265" y2="430" stroke="#000" stroke-width="2" marker-end="url(#arr)"/>
+  <rect x="148" y="290" width="108" height="44" rx="4" fill="#fff"/>
+  <text x="202" y="305" text-anchor="middle" font-size="10" font-weight="700" fill="#000">Membership /</text>
+  <text x="202" y="318" text-anchor="middle" font-size="10" fill="#000">Trial / Review /</text>
+  <text x="202" y="331" text-anchor="middle" font-size="10" fill="#000">Supplement Order</text>
+
+  <!-- System → User: Gym listings / Membership status / Orders -->
+  <line x1="262" y1="450" x2="178" y2="86" stroke="#000" stroke-width="2" marker-end="url(#arr)"/>
+  <rect x="30" y="340" width="108" height="44" rx="4" fill="#fff"/>
+  <text x="84" y="355" text-anchor="middle" font-size="10" font-weight="700" fill="#000">Gym Listings /</text>
+  <text x="84" y="368" text-anchor="middle" font-size="10" fill="#000">Membership /</text>
+  <text x="84" y="381" text-anchor="middle" font-size="10" fill="#000">Order Status</text>
+
+  <!-- ============================================================
+       DATA FLOWS — GYM OWNER ↔ SYSTEM
+  ============================================================ -->
+
+  <!-- Gym Owner → System: Partner application / Gym details / Trainers / Supplements -->
+  <line x1="560" y1="68" x2="478" y2="360" stroke="#000" stroke-width="2" marker-end="url(#arr)"/>
+  <rect x="484" y="185" width="108" height="44" rx="4" fill="#fff"/>
+  <text x="538" y="200" text-anchor="middle" font-size="10" font-weight="700" fill="#000">Partner App /</text>
+  <text x="538" y="213" text-anchor="middle" font-size="10" fill="#000">Gym Details /</text>
+  <text x="538" y="226" text-anchor="middle" font-size="10" fill="#000">Trainers / Plans</text>
+
+  <!-- System → Gym Owner: Approval status / Members / Earnings / Requests -->
+  <line x1="476" y1="370" x2="562" y2="76" stroke="#000" stroke-width="2" marker-end="url(#arr)"/>
+  <rect x="576" y="230" width="108" height="44" rx="4" fill="#fff"/>
+  <text x="630" y="245" text-anchor="middle" font-size="10" font-weight="700" fill="#000">Approval Status /</text>
+  <text x="630" y="258" text-anchor="middle" font-size="10" fill="#000">Members /</text>
+  <text x="630" y="271" text-anchor="middle" font-size="10" fill="#000">Earnings / Requests</text>
+
+  <!-- Gym Owner → System: Onboarding payment / Plan renewal -->
+  <line x1="562" y1="80" x2="478" y2="430" stroke="#000" stroke-width="2" marker-end="url(#arr)"/>
+  <rect x="490" y="310" width="108" height="32" rx="4" fill="#fff"/>
+  <text x="544" y="325" text-anchor="middle" font-size="10" font-weight="700" fill="#000">Onboarding Fee /</text>
+  <text x="544" y="338" text-anchor="middle" font-size="10" fill="#000">Plan Renewal</text>
+
+  <!-- System → Gym Owner: Payment confirmation / Dashboard -->
+  <line x1="476" y1="450" x2="562" y2="86" stroke="#000" stroke-width="2" marker-end="url(#arr)"/>
+  <rect x="600" y="360" width="108" height="32" rx="4" fill="#fff"/>
+  <text x="654" y="375" text-anchor="middle" font-size="10" font-weight="700" fill="#000">Payment Confirm /</text>
+  <text x="654" y="388" text-anchor="middle" font-size="10" fill="#000">Dashboard Data</text>
+
+  <!-- ============================================================
+       DATA FLOWS — ADMIN ↔ SYSTEM
+  ============================================================ -->
+
+  <!-- Admin → System: Approve / Reject gym -->
+  <line x1="180" y1="770" x2="264" y2="530" stroke="#000" stroke-width="2" marker-end="url(#arr)"/>
+  <rect x="148" y="620" width="108" height="32" rx="4" fill="#fff"/>
+  <text x="202" y="635" text-anchor="middle" font-size="10" font-weight="700" fill="#000">Approve / Reject</text>
+  <text x="202" y="648" text-anchor="middle" font-size="10" fill="#000">Gym Decision</text>
+
+  <!-- System → Admin: Pending requests / All users / All payments -->
+  <line x1="262" y1="538" x2="178" y2="762" stroke="#000" stroke-width="2" marker-end="url(#arr)"/>
+  <rect x="30" y="660" width="108" height="44" rx="4" fill="#fff"/>
+  <text x="84" y="675" text-anchor="middle" font-size="10" font-weight="700" fill="#000">Pending Requests /</text>
+  <text x="84" y="688" text-anchor="middle" font-size="10" fill="#000">All Users /</text>
+  <text x="84" y="701" text-anchor="middle" font-size="10" fill="#000">All Payments</text>
+
+  <!-- ============================================================
+       DATA FLOWS — RAZORPAY ↔ SYSTEM
+  ============================================================ -->
+
+  <!-- System → Razorpay: Payment order request -->
+  <line x1="476" y1="530" x2="562" y2="762" stroke="#000" stroke-width="2" marker-end="url(#arr)"/>
+  <rect x="490" y="620" width="108" height="32" rx="4" fill="#fff"/>
+  <text x="544" y="635" text-anchor="middle" font-size="10" font-weight="700" fill="#000">Payment Order</text>
+  <text x="544" y="648" text-anchor="middle" font-size="10" fill="#000">Request</text>
+
+  <!-- Razorpay → System: Payment verification / Signature -->
+  <line x1="560" y1="770" x2="478" y2="538" stroke="#000" stroke-width="2" marker-end="url(#arr)"/>
+  <rect x="576" y="660" width="108" height="32" rx="4" fill="#fff"/>
+  <text x="630" y="675" text-anchor="middle" font-size="10" font-weight="700" fill="#000">Payment Status /</text>
+  <text x="630" y="688" text-anchor="middle" font-size="10" fill="#000">Signature</text>
+
+  <!-- ============================================================
+       DATA FLOWS — EMAIL SERVICE ↔ SYSTEM
+  ============================================================ -->
+
+  <!-- System → Email: Password reset email trigger -->
+  <line x1="370" y1="540" x2="370" y2="790" stroke="#000" stroke-width="2" marker-end="url(#arr)"/>
+  <rect x="378" y="660" width="108" height="32" rx="4" fill="#fff"/>
+  <text x="432" y="675" text-anchor="middle" font-size="10" font-weight="700" fill="#000">Reset Email</text>
+  <text x="432" y="688" text-anchor="middle" font-size="10" fill="#000">Trigger</text>
+
+  <!-- Email → System: Delivery confirmation -->
+  <line x1="356" y1="790" x2="356" y2="540" stroke="#000" stroke-width="2" marker-end="url(#arr)"/>
+  <rect x="254" y="660" width="108" height="32" rx="4" fill="#fff"/>
+  <text x="308" y="675" text-anchor="middle" font-size="10" font-weight="700" fill="#000">Delivery</text>
+  <text x="308" y="688" text-anchor="middle" font-size="10" fill="#000">Confirmation</text>
+
+</svg>
+
+<!-- ── BELOW DIAGRAM ── -->
+<div class="below">
+
+  <div class="legend">
+    <strong>Legend:</strong>
+    <div class="legend-item">
+      <span class="leg-rect"></span> External Entity
+    </div>
+    <div class="legend-item">
+      <span class="leg-circle"></span> Process (System)
+    </div>
+    <div class="legend-item">
+      <span class="leg-arrow"></span> Data Flow
+    </div>
+  </div>
+
+  <button class="download-btn" onclick="downloadDiagram()">⬇ Download as Image</button>
+</div>
+
+<script>
+function downloadDiagram() {
+  const svg = document.getElementById('dfd-svg');
+  const svgData = new XMLSerializer().serializeToString(svg);
+  const canvas = document.createElement('canvas');
+  const scale = 3;
+  const vb = svg.viewBox.baseVal;
+  canvas.width  = vb.width  * scale;
+  canvas.height = vb.height * scale;
+  const ctx = canvas.getContext('2d');
+  ctx.fillStyle = '#ffffff';
+  ctx.fillRect(0, 0, canvas.width, canvas.height);
+  const img = new Image();
+  const blob = new Blob([svgData], { type: 'image/svg+xml;charset=utf-8' });
+  const url  = URL.createObjectURL(blob);
+  img.onload = function () {
+    ctx.drawImage(img, 0, 0, canvas.width, canvas.height);
+    URL.revokeObjectURL(url);
+    const a = document.createElement('a');
+    a.download = 'smartfit_dfd_level0.png';
+    a.href = canvas.toDataURL('image/png');
+    a.click();
+  };
+  img.src = url;
+}
+</script>
+
+</body>
+</html>

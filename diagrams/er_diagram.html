@@ -1,240 +1,320 @@
-<!DOCTYPE html>
+﻿<!DOCTYPE html>
 <html lang="en">
 <head>
-    <meta charset="UTF-8">
-    <title>SmartFit Entity Relationship Diagram</title>
-    <script src="https://cdn.jsdelivr.net/npm/mermaid@10/dist/mermaid.min.js"></script>
-    <style>
-        body {
-            background: #ffffff;
-            padding: 40px;
-            font-family: Arial, sans-serif;
-            display: flex;
-            flex-direction: column;
-            align-items: center;
-            margin: 0;
-            text-align: center;
-        }
-
-        h2 {
-            margin-bottom: 5px;
-            font-size: 32px;
-        }
-
-        .mermaid {
-            margin-top: 10px;
-            background: white;
-            display: flex;
-            justify-content: center;
-            width: 100%;
-            /* Magnifies the native ER diagram cleanly on your screen! */
-            transform: scale(1.3);
-            transform-origin: top center;
-            margin-bottom: 400px;
-        }
-
-        /* Pure scaling leveraging the DOM without SVG box distortion */
-        .mermaid svg {
-            max-width: 100%;
-            height: auto;
-        }
-
-        .controls {
-            margin-bottom: 20px;
-        }
-
-        button {
-            padding: 15px 30px;
-            font-size: 24px;
-            font-weight: bold;
-            cursor: pointer;
-            background: #000;
-            color: #fff;
-            border: none;
-            border-radius: 6px;
-        }
-
-        @media print {
-            .controls { display: none; }
-            body { padding: 0; }
-        }
-    </style>
+<meta charset="UTF-8"/>
+<title>SmartFit – ER Diagram</title>
+<style>
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+  body { background: #fff; font-family: 'Segoe UI', Arial, sans-serif; padding: 10px; }
+  h1 { text-align: center; font-size: 18pt; font-weight: 900; letter-spacing: 2px; text-transform: uppercase; margin-bottom: 2px; color: #000; }
+  .subtitle { text-align: center; font-size: 10pt; color: #000; margin-bottom: 6px; }
+  canvas { display: block; margin: 0 auto; background: #fff; }
+  .below { max-width: 1400px; margin: 8px auto 0; }
+  .legend { display: flex; align-items: center; gap: 20px; padding: 6px 14px; background: #f5f5f5; border: 1.5px solid #000; border-radius: 6px; font-size: 10pt; flex-wrap: wrap; }
+  .download-btn { display: block; margin: 8px auto 0; padding: 8px 30px; background: #000; color: #fff; font-size: 12pt; font-weight: 700; border: none; border-radius: 8px; cursor: pointer; }
+  .download-btn:hover { background: #333; }
+</style>
 </head>
-
 <body>
-    <h2>SmartFit Entity Relationship Diagram (ERD)</h2>
-    <div class="controls">
-        <button onclick="downloadPNG()">Download as Portrait A4 PNG</button>
-    </div>
-    <div class="mermaid">
-        flowchart TD
-            %% ER Diagram: Entities (Yellow Rectangles)
-            E1[Supplier]
-            E2[Warehouse]
-            E3[Employee]
-            E4[Project]
-            E5[Part]
-            
-            %% ER Diagram: Relationships (Blue Diamonds)
-            R_Supply{Supply}
-            R_Inventory{Inventory}
-            R_Work{Work}
-            R_Manager{Manager}
-            
-            %% Ternary Supply Relationship
-            E1 ---|m| R_Supply
-            R_Supply ---|n| E4
-            R_Supply ---|p| E5
-            
-            %% Inventory Relationship
-            E2 ---|1| R_Inventory
-            R_Inventory ---|n| E5
-            
-            %% Work Relationship
-            E2 ---|1| R_Work
-            R_Work ---|n| E3
-            
-            %% Manager Self-Relationship
-            E3 ---|1| R_Manager
-            R_Manager ---|n| E3
-            
-            %% Attributes - Supplier (Purple Ovals)
-            A1_1((Supply))
-            A1_2((Supplier<br>code))
-            A1_3((Supplier<br>name))
-            A1_4((Address))
-            A1_5((Phone<br>number))
-            A1_6((Supplier<br>account))
-            E1 --- A1_1
-            E1 --- A1_2
-            E1 --- A1_3
-            E1 --- A1_4
-            E1 --- A1_5
-            E1 --- A1_6
+<h1>SmartFit — ER Diagram</h1>
+<div class="subtitle">Entity Relationship Diagram — Gym Management &amp; Fitness Platform</div>
+<canvas id="er" width="1400" height="900"></canvas>
+<div class="below">
+  <div class="legend">
+    <strong>Legend:</strong>
+    <span>▭ Entity</span>
+    <span>◇ Relationship (diamond)</span>
+    <span>⬭ - - - PK Attribute (dashed oval)</span>
+    <span>⬭ Attribute (solid oval)</span>
+    <span><b>1 / N</b> — Cardinality</span>
+  </div>
+  <button class="download-btn" onclick="downloadDiagram()">⬇ Download as Image</button>
+</div>
 
-            %% Attributes - Project
-            A4_1((Project<br>number))
-            A4_2((Budget))
-            A4_3((Launch<br>time))
-            E4 --- A4_1
-            E4 --- A4_2
-            E4 --- A4_3
+<script>
+const cv = document.getElementById('er');
+const g  = cv.getContext('2d');
 
-            %% Attributes - Part
-            A5_1((Part<br>number))
-            A5_2((Name))
-            A5_3((Specificatio<br>n))
-            A5_4((Unit<br>price))
-            A5_5((Description))
-            E5 --- A5_1
-            E5 --- A5_2
-            E5 --- A5_3
-            E5 --- A5_4
-            E5 --- A5_5
+// ── white background ──
+g.fillStyle = '#fff';
+g.fillRect(0, 0, cv.width, cv.height);
 
-            %% Attributes - Warehouse
-            A2_1((Warehouse<br>number))
-            A2_2((area))
-            A2_3((Phone<br>number))
-            E2 --- A2_1
-            E2 --- A2_2
-            E2 --- A2_3
+// ─────────────────────────────────────────────
+//  PRIMITIVES
+// ─────────────────────────────────────────────
+function drawEntity(x, y, w, h, label) {
+  g.save();
+  g.fillStyle = '#fff';
+  g.strokeStyle = '#000';
+  g.lineWidth = 2.5;
+  g.beginPath(); g.rect(x, y, w, h); g.fill(); g.stroke();
+  g.fillStyle = '#000';
+  g.font = 'bold 14px Segoe UI, Arial';
+  g.textAlign = 'center';
+  g.textBaseline = 'middle';
+  g.fillText(label, x + w/2, y + h/2);
+  g.restore();
+}
 
-            %% Attributes - Employee
-            A3_1((Employee<br>number))
-            A3_2((Name))
-            A3_3((Age))
-            A3_4((Title))
-            E3 --- A3_1
-            E3 --- A3_2
-            E3 --- A3_3
-            E3 --- A3_4
+function drawAttr(cx, cy, rx, ry, lines, isPK) {
+  g.save();
+  g.fillStyle = '#fff';
+  g.strokeStyle = '#000';
+  g.lineWidth = isPK ? 2.2 : 1.5;
+  if (isPK) g.setLineDash([5, 3]);
+  g.beginPath(); g.ellipse(cx, cy, rx, ry, 0, 0, Math.PI*2); g.fill(); g.stroke();
+  g.setLineDash([]);
+  g.fillStyle = '#000';
+  g.font = isPK ? 'bold 9px Segoe UI, Arial' : '9px Segoe UI, Arial';
+  g.textAlign = 'center';
+  g.textBaseline = 'middle';
+  const step = 11;
+  const startY = cy - (lines.length - 1) * step / 2;
+  lines.forEach((t, i) => g.fillText(t, cx, startY + i * step));
+  g.restore();
+}
 
-            %% Apply Precise Boardmix Visual Coloring
-            classDef entity fill:#FFE699,stroke:#D6B656,stroke-width:2px,font-weight:bold,font-size:22px,color:#000;
-            classDef attribute fill:#E1D5E7,stroke:#9673A6,stroke-width:2px,font-size:20px,color:#000;
-            classDef relationship fill:#DAE8FC,stroke:#6C8EBF,stroke-width:2px,font-size:20px,color:#000;
-            
-            class E1,E2,E3,E4,E5 entity;
-            class R_Supply,R_Inventory,R_Work,R_Manager relationship;
-            class A1_1,A1_2,A1_3,A1_4,A1_5,A1_6,A4_1,A4_2,A4_3,A5_1,A5_2,A5_3,A5_4,A5_5,A2_1,A2_2,A2_3,A3_1,A3_2,A3_3,A3_4 attribute;
-    </div>
+function drawDiamond(cx, cy, hw, hh, lines) {
+  g.save();
+  g.fillStyle = '#fff';
+  g.strokeStyle = '#000';
+  g.lineWidth = 2;
+  g.beginPath();
+  g.moveTo(cx, cy - hh); g.lineTo(cx + hw, cy);
+  g.lineTo(cx, cy + hh); g.lineTo(cx - hw, cy);
+  g.closePath(); g.fill(); g.stroke();
+  g.fillStyle = '#000';
+  g.font = 'bold 10px Segoe UI, Arial';
+  g.textAlign = 'center'; g.textBaseline = 'middle';
+  const step = 12;
+  const startY = cy - (lines.length - 1) * step / 2;
+  lines.forEach((t, i) => g.fillText(t, cx, startY + i * step));
+  g.restore();
+}
 
-    <script>
-        mermaid.initialize({
-            startOnLoad: true,
-            securityLevel: 'loose',
-            theme: 'base',
-            themeVariables: {
-                lineColor: '#000000',
-                fontFamily: 'Arial, sans-serif',
-                fontSize: '20px'
-            },
-            flowchart: {
-                nodeSpacing: 50,
-                rankSpacing: 60,
-                htmlLabels: true
-            }
-        });
+function drawLine(x1, y1, x2, y2) {
+  g.save(); g.strokeStyle = '#000'; g.lineWidth = 1.8;
+  g.beginPath(); g.moveTo(x1, y1); g.lineTo(x2, y2); g.stroke();
+  g.restore();
+}
 
-        function downloadPNG() {
-            const svg = document.querySelector('.mermaid svg');
-            if (!svg) { alert('SVG not loaded yet'); return; }
+function drawConnLine(x1, y1, x2, y2) { drawLine(x1, y1, x2, y2); }
 
-            let viewBox = svg.getAttribute('viewBox');
-            let baseWidth, baseHeight;
-            if (viewBox) {
-                let coords = viewBox.split(' ');
-                baseWidth = parseFloat(coords[2]);
-                baseHeight = parseFloat(coords[3]);
-            } else {
-                let bounds = svg.getBoundingClientRect();
-                baseWidth = bounds.width;
-                baseHeight = bounds.height;
-            }
+function drawAttrLine(ex, ey, ax, ay) {
+  g.save(); g.strokeStyle = '#000'; g.lineWidth = 1.3;
+  g.beginPath(); g.moveTo(ex, ey); g.lineTo(ax, ay); g.stroke();
+  g.restore();
+}
 
-            const targetResolutionMaxAxis = 2480;
-            const scale = targetResolutionMaxAxis / Math.max(baseWidth, baseHeight);
+function cardLabel(x, y, txt) {
+  g.save();
+  g.fillStyle = '#000';
+  g.font = 'bold 13px Segoe UI, Arial';
+  g.textAlign = 'center'; g.textBaseline = 'middle';
+  g.fillText(txt, x, y);
+  g.restore();
+}
 
-            const targetWidth = baseWidth * scale;
-            const targetHeight = baseHeight * scale;
+// ─────────────────────────────────────────────
+//  LAYOUT  — 3 columns × 3 rows, generous gaps
+//
+//  Col centres:  L=230  M=700  R=1170
+//  Row centres:  T=130  Mid=430  Bot=730
+//  Entity size:  W=180 H=44
+// ─────────────────────────────────────────────
+const EW = 180, EH = 44;
+const LC = 230, MC = 700, RC = 1170;
+const TR = 130, MR = 430, BR = 730;
 
-            // Stripped the devastating global stroke-width JS hacks out completely
-            // Restricting explicitly to pure high-res geometry math
+// entity top-left corners
+const ex = (c) => c - EW/2;
+const ey = (r) => r - EH/2;
 
-            const serializer = new XMLSerializer();
-            let svgStr = serializer.serializeToString(svg);
+// ── ENTITIES ──
+drawEntity(ex(LC), ey(TR), EW, EH, 'users');
+drawEntity(ex(MC), ey(TR), 200, EH, 'gym_owner_requests');
+drawEntity(ex(RC), ey(TR), EW, EH, 'trainers');
 
-            svgStr = svgStr.replace(/<svg([^>]*)>/, function (match, attrs) {
-                attrs = attrs.replace(/\b(width|height)="[^"]*"/g, '');
-                return '<svg' + attrs + ' width="' + targetWidth + '" height="' + targetHeight + '">';
-            });
+drawEntity(ex(LC), ey(MR), 200, EH, 'user_memberships');
+drawEntity(ex(MC), ey(MR), EW, EH, 'memberships');
+drawEntity(ex(RC), ey(MR), EW, EH, 'supplements');
 
-            svgStr = svgStr.replace(/max-width:[^;"]+;?/g, '');
+drawEntity(ex(LC), ey(BR), EW, EH, 'gym_reviews');
+drawEntity(ex(MC)-10, ey(BR), 210, EH, 'free_trial_requests');
+drawEntity(ex(RC), ey(BR), EW, EH, 'owner_payments');
 
-            const b64 = btoa(unescape(encodeURIComponent(svgStr)));
-            const img = new Image();
+// ─────────────────────────────────────────────
+//  ATTRIBUTES
+// ─────────────────────────────────────────────
 
-            const canvas = document.createElement('canvas');
-            const ctx = canvas.getContext('2d');
+// ── users (LC, TR=130) ──
+// PK above
+drawAttrLine(LC, ey(TR), LC, 50); drawAttr(LC, 38, 55, 16, ['user_id (PK)'], true);
+// left side attrs
+drawAttrLine(ex(LC), TR-10, 80, TR-30); drawAttr(44, TR-30, 34, 14, ['name'], false);
+drawAttrLine(ex(LC), TR,    80, TR);     drawAttr(44, TR,    34, 14, ['email'], false);
+drawAttrLine(ex(LC), TR+10, 80, TR+30); drawAttr(44, TR+30, 34, 14, ['role'], false);
+drawAttrLine(ex(LC), TR+15, 80, TR+60); drawAttr(44, TR+60, 40, 14, ['password'], false);
 
-            const padding = 80;
-            canvas.width = targetWidth + padding;
-            canvas.height = targetHeight + padding;
+// ── gym_owner_requests (MC, TR) ──
+drawAttrLine(MC, ey(TR), MC, 50);         drawAttr(MC, 38, 60, 16, ['gym_id (PK)'], true);
+drawAttrLine(MC-60, ey(TR), MC-120, 55);  drawAttr(MC-155, 50, 44, 14, ['gym_name'], false);
+drawAttrLine(MC+60, ey(TR), MC+120, 55);  drawAttr(MC+155, 50, 44, 14, ['address'], false);
+drawAttrLine(MC-80, ey(TR), MC-160, 80);  drawAttr(MC-196, 80, 36, 14, ['phone'], false);
+drawAttrLine(MC+80, ey(TR), MC+160, 80);  drawAttr(MC+196, 80, 44, 14, ['status'], false);
+drawAttrLine(MC, ey(TR), MC, 14);         drawAttr(MC, 8, 52, 8, ['monthly_fee'], false);
 
-            img.onload = function () {
-                ctx.fillStyle = "#ffffff";
-                ctx.fillRect(0, 0, canvas.width, canvas.height);
+// ── trainers (RC, TR) ──
+drawAttrLine(RC, ey(TR), RC, 50);           drawAttr(RC, 38, 60, 16, ['trainer_id (PK)'], true);
+drawAttrLine(RC+EW/2, TR-10, RC+EW/2+80, TR-30); drawAttr(RC+EW/2+116, TR-30, 36, 14, ['name'], false);
+drawAttrLine(RC+EW/2, TR,    RC+EW/2+80, TR);     drawAttr(RC+EW/2+124, TR,    52, 14, ['specialization'], false);
+drawAttrLine(RC+EW/2, TR+10, RC+EW/2+80, TR+30);  drawAttr(RC+EW/2+116, TR+30, 36, 14, ['price'], false);
 
-                ctx.drawImage(img, padding / 2, padding / 2);
+// ── user_memberships (LC, MR) ──
+drawAttrLine(LC, ey(MR), LC, MR-80);       drawAttr(LC, MR-94, 68, 16, ['id (PK)'], true);
+drawAttrLine(ex(LC), MR-10, 80, MR-30);    drawAttr(44, MR-30, 44, 14, ['plan_name'], false);
+drawAttrLine(ex(LC), MR,    80, MR);        drawAttr(44, MR,    32, 14, ['price'], false);
+drawAttrLine(ex(LC), MR+10, 80, MR+30);    drawAttr(44, MR+30, 44, 14, ['start_date'], false);
+drawAttrLine(ex(LC), MR+15, 80, MR+60);    drawAttr(44, MR+60, 32, 14, ['status'], false);
 
-                const a = document.createElement('a');
-                a.download = 'SmartFit_ER_Diagram.png';
-                a.href = canvas.toDataURL('image/png', 1.0);
-                a.click();
-            };
-            img.src = 'data:image/svg+xml;base64,' + b64;
-        }
-    </script>
+// ── memberships (MC, MR) ──
+drawAttrLine(MC, ey(MR), MC, MR-80);       drawAttr(MC, MR-94, 72, 16, ['membership_id (PK)'], true);
+drawAttrLine(MC-50, ey(MR), MC-110, MR-80); drawAttr(MC-148, MR-80, 40, 14, ['name'], false);
+drawAttrLine(MC+50, ey(MR), MC+110, MR-80); drawAttr(MC+148, MR-80, 44, 14, ['duration'], false);
+drawAttrLine(MC, ey(MR), MC, MR-120);       drawAttr(MC, MR-132, 32, 14, ['price'], false);
+
+// ── supplements (RC, MR) ──
+drawAttrLine(RC, ey(MR), RC, MR-80);        drawAttr(RC, MR-94, 72, 16, ['supplement_id (PK)'], true);
+drawAttrLine(RC+EW/2, MR-10, RC+EW/2+80, MR-30); drawAttr(RC+EW/2+116, MR-30, 40, 14, ['name'], false);
+drawAttrLine(RC+EW/2, MR,    RC+EW/2+80, MR);     drawAttr(RC+EW/2+116, MR,    32, 14, ['price'], false);
+drawAttrLine(RC+EW/2, MR+10, RC+EW/2+80, MR+30);  drawAttr(RC+EW/2+120, MR+30, 48, 14, ['stock_status'], false);
+
+// ── gym_reviews (LC, BR) ──
+drawAttrLine(LC, ey(BR)+EH, LC, BR+80);    drawAttr(LC, BR+94, 60, 16, ['id (PK)'], true);
+drawAttrLine(ex(LC), BR-10, 80, BR-30);    drawAttr(44, BR-30, 36, 14, ['rating'], false);
+drawAttrLine(ex(LC), BR,    80, BR);        drawAttr(44, BR,    40, 14, ['comment'], false);
+drawAttrLine(ex(LC), BR+10, 80, BR+30);    drawAttr(44, BR+30, 44, 14, ['created_at'], false);
+
+// ── free_trial_requests (MC-10, BR) ──
+drawAttrLine(MC, ey(BR)+EH, MC, BR+80);    drawAttr(MC, BR+94, 60, 16, ['id (PK)'], true);
+drawAttrLine(MC-60, ey(BR)+EH, MC-120, BR+80); drawAttr(MC-158, BR+80, 40, 14, ['date/time'], false);
+drawAttrLine(MC+60, ey(BR)+EH, MC+120, BR+80); drawAttr(MC+158, BR+80, 36, 14, ['status'], false);
+
+// ── owner_payments (RC, BR) ──
+drawAttrLine(RC, ey(BR)+EH, RC, BR+80);    drawAttr(RC, BR+94, 60, 16, ['id (PK)'], true);
+drawAttrLine(RC+EW/2, BR-10, RC+EW/2+80, BR-30); drawAttr(RC+EW/2+116, BR-30, 36, 14, ['amount'], false);
+drawAttrLine(RC+EW/2, BR,    RC+EW/2+80, BR);     drawAttr(RC+EW/2+116, BR,    32, 14, ['status'], false);
+drawAttrLine(RC+EW/2, BR+10, RC+EW/2+80, BR+30);  drawAttr(RC+EW/2+124, BR+30, 52, 14, ['razorpay_id'], false);
+
+// ─────────────────────────────────────────────
+//  RELATIONSHIPS  (diamonds on connecting lines)
+// ─────────────────────────────────────────────
+
+// ── Row 1 horizontal ──
+
+// users — registers — gym_owner_requests
+const r1mx = (LC + EW/2 + MC - 100) / 2;
+drawConnLine(LC + EW/2, TR, r1mx - 36, TR);
+drawDiamond(r1mx, TR, 36, 20, ['registers']);
+drawConnLine(r1mx + 36, TR, MC - 100, TR);
+cardLabel(LC + EW/2 + 18, TR - 12, '1');
+cardLabel(MC - 100 - 18, TR - 12, '1');
+
+// gym_owner_requests — has — trainers
+const r2mx = (MC + 100 + RC - EW/2) / 2;
+drawConnLine(MC + 100, TR, r2mx - 28, TR);
+drawDiamond(r2mx, TR, 28, 20, ['has']);
+drawConnLine(r2mx + 28, TR, RC - EW/2, TR);
+cardLabel(MC + 100 + 18, TR - 12, '1');
+cardLabel(RC - EW/2 - 18, TR - 12, 'N');
+
+// ── Column verticals ──
+
+// users — books — user_memberships
+const bky = (TR + EH/2 + MR - EH/2) / 2;
+drawConnLine(LC, TR + EH/2, LC, bky - 22);
+drawDiamond(LC, bky, 30, 22, ['books']);
+drawConnLine(LC, bky + 22, LC, MR - EH/2);
+cardLabel(LC + 16, TR + EH/2 + 14, '1');
+cardLabel(LC + 16, MR - EH/2 - 14, 'N');
+
+// gym_owner_requests — offers — memberships
+const ofy = (TR + EH/2 + MR - EH/2) / 2;
+drawConnLine(MC, TR + EH/2, MC, ofy - 22);
+drawDiamond(MC, ofy, 30, 22, ['offers']);
+drawConnLine(MC, ofy + 22, MC, MR - EH/2);
+cardLabel(MC + 16, TR + EH/2 + 14, '1');
+cardLabel(MC + 16, MR - EH/2 - 14, 'N');
+
+// ── Row 2 horizontal ──
+
+// user_memberships — purchased — memberships
+const pmx = (LC + 100 + MC - EW/2) / 2;
+drawConnLine(LC + 100, MR, pmx - 36, MR);
+drawDiamond(pmx, MR, 36, 22, ['purchased', 'in']);
+drawConnLine(pmx + 36, MR, MC - EW/2, MR);
+cardLabel(LC + 100 + 18, MR - 12, 'N');
+cardLabel(MC - EW/2 - 18, MR - 12, '1');
+
+// ── Diagonals ──
+
+// gym_owner_requests — sells — supplements
+const sx1 = MC + 100, sy1 = TR + EH/2;
+const sx2 = RC - EW/2, sy2 = MR;
+const smx = (sx1 + sx2) / 2, smy = (sy1 + sy2) / 2;
+drawConnLine(sx1, sy1, smx - 20, smy - 14);
+drawDiamond(smx, smy, 28, 20, ['sells']);
+drawConnLine(smx + 20, smy + 14, sx2, sy2);
+cardLabel(sx1 + 14, sy1 + 14, '1');
+cardLabel(sx2 - 14, sy2 - 14, 'N');
+
+// users — writes — gym_reviews
+const wx1 = LC - EW/2 + 20, wy1 = TR + EH/2;
+const wx2 = LC - EW/2 + 20, wy2 = BR - EH/2;
+const wmy = (wy1 + wy2) / 2;
+drawConnLine(wx1, wy1, wx1, wmy - 22);
+drawDiamond(wx1, wmy, 30, 22, ['writes']);
+drawConnLine(wx1, wmy + 22, wx2, wy2);
+cardLabel(wx1 + 16, wy1 + 14, '1');
+cardLabel(wx2 + 16, wy2 - 14, 'N');
+
+// gym_owner_requests — reviewed — gym_reviews
+const rvx1 = MC - 100, rvy1 = TR + EH/2;
+const rvx2 = LC + EW/2, rvy2 = BR - EH/2;
+const rvmx = (rvx1 + rvx2) / 2, rvmy = (rvy1 + rvy2) / 2;
+drawConnLine(rvx1, rvy1, rvmx + 20, rvmy - 14);
+drawDiamond(rvmx, rvmy, 36, 22, ['reviewed', 'in']);
+drawConnLine(rvmx - 20, rvmy + 14, rvx2, rvy2);
+cardLabel(rvx1 - 14, rvy1 + 14, '1');
+cardLabel(rvx2 + 14, rvy2 - 14, 'N');
+
+// users — requests — free_trial_requests
+const rqx1 = LC + EW/2 - 20, rqy1 = TR + EH/2;
+const rqx2 = MC - 10 - 105, rqy2 = BR - EH/2;
+const rqmx = (rqx1 + rqx2) / 2, rqmy = (rqy1 + rqy2) / 2;
+drawConnLine(rqx1, rqy1, rqmx + 18, rqmy - 14);
+drawDiamond(rqmx, rqmy, 34, 22, ['requests']);
+drawConnLine(rqmx - 18, rqmy + 14, rqx2, rqy2);
+cardLabel(rqx1 + 14, rqy1 + 14, '1');
+cardLabel(rqx2 - 14, rqy2 - 14, 'N');
+
+// gym_owner_requests — pays — owner_payments
+const px1 = MC + 100, py1 = TR + EH/2;
+const px2 = RC - EW/2, py2 = BR - EH/2;
+const pmx2 = (px1 + px2) / 2, pmy2 = (py1 + py2) / 2;
+drawConnLine(px1, py1, pmx2 + 18, pmy2 - 14);
+drawDiamond(pmx2, pmy2, 28, 22, ['pays']);
+drawConnLine(pmx2 - 18, pmy2 + 14, px2, py2);
+cardLabel(px1 + 14, py1 + 14, '1');
+cardLabel(px2 - 14, py2 - 14, 'N');
+
+// ─────────────────────────────────────────────
+function downloadDiagram() {
+  const a = document.createElement('a');
+  a.download = 'smartfit_er_diagram.png';
+  a.href = cv.toDataURL('image/png');
+  a.click();
+}
+</script>
 </body>
 </html>

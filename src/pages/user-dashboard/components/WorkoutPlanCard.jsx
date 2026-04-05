@@ -22,29 +22,31 @@ const WorkoutPlanCard = ({ workouts, setWorkouts }) => {
     setExpandedDay(expandedDay === id ? null : id);
   };
 
-  const toggleExercise = (dayId, exerciseId) => {
+  const syncWorkout = async (id, updatedExercises) => {
+    try {
+      await fetch(`${import.meta.env.VITE_API_URL}/update-workout/${id}`, {
+        method: "PUT",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ exercises: updatedExercises })
+      });
+    } catch(err) {
+      console.log("Sync error", err);
+    }
+  };
 
+  const toggleExercise = (dayId, exerciseId) => {
     setWorkouts(prev =>
       prev.map(day => {
-
         if (day.id === dayId) {
-
-          return {
-            ...day,
-            exercises: day.exercises.map(ex =>
-              ex.id === exerciseId
-                ? { ...ex, completed: !ex.completed }
-                : ex
-            )
-          };
-
+          const updatedExercises = day.exercises.map(ex =>
+            ex.id === exerciseId ? { ...ex, completed: !ex.completed } : ex
+          );
+          syncWorkout(dayId, updatedExercises);
+          return { ...day, exercises: updatedExercises };
         }
-
         return day;
-
       })
     );
-
   };
 
   const getCompletionPercentage = (exercises) => {
@@ -105,57 +107,36 @@ const WorkoutPlanCard = ({ workouts, setWorkouts }) => {
       console.log("Workout save error", err)
     }
 
-    const existing = workouts.find(w => w.day === day);
-
-    if (existing) {
-
-      setWorkouts(prev =>
-        prev.map(w =>
-          w.day === day
-            ? { ...w, exercises: [...w.exercises, ...exerciseList] }
-            : w
-        )
-      );
-
-    } else {
-
-      const newWorkout = {
-        id: Date.now(),
-        day: day,
-        exercises: exerciseList
-      };
-
-      setWorkouts([...workouts, newWorkout]);
-
-      setExpandedDay(newWorkout.id);
-
-    }
-
     setExerciseList([]);
     setDay("");
     setShowForm(false);
 
+    // After adding new exercises, refresh the whole list to ensure UI has correct DB IDs
+    const fetchWorkouts = async () => {
+      try {
+        const email = localStorage.getItem("userEmail");
+        const res = await fetch(`${import.meta.env.VITE_API_URL}/user-workouts/${email}`);
+        const data = await res.json();
+        setWorkouts(data);
+      } catch (e) {
+        console.log(e);
+      }
+    };
+    fetchWorkouts();
+
   };
 
   const deleteExercise = (dayId, exerciseId) => {
-
     setWorkouts(prev =>
       prev.map(day => {
-
         if (day.id === dayId) {
-
-          return {
-            ...day,
-            exercises: day.exercises.filter(e => e.id !== exerciseId)
-          };
-
+          const updatedExercises = day.exercises.filter(e => e.id !== exerciseId);
+          syncWorkout(dayId, updatedExercises);
+          return { ...day, exercises: updatedExercises };
         }
-
         return day;
-
       })
     );
-
   };
 
   const startEdit = (dayId, exercise) => {
@@ -168,25 +149,16 @@ const WorkoutPlanCard = ({ workouts, setWorkouts }) => {
   };
 
   const saveEdit = () => {
-
     setWorkouts(prev =>
       prev.map(day => {
-
         if (day.id === editing.dayId) {
-
-          return {
-            ...day,
-            exercises: day.exercises.map(ex =>
-              ex.id === editing.exerciseId
-                ? { ...ex, name: exercise, sets: sets }
-                : ex
-            )
-          };
-
+          const updatedExercises = day.exercises.map(ex =>
+            ex.id === editing.exerciseId ? { ...ex, name: exercise, sets: sets } : ex
+          );
+          syncWorkout(editing.dayId, updatedExercises);
+          return { ...day, exercises: updatedExercises };
         }
-
         return day;
-
       })
     );
 
