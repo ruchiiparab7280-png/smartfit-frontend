@@ -57,14 +57,14 @@ const GymDetailsModal = ({ gym, isOpen, onClose }) => {
   const [selectedTrainer, setSelectedTrainer] = useState(null);
 
   const [trainerDate, setTrainerDate] = useState("");
-  const [trainerTime, setTrainerTime] = useState("");
+  const [trainerTime, setTrainerTime] = useState("9:00 AM");
   const [trainerName, setTrainerName] = useState("");
   const [trainerPhone, setTrainerPhone] = useState("");
 
   const [showTrialModal, setShowTrialModal] = useState(false)
 
   const [trialDate, setTrialDate] = useState("")
-  const [trialTime, setTrialTime] = useState("")
+  const [trialTime, setTrialTime] = useState("9:00 AM")
   const [trialName, setTrialName] = useState("")
   const [trialPhone, setTrialPhone] = useState("")
 
@@ -103,6 +103,11 @@ const GymDetailsModal = ({ gym, isOpen, onClose }) => {
 
   const handleTrialBooking = async () => {
 
+    if (!trialDate || !trialTime || !trialName || !trialPhone) {
+      alert("Please fill all details");
+      return;
+    }
+
     await fetch(`${import.meta.env.VITE_API_URL}/book-free-trial`, {
       method: "POST",
       headers: {
@@ -111,8 +116,8 @@ const GymDetailsModal = ({ gym, isOpen, onClose }) => {
       body: JSON.stringify({
         user_email: localStorage.getItem("userEmail"),
         gym_email: gym.email,
-        gym_name: gym.name,
-        gym_city: gym.city,
+        gym_name: gym.gym_name || gym.name,
+        gym_city: gym.city || gym.address,
         user_name: trialName,
         user_phone: trialPhone,
         date: trialDate,
@@ -271,6 +276,11 @@ const GymDetailsModal = ({ gym, isOpen, onClose }) => {
 
   const handleTrainerBooking = async () => {
 
+    if (!trainerDate || !trainerTime || !trainerName || !trainerPhone) {
+      alert("Please fill all details");
+      return;
+    }
+
     await fetch(`${import.meta.env.VITE_API_URL}/book-trainer`, {
       method: "POST",
       headers: {
@@ -279,7 +289,7 @@ const GymDetailsModal = ({ gym, isOpen, onClose }) => {
       body: JSON.stringify({
         user_email: localStorage.getItem("userEmail"),
         gym_email: gym.email,
-        gym_name: gym.name,
+        gym_name: gym.gym_name || gym.name,
         trainer_name: selectedTrainer.name,
         trainer_price: selectedTrainer.price,
         date: trainerDate,

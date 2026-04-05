@@ -1,221 +1,283 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-    <meta charset="UTF-8">
-    <title>SmartFit Usecase Diagram</title>
-    <script src="https://cdn.jsdelivr.net/npm/mermaid@10/dist/mermaid.min.js"></script>
-    <style>
-        body { 
-            background: #ffffff; 
-            padding: 20px; 
-            font-family: Arial, sans-serif; 
-            display: flex; 
-            flex-direction: column; 
-            align-items: center; 
-            margin: 0;
-        }
-        h2 { margin-bottom: 5px; }
-        .mermaid { margin-top: 10px; background: white; }
-        .controls { margin-bottom: 20px; }
-        button { padding: 10px 20px; font-size: 16px; cursor: pointer; background: #000; color: #fff; border: none; border-radius: 4px; }
-        @media print { .controls { display: none; } body { padding: 0; } }
-    </style>
+<meta charset="UTF-8" />
+<title>SmartFit – UML Use Case Diagram</title>
+<style>
+  @page { size: A4 portrait; margin: 0; }
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+  body {
+    background: #fff;
+    width: 210mm;
+    min-height: 297mm;
+    font-family: 'Segoe UI', Arial, sans-serif;
+    color: #000;
+    padding: 8mm 6mm 8mm 6mm;
+  }
+  h1 {
+    text-align: center;
+    font-size: 20pt;
+    font-weight: 900;
+    color: #000;
+    letter-spacing: 2px;
+    margin-bottom: 2mm;
+    text-transform: uppercase;
+  }
+  .subtitle {
+    text-align: center;
+    font-size: 10pt;
+    color: #333;
+    margin-bottom: 4mm;
+    letter-spacing: 1px;
+  }
+  svg {
+    display: block;
+    margin: 0 auto;
+    width: 198mm;
+    height: auto;
+  }
+</style>
 </head>
 <body>
-    <h2>SmartFit Usecase Diagram</h2>
-    <div class="controls">
-        <button onclick="downloadPNG()">Download as Portrait A4 PNG</button>
-    </div>
-    <div class="mermaid">
-%%{init: {
-  'flowchart': {
-    'curve': 'basis',
-    'rankSpacing': 60,
-    'nodeSpacing': 50
-  },
-  'theme': 'base',
-  'themeVariables': {
-    'primaryColor': '#ffffff',
-    'primaryTextColor': '#000000',
-    'primaryBorderColor': '#000000',
-    'lineColor': '#000000',
-    'secondaryColor': '#ffffff',
-    'tertiaryColor': '#ffffff',
-    'fontFamily': 'Arial, sans-serif',
-    'edgeLabelBackground': '#ffffff',
-    'clusterBkg': '#ffffff',
-    'clusterBorder': '#000000',
-    'fontSize': '28px'
-  }
-}}%%
-flowchart LR
-    classDef actor fill:none,stroke:none;
-    classDef uc fill:#fff,stroke:#000,stroke-width:2px,shape:ellipse;
-    
-    %% Actors with explicit empty padding lines to create bounding space for SVG injection
-    User([" \n \n \n \n \nUser\n \n "]):::actor
-    Owner([" \n \n \n \n \nGym Owner\n \n "]):::actor
-    Admin([" \n \n \n \n \nSystem Admin\n \n "]):::actor
-    
-    subgraph SmartFit Gym Management System
-        UC_Auth(["Authenticate\nUser"]):::uc
-        UC_Login(["Login &\nRegister"]):::uc
-        
-        UC_Browse(["Browse Gyms\n& Instructors"]):::uc
-        UC_Book(["Book Gym\nMembership"]):::uc
-        UC_Trial(["Book Free\nTrial"]):::uc
-        UC_Workout(["Track Daily\nWorkout"]):::uc
-        
-        UC_Pay(["Process\nPayment"]):::uc
-        
-        UC_RegGym(["Register\nNew Gym"]):::uc
-        UC_Manage(["Manage Trainers\n& Supplements"]):::uc
-        UC_Ana(["View Revenue\nAnalytics"]):::uc
-        
-        UC_Approve(["Approve Gym\nRequests"]):::uc
-        UC_Audit(["System\nAudit"]):::uc
-        
-        %% Use French quotes for textbook specific includes alongside explicitly dashed arrows
-        UC_Login -.->|«include»| UC_Auth
-        UC_Book -.->|«include»| UC_Pay
-        UC_RegGym -.->|«include»| UC_Pay
-    end
-    
-    %% Connect Left Actor with solid pointing arrows
-    User --- UC_Login
-    User --- UC_Browse
-    User --- UC_Book
-    User --- UC_Trial
-    User --- UC_Workout
-    
-    %% INVISIBLE RANK FORCER: Forces Owner and Admin to explicitly anchor
-    %% to the literal right-hand side of the System boundary (rank > UC_Pay/UC_Auth)
-    UC_Pay ~~~ Owner
-    UC_Auth ~~~ Owner
-    UC_Pay ~~~ Admin
-    UC_Auth ~~~ Admin
 
-    %% Connect Right Actors (Solid structural associations without arrowheads)
-    UC_RegGym --- Owner
-    UC_Manage --- Owner
-    UC_Ana --- Owner
-    
-    UC_Approve --- Admin
-    UC_Audit --- Admin
-    </div>
-    <script>
-        mermaid.initialize({
-            startOnLoad: true,
-            securityLevel: 'loose'
-        });
-        
-        // Bulletproof MutationObserver to ensure we NEVER miss the Mermaid rendering cycle
-        // This guarantees the stick-figure script executes exactly when the graphic is painted to the DOM!
-        const stickmanObserver = new MutationObserver((mutations, obs) => {
-            const svg = document.querySelector('.mermaid svg');
-            if (svg) {
-                const actors = svg.querySelectorAll('.node.actor');
-                if (actors.length > 0) {
-                    obs.disconnect(); // Stop observing permanently once found to save resources
-                    
-                    actors.forEach(node => {
-                        // Strip out the underlying Mermaid pill-box UI completely
-                        const bg = node.querySelector('.label-container, rect, circle, ellipse, polygon, path.basic');
-                        if (bg) bg.style.display = 'none';
-                        
-                        // Dynamically append pure mathematical UML SVGs onto the graphic node!
-                        const stickman = document.createElementNS("http://www.w3.org/2000/svg", "g");
-                        stickman.innerHTML = `
-                          <circle cx="0" cy="-65" r="14" fill="none" stroke="black" stroke-width="4"/>
-                          <line x1="0" y1="-51" x2="0" y2="-10" stroke="black" stroke-width="4"/>
-                          <line x1="-25" y1="-35" x2="25" y2="-35" stroke="black" stroke-width="4"/>
-                          <line x1="0" y1="-10" x2="-20" y2="15" stroke="black" stroke-width="4"/>
-                          <line x1="0" y1="-10" x2="20" y2="15" stroke="black" stroke-width="4"/>
-                        `;
-                        
-                        const labelGroup = node.querySelector('.label');
-                        if (labelGroup) {
-                            // No hacky CSS transform modifications needed anymore! 
-                            // The math draws the actor entirely floating above the text natively.
-                            node.insertBefore(stickman, labelGroup);
-                        }
-                    });
-                }
-            }
-        });
-        
-        // Begin watching immediately
-        stickmanObserver.observe(document.body, { childList: true, subtree: true });
+<h1>SmartFit — UML Use Case Diagram</h1>
+<div class="subtitle">Gym Management &amp; Fitness Platform</div>
 
-        function downloadPNG() {
-            const svg = document.querySelector('.mermaid svg');
-            if(!svg) { alert('SVG not loaded yet'); return; }
-            
-            // Standard A4 dimensions MUST always be Forced Portrait
-            const a4w = 2480; 
-            const a4h = 3508;
-            
-            let viewBox = svg.getAttribute('viewBox');
-            let baseWidth, baseHeight;
-            if (viewBox) {
-                let coords = viewBox.split(' ');
-                baseWidth = parseFloat(coords[2]);
-                baseHeight = parseFloat(coords[3]);
-            } else {
-                let bounds = svg.getBoundingClientRect();
-                baseWidth = bounds.width; 
-                baseHeight = bounds.height;
-            }
-            
-            // Margin for breathing room
-            const margin = 120;
-            const safeW = a4w - (margin * 2);
-            const safeH = a4h - (margin * 2);
-            
-            // Calculate explicit scaling to target A4 size
-            const scale = Math.min(safeW / baseWidth, safeH / baseHeight);
-            const targetWidth = baseWidth * scale;
-            const targetHeight = baseHeight * scale;
-            
-            const serializer = new XMLSerializer();
-            let svgStr = serializer.serializeToString(svg);
-            
-            // CRITICAL FIX: Make the SVG natively scale to target resolution to prevent blurry artifacts
-            svgStr = svgStr.replace(/<svg([^>]*)>/, function(match, attrs) {
-                attrs = attrs.replace(/\b(width|height)="[^"]*"/g, '');
-                return '<svg' + attrs + ' width="' + targetWidth + '" height="' + targetHeight + '">';
-            });
-            svgStr = svgStr.replace(/max-width:[^;"]+;?/g, '');
-            // Enforce thicker stroke logic for crystal clear print
-            svgStr = svgStr.replace(/stroke-width:[^;"]+;?/g, 'stroke-width: 3px;');
-            svgStr = svgStr.replace(/font-family:[^;"]+;?/g, 'font-family: Arial, sans-serif; font-weight: bold;');
-            
-            const b64 = btoa(unescape(encodeURIComponent(svgStr)));
-            const img = new Image();
-            
-            const canvas = document.createElement('canvas');
-            const ctx = canvas.getContext('2d');
-            canvas.width = a4w; 
-            canvas.height = a4h;
-            
-            img.onload = function () {
-                // Background
-                ctx.fillStyle = "#ffffff";
-                ctx.fillRect(0, 0, canvas.width, canvas.height);
-                
-                const offsetX = (a4w - targetWidth) / 2;
-                const offsetY = (a4h - targetHeight) / 2;
-                
-                // Direct draw since Vector matches precise target resolution
-                ctx.drawImage(img, offsetX, offsetY);
-                
-                const a = document.createElement('a');
-                a.download = 'SmartFit_Usecase_Diagram_Portrait.png';
-                a.href = canvas.toDataURL('image/png', 1.0);
-                a.click();
-            };
-            img.src = 'data:image/svg+xml;base64,' + b64;
-        }
-    </script>
+<svg viewBox="0 0 780 900" xmlns="http://www.w3.org/2000/svg">
+
+  <defs>
+    <marker id="open" markerWidth="10" markerHeight="7" refX="9" refY="3.5" orient="auto">
+      <polyline points="0 0, 10 3.5, 0 7" fill="none" stroke="#000" stroke-width="1.8"/>
+    </marker>
+  </defs>
+
+  <!-- ============================================================
+       SYSTEM BOUNDARY
+  ============================================================ -->
+  <rect x="148" y="8" width="484" height="850"
+        fill="none" stroke="#000" stroke-width="3" rx="10"/>
+  <text x="390" y="30" text-anchor="middle"
+        font-size="16" font-weight="900" fill="#000" letter-spacing="1">
+    SmartFit System
+  </text>
+
+  <!-- ============================================================
+       LEFT ACTORS  — User (top-left), Gym Owner (bottom-left)
+  ============================================================ -->
+
+  <!-- USER -->
+  <circle cx="60" cy="160" r="18" fill="none" stroke="#000" stroke-width="2.5"/>
+  <line x1="60" y1="178" x2="60" y2="224" stroke="#000" stroke-width="2.5"/>
+  <line x1="32" y1="200" x2="88" y2="200" stroke="#000" stroke-width="2.5"/>
+  <line x1="60" y1="224" x2="36" y2="252" stroke="#000" stroke-width="2.5"/>
+  <line x1="60" y1="224" x2="84" y2="252" stroke="#000" stroke-width="2.5"/>
+  <text x="60" y="270" text-anchor="middle" font-size="14" font-weight="800" fill="#000">User</text>
+
+  <!-- GYM OWNER -->
+  <circle cx="60" cy="560" r="18" fill="none" stroke="#000" stroke-width="2.5"/>
+  <line x1="60" y1="578" x2="60" y2="624" stroke="#000" stroke-width="2.5"/>
+  <line x1="32" y1="600" x2="88" y2="600" stroke="#000" stroke-width="2.5"/>
+  <line x1="60" y1="624" x2="36" y2="652" stroke="#000" stroke-width="2.5"/>
+  <line x1="60" y1="624" x2="84" y2="652" stroke="#000" stroke-width="2.5"/>
+  <text x="60" y="670" text-anchor="middle" font-size="14" font-weight="800" fill="#000">Gym Owner</text>
+
+  <!-- ============================================================
+       RIGHT ACTORS — Admin (top-right), External systems (bottom-right)
+  ============================================================ -->
+
+  <!-- ADMIN -->
+  <circle cx="720" cy="160" r="18" fill="none" stroke="#000" stroke-width="2.5"/>
+  <line x1="720" y1="178" x2="720" y2="224" stroke="#000" stroke-width="2.5"/>
+  <line x1="692" y1="200" x2="748" y2="200" stroke="#000" stroke-width="2.5"/>
+  <line x1="720" y1="224" x2="696" y2="252" stroke="#000" stroke-width="2.5"/>
+  <line x1="720" y1="224" x2="744" y2="252" stroke="#000" stroke-width="2.5"/>
+  <text x="720" y="270" text-anchor="middle" font-size="14" font-weight="800" fill="#000">Admin</text>
+
+  <!-- ============================================================
+       EXTERNAL SYSTEMS (outside boundary, bottom)
+  ============================================================ -->
+  <rect x="168" y="868" width="100" height="28" rx="6" fill="none" stroke="#000" stroke-width="2"/>
+  <text x="218" y="887" text-anchor="middle" font-size="11" font-weight="700" fill="#000">Razorpay</text>
+
+  <rect x="512" y="868" width="110" height="28" rx="6" fill="none" stroke="#000" stroke-width="2"/>
+  <text x="567" y="887" text-anchor="middle" font-size="11" font-weight="700" fill="#000">Email Service</text>
+
+  <!-- ============================================================
+       SECTION LABELS
+  ============================================================ -->
+  <text x="390" y="52" text-anchor="middle" font-size="11" fill="#555" font-style="italic" font-weight="600">── Registered User ──</text>
+  <text x="390" y="490" text-anchor="middle" font-size="11" fill="#555" font-style="italic" font-weight="600">── Gym Owner ──</text>
+  <text x="390" y="730" text-anchor="middle" font-size="11" fill="#555" font-style="italic" font-weight="600">── Admin ──</text>
+
+  <!-- ============================================================
+       USE CASES — USER  (rows 1–4)
+  ============================================================ -->
+
+  <!-- Row 1 -->
+  <ellipse cx="270" cy="85" rx="108" ry="22" fill="none" stroke="#000" stroke-width="2"/>
+  <text x="270" y="90" text-anchor="middle" font-size="12" font-weight="700" fill="#000">Sign Up</text>
+
+  <ellipse cx="510" cy="85" rx="108" ry="22" fill="none" stroke="#000" stroke-width="2"/>
+  <text x="510" y="90" text-anchor="middle" font-size="12" font-weight="700" fill="#000">Log In</text>
+
+  <!-- Row 2 -->
+  <ellipse cx="270" cy="150" rx="108" ry="22" fill="none" stroke="#000" stroke-width="2"/>
+  <text x="270" y="155" text-anchor="middle" font-size="12" font-weight="700" fill="#000">Forgot / Reset Password</text>
+
+  <ellipse cx="510" cy="150" rx="108" ry="22" fill="none" stroke="#000" stroke-width="2"/>
+  <text x="510" y="155" text-anchor="middle" font-size="12" font-weight="700" fill="#000">View User Dashboard</text>
+
+  <!-- Row 3 -->
+  <ellipse cx="270" cy="215" rx="108" ry="22" fill="none" stroke="#000" stroke-width="2"/>
+  <text x="270" y="220" text-anchor="middle" font-size="12" font-weight="700" fill="#000">Browse / Search Gyms</text>
+
+  <ellipse cx="510" cy="215" rx="108" ry="22" fill="none" stroke="#000" stroke-width="2"/>
+  <text x="510" y="220" text-anchor="middle" font-size="12" font-weight="700" fill="#000">View Gym Details</text>
+
+  <!-- Row 4 -->
+  <ellipse cx="270" cy="280" rx="108" ry="22" fill="none" stroke="#000" stroke-width="2"/>
+  <text x="270" y="285" text-anchor="middle" font-size="12" font-weight="700" fill="#000">Purchase Membership</text>
+
+  <ellipse cx="510" cy="280" rx="108" ry="22" fill="none" stroke="#000" stroke-width="2"/>
+  <text x="510" y="285" text-anchor="middle" font-size="12" font-weight="700" fill="#000">Buy Supplement</text>
+
+  <!-- Row 5 -->
+  <ellipse cx="270" cy="345" rx="108" ry="22" fill="none" stroke="#000" stroke-width="2"/>
+  <text x="270" y="350" text-anchor="middle" font-size="12" font-weight="700" fill="#000">Book Free Trial</text>
+
+  <ellipse cx="510" cy="345" rx="108" ry="22" fill="none" stroke="#000" stroke-width="2"/>
+  <text x="510" y="350" text-anchor="middle" font-size="12" font-weight="700" fill="#000">Write Review</text>
+
+  <!-- Row 6 — Process Payment (shared, dashed) -->
+  <ellipse cx="390" cy="420" rx="108" ry="22" fill="none" stroke="#000" stroke-width="2" stroke-dasharray="6,3"/>
+  <text x="390" y="425" text-anchor="middle" font-size="12" font-weight="700" fill="#000">Process Payment</text>
+
+  <!-- ============================================================
+       USE CASES — GYM OWNER  (rows 7–9)
+  ============================================================ -->
+
+  <!-- Row 7 -->
+  <ellipse cx="270" cy="520" rx="108" ry="22" fill="none" stroke="#000" stroke-width="2"/>
+  <text x="270" y="525" text-anchor="middle" font-size="12" font-weight="700" fill="#000">Submit Application</text>
+
+  <ellipse cx="510" cy="520" rx="108" ry="22" fill="none" stroke="#000" stroke-width="2"/>
+  <text x="510" y="525" text-anchor="middle" font-size="12" font-weight="700" fill="#000">Pay Onboarding Fee</text>
+
+  <!-- Row 8 -->
+  <ellipse cx="270" cy="585" rx="108" ry="22" fill="none" stroke="#000" stroke-width="2"/>
+  <text x="270" y="590" text-anchor="middle" font-size="12" font-weight="700" fill="#000">Manage Gym Details</text>
+
+  <ellipse cx="510" cy="585" rx="108" ry="22" fill="none" stroke="#000" stroke-width="2"/>
+  <text x="510" y="590" text-anchor="middle" font-size="12" font-weight="700" fill="#000">Manage Trainers</text>
+
+  <!-- Row 9 -->
+  <ellipse cx="270" cy="650" rx="108" ry="22" fill="none" stroke="#000" stroke-width="2"/>
+  <text x="270" y="655" text-anchor="middle" font-size="12" font-weight="700" fill="#000">Manage Memberships</text>
+
+  <ellipse cx="510" cy="650" rx="108" ry="22" fill="none" stroke="#000" stroke-width="2"/>
+  <text x="510" y="655" text-anchor="middle" font-size="12" font-weight="700" fill="#000">Manage Supplements</text>
+
+  <!-- ============================================================
+       USE CASES — ADMIN  (rows 10–11)
+  ============================================================ -->
+
+  <!-- Row 10 -->
+  <ellipse cx="270" cy="760" rx="108" ry="22" fill="none" stroke="#000" stroke-width="2"/>
+  <text x="270" y="765" text-anchor="middle" font-size="12" font-weight="700" fill="#000">View Admin Dashboard</text>
+
+  <ellipse cx="510" cy="760" rx="108" ry="22" fill="none" stroke="#000" stroke-width="2"/>
+  <text x="510" y="765" text-anchor="middle" font-size="12" font-weight="700" fill="#000">Approve / Reject Gym</text>
+
+  <!-- Row 11 -->
+  <ellipse cx="270" cy="820" rx="108" ry="22" fill="none" stroke="#000" stroke-width="2"/>
+  <text x="270" y="825" text-anchor="middle" font-size="12" font-weight="700" fill="#000">Manage All Users</text>
+
+  <ellipse cx="510" cy="820" rx="108" ry="22" fill="none" stroke="#000" stroke-width="2"/>
+  <text x="510" y="825" text-anchor="middle" font-size="12" font-weight="700" fill="#000">View All Payments</text>
+
+  <!-- ============================================================
+       ASSOCIATION LINES — USER (left)
+  ============================================================ -->
+  <line x1="78" y1="152" x2="162" y2="85"  stroke="#000" stroke-width="2"/>
+  <line x1="78" y1="158" x2="162" y2="150" stroke="#000" stroke-width="2"/>
+  <line x1="78" y1="164" x2="162" y2="215" stroke="#000" stroke-width="2"/>
+  <line x1="78" y1="170" x2="162" y2="280" stroke="#000" stroke-width="2"/>
+  <line x1="78" y1="176" x2="162" y2="345" stroke="#000" stroke-width="2"/>
+
+  <!-- USER → right UCs -->
+  <line x1="78" y1="154" x2="402" y2="85"  stroke="#000" stroke-width="2"/>
+  <line x1="78" y1="160" x2="402" y2="150" stroke="#000" stroke-width="2"/>
+  <line x1="78" y1="166" x2="402" y2="215" stroke="#000" stroke-width="2"/>
+  <line x1="78" y1="172" x2="402" y2="280" stroke="#000" stroke-width="2"/>
+  <line x1="78" y1="178" x2="402" y2="345" stroke="#000" stroke-width="2"/>
+
+  <!-- ============================================================
+       ASSOCIATION LINES — GYM OWNER (left)
+  ============================================================ -->
+  <line x1="78" y1="552" x2="162" y2="520" stroke="#000" stroke-width="2"/>
+  <line x1="78" y1="558" x2="162" y2="585" stroke="#000" stroke-width="2"/>
+  <line x1="78" y1="564" x2="162" y2="650" stroke="#000" stroke-width="2"/>
+
+  <line x1="78" y1="554" x2="402" y2="520" stroke="#000" stroke-width="2"/>
+  <line x1="78" y1="560" x2="402" y2="585" stroke="#000" stroke-width="2"/>
+  <line x1="78" y1="566" x2="402" y2="650" stroke="#000" stroke-width="2"/>
+
+  <!-- ============================================================
+       ASSOCIATION LINES — ADMIN (right)
+  ============================================================ -->
+  <line x1="702" y1="152" x2="618" y2="760" stroke="#000" stroke-width="2"/>
+  <line x1="702" y1="158" x2="618" y2="820" stroke="#000" stroke-width="2"/>
+
+  <line x1="702" y1="154" x2="378" y2="760" stroke="#000" stroke-width="2"/>
+  <line x1="702" y1="160" x2="378" y2="820" stroke="#000" stroke-width="2"/>
+
+  <!-- ============================================================
+       «include» RELATIONSHIPS
+  ============================================================ -->
+
+  <!-- Purchase Membership → Process Payment -->
+  <line x1="310" y1="302" x2="350" y2="398" stroke="#000" stroke-width="1.8" stroke-dasharray="6,3" marker-end="url(#open)"/>
+  <text x="280" y="358" font-size="10" fill="#000" font-style="italic">«include»</text>
+
+  <!-- Buy Supplement → Process Payment -->
+  <line x1="510" y1="302" x2="450" y2="398" stroke="#000" stroke-width="1.8" stroke-dasharray="6,3" marker-end="url(#open)"/>
+  <text x="510" y="358" font-size="10" fill="#000" font-style="italic">«include»</text>
+
+  <!-- Pay Onboarding Fee → Process Payment -->
+  <line x1="510" y1="498" x2="450" y2="442" stroke="#000" stroke-width="1.8" stroke-dasharray="6,3" marker-end="url(#open)"/>
+  <text x="516" y="474" font-size="10" fill="#000" font-style="italic">«include»</text>
+
+  <!-- Forgot/Reset Password → Email Service -->
+  <line x1="378" y1="172" x2="567" y2="868" stroke="#000" stroke-width="1.8" stroke-dasharray="5,3" marker-end="url(#open)"/>
+  <text x="510" y="560" font-size="10" fill="#333" font-style="italic">«uses»</text>
+
+  <!-- Process Payment → Razorpay -->
+  <line x1="300" y1="442" x2="218" y2="868" stroke="#000" stroke-width="1.8" stroke-dasharray="5,3" marker-end="url(#open)"/>
+  <text x="218" y="680" font-size="10" fill="#333" font-style="italic">«uses»</text>
+
+  <!-- ============================================================
+       LEGEND
+  ============================================================ -->
+  <rect x="155" y="854" width="470" height="20" rx="5" fill="#f0f0f0" stroke="#999" stroke-width="1"/>
+
+  <line x1="170" y1="864" x2="200" y2="864" stroke="#000" stroke-width="2"/>
+  <text x="204" y="868" font-size="10" fill="#000">Association</text>
+
+  <line x1="278" y1="864" x2="308" y2="864" stroke="#000" stroke-width="2" stroke-dasharray="5,3"/>
+  <text x="312" y="868" font-size="10" fill="#000">«include» / «uses»</text>
+
+  <ellipse cx="435" cy="864" rx="26" ry="9" fill="none" stroke="#000" stroke-width="1.5"/>
+  <text x="435" y="868" text-anchor="middle" font-size="9" fill="#000">Use Case</text>
+
+  <circle cx="512" cy="864" r="7" fill="none" stroke="#000" stroke-width="1.5"/>
+  <line x1="512" y1="871" x2="512" y2="877" stroke="#000" stroke-width="1.5"/>
+  <line x1="505" y1="874" x2="519" y2="874" stroke="#000" stroke-width="1.5"/>
+  <text x="524" y="868" font-size="10" fill="#000">Actor</text>
+
+  <rect x="572" y="857" width="50" height="14" rx="3" fill="none" stroke="#000" stroke-width="1.5"/>
+  <text x="597" y="868" text-anchor="middle" font-size="9" fill="#000">External</text>
+
+</svg>
+
 </body>
 </html>
