@@ -122,10 +122,12 @@ const UserDashboard = () => {
     const fetchMembership = async () => {
 
       const email = localStorage.getItem("userEmail")
+      if (!email) return;
 
-      const res = await fetch(`${import.meta.env.VITE_API_URL}/user-memberships/${email}`)
-
-      const data = await res.json()
+      try {
+        const res = await fetch(`${import.meta.env.VITE_API_URL}/user-memberships/${email}`)
+        if (!res.ok) return;
+        const data = await res.json()
 
       if (data.length > 0) {
         const firstMembership = data[0];
@@ -167,6 +169,10 @@ const UserDashboard = () => {
 
       }
 
+      } catch (err) {
+        console.log("Membership fetch error", err);
+      }
+
     }
 
     fetchMembership()
@@ -178,14 +184,18 @@ const UserDashboard = () => {
     const fetchWorkouts = async () => {
 
       const email = localStorage.getItem("userEmail")
+      if (!email) return;
 
-      const res = await fetch(
-        `${import.meta.env.VITE_API_URL}/user-workouts/${email}`
-      )
-
-      const data = await res.json()
-
-      setWorkouts(data)
+      try {
+        const res = await fetch(
+          `${import.meta.env.VITE_API_URL}/user-workouts/${email}`
+        )
+        if (!res.ok) return;
+        const data = await res.json()
+        if (Array.isArray(data)) setWorkouts(data)
+      } catch (err) {
+        console.log("Workout fetch error", err)
+      }
 
     }
 
