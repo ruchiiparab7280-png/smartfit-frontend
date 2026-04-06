@@ -317,7 +317,18 @@ const UserDashboard = () => {
         )
 
       case "gyms":
-        return <GymListing />
+        return (
+          <div className="bg-card p-10 rounded-lg text-center">
+            <h2 className="text-xl font-semibold mb-2">Find a Gym</h2>
+            <p className="text-muted-foreground mb-4">Browse gyms near you.</p>
+            <button
+              onClick={() => navigate("/gym-listing")}
+              className="bg-orange-500 text-white px-5 py-2 rounded"
+            >
+              Explore Gyms
+            </button>
+          </div>
+        )
 
       case "trial":
         return <FreeTrialRequests />
