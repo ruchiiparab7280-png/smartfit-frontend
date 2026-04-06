@@ -137,17 +137,23 @@ const WorkoutPlanCard = ({ workouts, setWorkouts }) => {
 
   };
 
-  const deleteExercise = (dayId, exerciseId) => {
+  const deleteExercise = async (dayId, exerciseId) => {
     setWorkouts(prev =>
       prev.map(day => {
         if (day.id === dayId) {
           const updatedExercises = day.exercises.filter(e => e.id !== exerciseId);
-          syncWorkout(dayId, updatedExercises);
           return { ...day, exercises: updatedExercises };
         }
         return day;
       })
     );
+    try {
+      await fetch(`${import.meta.env.VITE_API_URL}/delete-exercise/${exerciseId}`, {
+        method: "DELETE"
+      });
+    } catch(err) {
+      console.log("Delete error", err);
+    }
   };
 
   const startEdit = (dayId, exercise) => {
