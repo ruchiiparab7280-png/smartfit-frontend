@@ -18,6 +18,8 @@ const WorkoutPlanCard = ({ workouts, setWorkouts }) => {
 
   const [editing, setEditing] = useState(null);
 
+  const [saveError, setSaveError] = useState("");
+
   const toggleDay = (id) => {
     setExpandedDay(expandedDay === id ? null : id);
   };
@@ -82,6 +84,7 @@ const WorkoutPlanCard = ({ workouts, setWorkouts }) => {
 
     if (!day || exerciseList.length === 0) return;
 
+    setSaveError("");
     const user_email = localStorage.getItem("userEmail")
 
     try {
@@ -99,12 +102,19 @@ const WorkoutPlanCard = ({ workouts, setWorkouts }) => {
         })
       })
 
-      const data = await res.json()
+      if (!res.ok) {
+        const errData = await res.json().catch(() => ({}));
+        setSaveError(errData.message || "Failed to save workout. Please try again.");
+        return;
+      }
 
+      const data = await res.json()
       console.log(data)
 
     } catch (err) {
       console.log("Workout save error", err)
+      setSaveError("Network error. Please check your connection and try again.");
+      return;
     }
 
     setExerciseList([]);
@@ -116,6 +126,7 @@ const WorkoutPlanCard = ({ workouts, setWorkouts }) => {
       try {
         const email = localStorage.getItem("userEmail");
         const res = await fetch(`${import.meta.env.VITE_API_URL}/user-workouts/${email}`);
+        if (!res.ok) return;
         const data = await res.json();
         setWorkouts(data);
       } catch (e) {
@@ -267,6 +278,10 @@ const WorkoutPlanCard = ({ workouts, setWorkouts }) => {
           <Button onClick={saveWorkout}>
             Save Workout
           </Button>
+
+          {saveError && (
+            <p className="text-red-500 text-sm mt-2">{saveError}</p>
+          )}
 
         </div>
 
